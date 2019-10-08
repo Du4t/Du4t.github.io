@@ -1,0 +1,531 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    
+    
+    <title>使用Hexo配合Github搭建自己的博客 | Du4t的博客 | Du4t~~~~</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="keywords" content="Others">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
+    
+    <script type="text/javascript">
+        // Data Center
+        var DC = {
+            reward:	false,
+            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
+            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
+            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
+            d: JSON.parse('{"app_id":null}')
+        };
+    </script>
+    <script type="text/javascript">
+        window.lazyScripts=[];
+    </script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class>
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      
+      <img src="/img/brand.jpg" class="brand-bg">
+      
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/100.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Du4t</h5>
+          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>9</span>
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>5</span>
+            
+              <span>@</span>
+            
+              <span>q</span>
+            
+              <span>q</span>
+            
+              <span>.</span>
+            
+              <span>c</span>
+            
+              <span>o</span>
+            
+              <span>m</span>
+            
+          </a>
+        </hgroup>
+        
+        <ul class="menu-link">
+          
+              <li>
+                <a href="https://github.com/Du4t" target="_blank">
+                  <i class="icon icon-lg icon-github"></i>
+                </a>
+              </li>
+            
+        </ul>
+        
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class>
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                HOME
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                CATEGORIES
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                TAGS
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                ARCHIVES
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row clearfix">
+        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">
+            <span>使用Hexo配合Github搭建自己的博客</span>
+            
+        </div>
+        
+        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
+            <i class="icon icon-lg icon-search"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+    <img src="/img/banner.jpg" class="header-bg">
+    <div class="container fade-scale">
+        <h1 class="title">使用Hexo配合Github搭建自己的博客</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-10-08T06:43:25.000Z" itemprop="datePublished" class="page-time">
+  2019-10-08
+</time>
+
+
+            
+        </h5>
+        
+    </div>
+    
+
+</header>
+
+<div id="site_search">
+    <div class="search-title clearfix">
+        <span class="pull-left">
+          <i class="icon icon-lg icon-search"></i>
+        </span>
+        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
+        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
+          <i class="icon icon-lg icon-close"></i>
+        </a>
+    </div>
+    <div id="local-search-result"></div>
+</div>
+
+
+<div class="container body-wrap">
+    <article id="post-使用Hexo配合Github搭建自己的博客" class="post-article article-type-post" itemprop="blogPost">
+    <div class="post-card">
+        <h1 class="post-card-title">使用Hexo配合Github搭建自己的博客</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-10-08 14:43:25" datetime="2019-10-08T06:43:25.000Z" itemprop="datePublished">2019-10-08</time>
+
+            
+
+
+            
+
+            
+
+
+            
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            
+            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="下载工具"><a href="#下载工具" class="headerlink" title="下载工具"></a>下载工具</h2><p><strong>1.安装Git Bash</strong></p>
+<p><a href="https://gitforwindows.org/" target="_blank" rel="noopener">下载地址</a></p>
+<p>安装流程: 无脑下一步即可<br>安装好后 在任意处右键打开Git Bash 输入</p>
+<blockquote>
+<p>git version</p>
+</blockquote>
+<p>来查看当前的Git Bash版本 如果客户端正常显示版本即为安装成功</p>
+<p><strong>2.安装Node JS</strong></p>
+<p>由于Hexo是基于Node JS环境的静态博客 所以一般来说还是装一下吧…<br><a href="https://nodejs.org/en/" target="_blank" rel="noopener">下载地址</a></p>
+<p>安装流程:下载好之后双击安装 注意勾选 <kbd>Add to Path</kbd> 这样做的好处就是不用自己去配置环境变量了 然后继续下一步即可</p>
+<p><strong>3.安装Hexo</strong></p>
+<p>这就是我们博客的关键了 不用紧张 我们不需要去费尽心思的找安装包 直接创建一个文件夹(以后存放博客的地方) 然后进入文件夹 右键<kbd>Git Bash here</kbd> 然后输入安装命令 <kbd>npm i -g hexo</kbd>静等安装完毕即可 </p>
+<p>在安装完Hexo后就是初始化了 输入初始化命令<br><kbm>hexo init</kbm> 然后等待完成即可</p>
+<h2 id="连接Github"><a href="#连接Github" class="headerlink" title="连接Github"></a>连接Github</h2><p>没有账号的创建账号 这就不说了..有了账号的 新建仓库 仓库名称<strong>必须</strong>为 <strong>自己的用户名.github.io</strong></p>
+<p>在创建完成后 返回到gitbash中 来配置自己的github账户信息</p>
+<p>在Git Bash中输入 </p>
+<p><kbm>git config –global user.name “自己的github用户名”</kbm></p>
+<p><kbm>git config –global user.email “自己注册github的邮箱”</kbm></p>
+<p>接下来就是创建SSH keys将gitbash和github连接起来 在bash中输入 </p>
+<p><kbm>ssh-keygen -t rsa -C “自己的邮箱”</kbm></p>
+<p>然后使用git命令 来复制ssh key</p>
+<p><kbm>paste < ~/.ssh/id_rsa.pub</kbm></p>
+<p>接着打开github的账户设置 选择<em>SSH and GPG keys</em> 然后<em>New SSH key</em> 标题随便填 把复制好的ssh粘进去就完事了 确定粘完之后回到bash 测试是否成功</p>
+<p><kbm>ssh -T <a href="mailto:git@github.com" target="_blank" rel="noopener">git@github.com</a> </kbm></p>
+<p>如果提示 <kbm>Are you sure you want to continue connecting (yes/no)?</kbm> 输入yes 然后就会看到</p>
+<blockquote>
+<p>Hi ***! You’ve successfully authenticated, but GitHub does not provide shell access.</p>
+</blockquote>
+<p>这个时候SSH已经配置成功了 </p>
+<h2 id="配置博客"><a href="#配置博客" class="headerlink" title="配置博客"></a>配置博客</h2><p>这个时候博客的雏形已经搭建出来了 就是有点丑..我们先去github上 随便找个自己喜欢的主题<br>然后放到<strong>博客根目录下的themes</strong>里即可</p>
+<p>然后打开 <strong>_config.yml</strong> 来具体配置博客的信息 如图所示修改属于自己的信息 将Du4t改成自己的github用户名即可</p>
+<figure class="image-box">
+                <a rel="使用Hexo配合Github搭建自己的博客" href="https://i.loli.net/2019/10/08/zuGNOlStARIfHdw.png" title="配置1" data-fancybox="images"><img src="https://i.loli.net/2019/10/08/zuGNOlStARIfHdw.png" alt="1.png" title="配置1" class></a>
+                <p>配置1</p>
+            </figure>
+<figure class="image-box">
+                <a rel="使用Hexo配合Github搭建自己的博客" href="https://i.loli.net/2019/10/08/9vPSRmlU61AyGIk.png" title="配置2" data-fancybox="images"><img src="https://i.loli.net/2019/10/08/9vPSRmlU61AyGIk.png" alt="2.png" title="配置2" class></a>
+                <p>配置2</p>
+            </figure>
+
+<h2 id="书写自己的博客"><a href="#书写自己的博客" class="headerlink" title="书写自己的博客"></a>书写自己的博客</h2><p>在bash中输入<kbm>hexo new 文章名</kbm> 然后就可以去_post文件夹中找到自己的博客了 使用MarkDown语法书写自己的博文即可</p>
+<h2 id="上传github"><a href="#上传github" class="headerlink" title="上传github"></a>上传github</h2><p>还是先安装一波 <kbm>npm install hexo-deployer-git –save</kbm> 安装完成后我们就可以通过bash直接将自己的博客部署到github上让别人看到了 </p>
+<p><em>建议每次都按照以下步骤部署自己的博客！</em></p>
+<p><kbm>hexo clean</kbm></p>
+<p><kbm>hexo g</kbm></p>
+<p><kbm>hexo d</kbm></p>
+<p>等待部署完毕 去 <em>自己的用户名.github.io</em> 就可以看到自己的博客了</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+        </div>
+        
+<blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-08T10:35:44.978Z" itemprop="dateUpdated">2019-10-08 18:35:44</time>
+</span><br>
+
+
+        
+        转载注明出处，原文地址：<a href="/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/" target="_blank" rel="external">http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/</a>
+        
+    </div>
+    <footer>
+        <a href="http://Du4t.github.io">
+            <img src="/img/100.jpg" alt="Du4t">
+            Du4t
+        </a>
+    </footer>
+</blockquote>
+
+        
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Others/">Others</a></li></ul>
+
+            <div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/&title=《使用Hexo配合Github搭建自己的博客》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/&title=《使用Hexo配合Github搭建自己的博客》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+        </div>
+        
+            
+
+
+        
+    </div>
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="prev">
+      <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">No title</h4>
+      </a>
+    </div>
+  
+
+  
+</nav>
+
+
+    
+    
+        <aside class="post-widget">
+            <nav class="post-toc-wrap" id="post-toc">
+                <strong>目录</strong>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#下载工具"><span class="post-toc-number">1.</span> <span class="post-toc-text">下载工具</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#连接Github"><span class="post-toc-number">2.</span> <span class="post-toc-text">连接Github</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#配置博客"><span class="post-toc-number">3.</span> <span class="post-toc-text">配置博客</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#书写自己的博客"><span class="post-toc-number">4.</span> <span class="post-toc-text">书写自己的博客</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#上传github"><span class="post-toc-number">5.</span> <span class="post-toc-text">上传github</span></a></li></ol>
+            </nav>
+            <div class="toc-bar"><div>
+        </div></div></aside>
+    
+</article>
+
+
+</div>
+
+    </main>
+    <footer class="footer ">
+    
+    <div class="bottom">
+        <p>
+            <span>
+                Du4t © 2019
+            </span>
+        		
+           	
+            
+            
+            <span>
+	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
+            </span>
+            
+            
+            
+
+            
+                
+<span class="site-uv" title="总访客量">
+    <i class="icon icon-user"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
+</span>
+
+
+<span class="site-pv" title="总访问量">
+    <i class="icon icon-eye"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
+</span>
+
+            
+        </p>
+    </div>
+</footer>
+
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/&title=《使用Hexo配合Github搭建自己的博客》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/&title=《使用Hexo配合Github搭建自己的博客》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsUlEQVR42u3aQW4bMRAEQP3/0w4Q5JActOnmcBQjqD0Ja4li0cBy1MPXK76+fl75X9+9/+u369395+u1ceHh4eEdTf15uHzo/FMJ4Hk+0RLg4eHhrfHaibbTOtsq2oXDw8PD+268d1+QTy5ZDjw8PLz/iXcrPkgWq11QPDw8vM/zkjDi7J23Suf1rAUPDw9voYv0fV4v9vfw8PDwBl31tiU22VTyeKIYDQ8PD2+B91zsJs/b5H6+BO2Bg2jDwMPDw1vjtbXo2UGBJIS93DzDw8PDW+Alj/WzYvpu66sdGQ8PD2+blzzi5xtA2xK70NzCw8PDu8qbBLXzKeYLdzgTPDw8vGXeJIzIQ4HkziRE/uM1Hh4e3hpv0r5qS/CksD4bJzophoeHhzfmtUemzr6+DWfPjhTg4eHh/Sve2cmllp1P96xVhoeHh7fHSx7B7SGnNoDIS/N2E8LDw8Pb4z3Hss8P8XyE/JDW2YIWDTA8PDy8Ma+dyiTMPSup20YdHh4e3h6vLWrzJlkbLhTTLY924eHh4W3wko0hf09ecM/D3OIABB4eHt5V3t0GVXLnVsOs+L/h4eHhLfCSOKAYNC6a29Ch3lrw8PDwPsLLN4nkIZ6HsHkhnoyAh4eHt8d7/sGfR6t59HAGG80BDw8Pb4F3K0g9e3BPjmHVGDw8PLwxL48A8om240/CiL8sNB4eHt4ab9ISS2LZtkzPd7MihsDDw8Mb877KK2+M5SV13gzLI4xfr/Hw8PAWeGdhRLTbtA2qmN1uZnh4eHgbvGQz+GTocHZQ4O1n8fDw8NZ4+Y/8yUTz9v+1Fh0eHh7eN+PlZfekoZUHE5c3Bjw8PLwxrwXnrbKzaLgII/Dw8PAWeHmzvy242zZVW76/2r0FDw8Pb8ybNMDawwG32mZ1mIuHh4d3h/cDt1m7YEwxgfMAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+    
+    <!-- main-js -->
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
+
+<!-- third-party -->
+
+
+
+
+
+
+<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
+<script type="text/javascript">
+	var search_path = "search.xml";
+	if (search_path.length === 0) {
+		search_path = "search.xml";
+	}
+	var path = "/" + search_path;
+	searchFunc(path, "local-search-input", "local-search-result");
+</script>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+    
+    
+
+
+
+
+
+    <!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+            processEscapes: true,
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+    <script>
+    (function() {
+        var OriginTitile = document.title, titleTime;
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                document.title = '死鬼去哪里了！';
+                clearTimeout(titleTime);
+            } else {
+                document.title = '(つェ⊂)咦!又好了!';
+                titleTime = setTimeout(function() {
+                    document.title = OriginTitile;
+                },2000);
+            }
+        });
+    })();
+</script>
+
+
+
+
+
+    
+
+
+<script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>
