@@ -227,7 +227,8 @@
     <div class="post-content" id="post-content" itemprop="postContent">
     
     
-        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><blockquote>
+        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
+<blockquote>
 <p>近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果</p>
 </blockquote>
 <h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护</p>
@@ -455,7 +456,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script>
     
     <a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" class="post-more waves-effect waves-button">
         more
@@ -517,7 +518,8 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <div class="post-content" id="post-content" itemprop="postContent">
     
     
-        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>对于正常且安全的使用==printf函数==是这样操作的</p>
+        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
+<h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>对于正常且安全的使用==printf函数==是这样操作的</p>
 <pre><code>#include <stdio.h>
 
 int main(void)
@@ -744,7 +746,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
             });
             document.body.appendChild(img);
           });
-      </script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script>
     
     <a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" class="post-more waves-effect waves-button">
         more
@@ -806,7 +808,9 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
     <div class="post-content" id="post-content" itemprop="postContent">
     
     
-        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="Base64"><a href="#Base64" class="headerlink" title="Base64"></a>Base64</h2><pre><code>对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的
+        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
+
+<h2 id="Base64"><a href="#Base64" class="headerlink" title="Base64"></a>Base64</h2><pre><code>对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的
 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到</code></pre><p>Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节==</p>
 <p>在重新分配完6个字节后 会在==6位字节前部补0== 将字节补成八位 也就是说 此时字节最大值为 <em>00111111=63</em><br>此时 Base64算法会将此时的字节所代表的的十进制数作为下标来索引表中进行替换 索引表如下<br>| 编号 | 字符 | 编号 | 字符 | 编号 | 字符 | 编号 | 字符 |<br>|—-|—-|—-|—-|—-|—-|—-|—-|<br>| 0  | A  | 16 | Q  | 32 | g  | 48 | w  |<br>| 1  | B  | 17 | R  | 33 | h  | 49 | x  |<br>| 2  | C  | 18 | S  | 34 | i  | 50 | y  |<br>| 3  | D  | 19 | T  | 35 | j  | 51 | z  |<br>| 4  | E  | 20 | U  | 36 | k  | 52 | 0  |<br>| 5  | F  | 21 | V  | 37 | l  | 53 | 1  |<br>| 6  | G  | 22 | W  | 38 | m  | 54 | 2  |<br>| 7  | H  | 23 | X  | 39 | n  | 55 | 3  |<br>| 8  | I  | 24 | Y  | 40 | o  | 56 | 4  |<br>| 9  | J  | 25 | Z  | 41 | p  | 57 | 5  |<br>| 10 | K  | 26 | a  | 42 | q  | 58 | 6  |<br>| 11 | L  | 27 | b  | 43 | r  | 59 | 7  |<br>| 12 | M  | 28 | c  | 44 | s  | 60 | 8  |<br>| 13 | N  | 29 | d  | 45 | t  | 61 | 9  |<br>| 14 | O  | 30 | e  | 46 | u  | 62 |+  |<br>| 15 | P  | 31 | f  | 47 | v  | 63 |/|</p>
 <figure class="image-box">
@@ -992,7 +996,7 @@ End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as l
             });
             document.body.appendChild(img);
           });
-      </script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script>
     
     <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" class="post-more waves-effect waves-button">
         more
@@ -1119,7 +1123,7 @@ End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as l
             });
             document.body.appendChild(img);
           });
-      </script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script>
     
     <a href="/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/" class="post-more waves-effect waves-button">
         more
@@ -1303,6 +1307,6 @@ End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as l
 
 
     
-
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script>
 
 <script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>
