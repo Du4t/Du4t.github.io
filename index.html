@@ -232,19 +232,19 @@
 </blockquote>
 <h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 
 <blockquote>
 <p>这里先讲一下什么是Canary保护<br>Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调用函数的时候 会在栈中压入一个随机Canary值 在函数结束的时候程序会判断Canary值是否发生变动 如果发生变动就认为是程序遭到了攻击 程序直接异常退出 Canary值通常和函数返回地址在栈中相连 主要是防护攻击者更改程序返回地址来执行shellcode<br>这里我们直接拿本题做例子</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>可以明确看到程序现在在存储Canary值 我们在数据下硬件读写断点 然后让程序跑起来
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185721986.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185721986.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt title class></a>
+                <p></p>
             </figure>这里在函数末尾取出Canary值 如果与刚开始的值不一致 执行stack_chk_fail函数 
 <p>对于如何绕过Canary保护 基本思路是利用各种漏洞 先泄漏出来Canary的地址 然后取出值 等溢出过后再还原 当然具体如何利用还得就题论题</p>
 </blockquote>
@@ -253,23 +253,23 @@
 </blockquote>
 <p>回到本题 先随便执行下 就是输入用户名和留言 然后程序原样打印出来</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190438694.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190438694.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt title class></a>
+                <p></p>
             </figure>
 <p>没什么世纪大发现 那就常规操作 载入IDA吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>发现程序存在格式化字符串漏洞 然后理解下程序逻辑 简单来说就是将pwnme变量的值更改为8就能拿到flag了 双击pwnme看一下 发现pwnme变量还是一个在bss段的全局变量 那基本思路已经有了</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190855410.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190855410.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt title class></a>
+                <p></p>
             </figure>
 <p>解法基本就是通过格式化字符串漏洞更改pwnme的值了 那第一步就是测试程序的回显位了 这里我的回显位是在第十位</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191119916.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191119916.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt title class></a>
+                <p></p>
             </figure>
 <p>那基本信息获取的差不多了 就可以开始编写脚本了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -284,31 +284,31 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>执行脚本即可</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>得到flag:cyberpeace{bb8c9af83fb8e8913ed25c1d5cc41751}</p>
 <h2 id="when-did-you-born"><a href="#when-did-you-born" class="headerlink" title="when_did_you_born"></a>when_did_you_born</h2><p>照例 日常开局…</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>跑一下 没啥思路 直接载入IDA吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>简单理解下 就是程序要求变量v5的值最后为1926 而程序开始的输入不允许输入1926…初看是自相矛盾的..话说哪道Pwn题给的初始条件不是自相矛盾的… 在代码中发现gets函数..因为gets函数不会限制输入的字符个数 初步怀疑是栈溢出 双击v4查看程序栈图</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>没跑了 栈溢出 直接开始写脚本吧</p>
 <blockquote>
 <p>这里解释下为什么程序开启了Canary保护依然可以使用栈溢出漏洞 这是因为Canary保护主要是防护函数的返回地址不被篡改的 从这里程序的栈图就能看出 Canary值的变量名就是var_8 如果我们切换到汇编窗口 就能看到最后的校验使用的就是这个var_8变量</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 </blockquote>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -323,8 +323,8 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>执行即可 </p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928205109233.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928205109233.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt title class></a>
+                <p></p>
             </figure>
 <p>得到flag:cyberpeace{5f65371d87fafa327d2c0d3e254cfab5}</p>
 <h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>正常起手式 查保护</p>
@@ -500,7 +500,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     
     
     <div class="post-meta">
-        <time class="post-time" title="2019-10-08 20:17:25" datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished">2019-10-08</time>
+        <time class="post-time" title="2019-10-08 20:16:25" datetime="2019-10-08T12:16:25.000Z" itemprop="datePublished">2019-10-08</time>
 
         
 
@@ -539,8 +539,8 @@ int main(void)
 </blockquote>
 <p>但是由于函数调用的关系 实参和形参结合的顺序是从左向右结合的 所以函数这样写也是可以正常输出的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>以上代码 本身没有什么问题 但是如果用户可以控制输入的话 就会造成一些意想不到的结果
 
 <pre><code>#include <stdio.h>
@@ -551,13 +551,13 @@ int main(void)
     printf(a);
     return 0;
  } </stdio.h></code></pre><figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>我们可以通过测试发现 程序输出了一些奇怪的输出 我们载入x32dbg查看下 程序到底输出的是什么<br>通过观察栈中 我们发现 其实程序输出的就是栈中的数据</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923195130178.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923195130178.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt title class></a>
+                <p></p>
             </figure>
 <p>造成这种结果的原因是 因为我们输入的%x 在我们用不安全的方式调用printf函数的时候 没有明确表示出哪里的参数是空缺的 这就会造成系统自动从左往右进行匹配 我们输入的%x 又正好是在 “格式化字符串” 这个参数内 系统就会将他当成默认的%x来进行输出</p>
 <blockquote>
@@ -585,21 +585,21 @@ int main(int argc,char **argv)
     return 0;
 }</string.h></stdio.h></code></pre><p>在这里我们是直接将flag数组的地址直接输出出来 相当于泄露了关键字符串的地址吧…<br>因为==所有的局部变量都是存放在栈中的== 首先第一步就是需要遍历栈中数据找到输入的数据 以达到后面控制输入变量的目的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923212726366.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923212726366.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt title class></a>
+                <p></p>
             </figure>这里发现栈中数据的第九位正好就是我们输入的数据 为了方便查看 也可以使用以下方式来查看第n位的回显
 
 <blockquote>
 <p>%< Number >$ formot string<br>注意此方法仅适用于Linux系统 且在命令行中使用需要转义$</p>
 </blockquote>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923213014599.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923213014599.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt title class></a>
+                <p></p>
             </figure>
 <p>在这里就可以控制输入的参数 将输入改为flag字符串的地址 同时根据上面所提过的 将%08x更改为%s直接读取到flag字符串具体的值</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092321331572.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092321331572.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt title class></a>
+                <p></p>
             </figure>
 <p>根据以上操作 如果条件允许的话 就可以做到任意内存读取</p>
 <h2 id="内存修改"><a href="#内存修改" class="headerlink" title="内存修改"></a>内存修改</h2><blockquote>
@@ -620,35 +620,35 @@ int main(int argc,char **argv)
     return 0;
 }</string.h></stdio.h></code></pre><p>首先运行一次程序 可以得知静态变量b的地址 然后尝试查看回显位 这里我的回显位是第十位</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924181656618.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924181656618.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt title class></a>
+                <p></p>
             </figure>尝试在运行程序时 使用printf写入地址
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418190293.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418190293.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt title class></a>
+                <p></p>
             </figure>
 <p>此时就可以使用之前介绍过的 格式说明符%n了 %n将他自身前字符的个数 赋值给地址为0x5655700c的静态变量b 以达到修改内存中值的目的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418215847.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418215847.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt title class></a>
+                <p></p>
             </figure>
 <p>同样的 如果我们想将b的值修改的更大 只需要在 ‘%10$n’ 前增加对应数量的0即可 </p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924182308483.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924182308483.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt title class></a>
+                <p></p>
             </figure>
 <h2 id="格式化字符串的应用"><a href="#格式化字符串的应用" class="headerlink" title="格式化字符串的应用"></a>格式化字符串的应用</h2><blockquote>
 <p>这里使用攻防世界 PWN模块的 CGfsb 作为例题</p>
 </blockquote>
 <p>首先载入IDA 通过阅读源码 发现关键判断 只要pwnme变量等于8 就能输出flag 同时发现程序崔仔格式化字符串漏洞 这里的条件和上面模块的条件类似</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>双击pwnme变量 查看pwnme的具体地址 在得知了具体地址后 我们就可以开始写脚本了</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184625528.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184625528.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt title class></a>
+                <p></p>
             </figure>
 
 <blockquote>
@@ -722,8 +722,8 @@ sh.send(pwnme+"0000%10$n")
 #程序持续运行
 sh.interactive()</code></pre><p>运行脚本 得到flag</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 
 <script>
@@ -754,7 +754,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
 
 <div class="post-footer">
     
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RE/">RE</a></li></ul>
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
 
 </div>
 
@@ -776,7 +776,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
 
   
     <h3 class="post-title ab-title" itemprop="name">
-      <a class="post-title-link" href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/">No title</a>
+      <a class="post-title-link" href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/">逆向常见的算法</a>
     </h3>
   
 
@@ -789,7 +789,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
     
     
     <div class="post-meta">
-        <time class="post-time" title="2019-10-08 19:12:43" datetime="2019-10-08T11:12:43.100Z" itemprop="datePublished">2019-10-08</time>
+        <time class="post-time" title="2019-10-08 20:15:25" datetime="2019-10-08T12:15:25.000Z" itemprop="datePublished">2019-10-08</time>
 
         
 
@@ -810,8 +810,8 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到</code></pre><p>Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节==</p>
 <p>在重新分配完6个字节后 会在==6位字节前部补0== 将字节补成八位 也就是说 此时字节最大值为 <em>00111111=63</em><br>此时 Base64算法会将此时的字节所代表的的十进制数作为下标来索引表中进行替换 索引表如下<br>| 编号 | 字符 | 编号 | 字符 | 编号 | 字符 | 编号 | 字符 |<br>|—-|—-|—-|—-|—-|—-|—-|—-|<br>| 0  | A  | 16 | Q  | 32 | g  | 48 | w  |<br>| 1  | B  | 17 | R  | 33 | h  | 49 | x  |<br>| 2  | C  | 18 | S  | 34 | i  | 50 | y  |<br>| 3  | D  | 19 | T  | 35 | j  | 51 | z  |<br>| 4  | E  | 20 | U  | 36 | k  | 52 | 0  |<br>| 5  | F  | 21 | V  | 37 | l  | 53 | 1  |<br>| 6  | G  | 22 | W  | 38 | m  | 54 | 2  |<br>| 7  | H  | 23 | X  | 39 | n  | 55 | 3  |<br>| 8  | I  | 24 | Y  | 40 | o  | 56 | 4  |<br>| 9  | J  | 25 | Z  | 41 | p  | 57 | 5  |<br>| 10 | K  | 26 | a  | 42 | q  | 58 | 6  |<br>| 11 | L  | 27 | b  | 43 | r  | 59 | 7  |<br>| 12 | M  | 28 | c  | 44 | s  | 60 | 8  |<br>| 13 | N  | 29 | d  | 45 | t  | 61 | 9  |<br>| 14 | O  | 30 | e  | 46 | u  | 62 |+  |<br>| 15 | P  | 31 | f  | 47 | v  | 63 |/|</p>
 <figure class="image-box">
-                <a rel="No" title href="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" data-fancybox="images"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="逆向常见的算法" href="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" title data-fancybox="images"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" alt title class></a>
+                <p></p>
             </figure>
 <p>Base64算法在逆向中的体现 主要就在于==程序内存中存在一个索引表==<br><em>同理 如果是Base64解密 内存中当然存在一个解密表</em></p>
 <p>并且在程序算法中存在明显的 右移2位和右移4位等明显位运算操作<br><em>同理 如果是Base64解密 应该存在左移2位和左移4位等明显的位运算操作</em></p>
@@ -999,6 +999,12 @@ End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as l
     </a>
     </div>
 </article>
+
+<div class="post-footer">
+    
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RE/">RE</a></li></ul>
+
+</div>
 
 
             </li>

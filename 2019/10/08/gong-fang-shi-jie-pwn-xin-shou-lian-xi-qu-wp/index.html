@@ -204,19 +204,19 @@
 </blockquote>
 <h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 
 <blockquote>
 <p>这里先讲一下什么是Canary保护<br>Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调用函数的时候 会在栈中压入一个随机Canary值 在函数结束的时候程序会判断Canary值是否发生变动 如果发生变动就认为是程序遭到了攻击 程序直接异常退出 Canary值通常和函数返回地址在栈中相连 主要是防护攻击者更改程序返回地址来执行shellcode<br>这里我们直接拿本题做例子</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>可以明确看到程序现在在存储Canary值 我们在数据下硬件读写断点 然后让程序跑起来
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185721986.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185721986.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt title class></a>
+                <p></p>
             </figure>这里在函数末尾取出Canary值 如果与刚开始的值不一致 执行stack_chk_fail函数 
 <p>对于如何绕过Canary保护 基本思路是利用各种漏洞 先泄漏出来Canary的地址 然后取出值 等溢出过后再还原 当然具体如何利用还得就题论题</p>
 </blockquote>
@@ -225,23 +225,23 @@
 </blockquote>
 <p>回到本题 先随便执行下 就是输入用户名和留言 然后程序原样打印出来</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190438694.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190438694.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt title class></a>
+                <p></p>
             </figure>
 <p>没什么世纪大发现 那就常规操作 载入IDA吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>发现程序存在格式化字符串漏洞 然后理解下程序逻辑 简单来说就是将pwnme变量的值更改为8就能拿到flag了 双击pwnme看一下 发现pwnme变量还是一个在bss段的全局变量 那基本思路已经有了</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190855410.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190855410.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt title class></a>
+                <p></p>
             </figure>
 <p>解法基本就是通过格式化字符串漏洞更改pwnme的值了 那第一步就是测试程序的回显位了 这里我的回显位是在第十位</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191119916.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191119916.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt title class></a>
+                <p></p>
             </figure>
 <p>那基本信息获取的差不多了 就可以开始编写脚本了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -256,31 +256,31 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>执行脚本即可</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>得到flag:cyberpeace{bb8c9af83fb8e8913ed25c1d5cc41751}</p>
 <h2 id="when-did-you-born"><a href="#when-did-you-born" class="headerlink" title="when_did_you_born"></a>when_did_you_born</h2><p>照例 日常开局…</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>跑一下 没啥思路 直接载入IDA吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>简单理解下 就是程序要求变量v5的值最后为1926 而程序开始的输入不允许输入1926…初看是自相矛盾的..话说哪道Pwn题给的初始条件不是自相矛盾的… 在代码中发现gets函数..因为gets函数不会限制输入的字符个数 初步怀疑是栈溢出 双击v4查看程序栈图</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>没跑了 栈溢出 直接开始写脚本吧</p>
 <blockquote>
 <p>这里解释下为什么程序开启了Canary保护依然可以使用栈溢出漏洞 这是因为Canary保护主要是防护函数的返回地址不被篡改的 从这里程序的栈图就能看出 Canary值的变量名就是var_8 如果我们切换到汇编窗口 就能看到最后的校验使用的就是这个var_8变量</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 </blockquote>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -295,8 +295,8 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>执行即可 </p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928205109233.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928205109233.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt title class></a>
+                <p></p>
             </figure>
 <p>得到flag:cyberpeace{5f65371d87fafa327d2c0d3e254cfab5}</p>
 <h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>正常起手式 查保护</p>
@@ -434,7 +434,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-10-08T12:18:00.979Z" itemprop="dateUpdated">2019-10-08 20:18:00</time>
+    最后更新时间：<time datetime="2019-10-08T12:26:22.170Z" itemprop="dateUpdated">2019-10-08 20:26:22</time>
 </span><br>
 
 

@@ -5,7 +5,7 @@
     <title>格式化字符串漏洞 | Du4t的博客 | Du4t~~~~</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-    <meta name="keywords" content="RE">
+    <meta name="keywords" content="PWN">
     <link rel="shortcut icon" href="/img/favicon.ico">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
     <link rel="stylesheet" href="/css/style.css?v=1.4.4">
@@ -153,7 +153,7 @@
         <h1 class="title">格式化字符串漏洞</h1>
         <h5 class="subtitle">
             
-                <time datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished" class="page-time">
+                <time datetime="2019-10-08T12:16:25.000Z" itemprop="datePublished" class="page-time">
   2019-10-08
 </time>
 
@@ -185,7 +185,7 @@
     <div class="post-card">
         <h1 class="post-card-title">格式化字符串漏洞</h1>
         <div class="post-meta">
-            <time class="post-time" title="2019-10-08 20:17:25" datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished">2019-10-08</time>
+            <time class="post-time" title="2019-10-08 20:16:25" datetime="2019-10-08T12:16:25.000Z" itemprop="datePublished">2019-10-08</time>
 
             
 
@@ -221,8 +221,8 @@ int main(void)
 </blockquote>
 <p>但是由于函数调用的关系 实参和形参结合的顺序是从左向右结合的 所以函数这样写也是可以正常输出的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>以上代码 本身没有什么问题 但是如果用户可以控制输入的话 就会造成一些意想不到的结果
 
 <pre><code>#include <stdio.h>
@@ -233,13 +233,13 @@ int main(void)
     printf(a);
     return 0;
  } </stdio.h></code></pre><figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>我们可以通过测试发现 程序输出了一些奇怪的输出 我们载入x32dbg查看下 程序到底输出的是什么<br>通过观察栈中 我们发现 其实程序输出的就是栈中的数据</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923195130178.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923195130178.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt title class></a>
+                <p></p>
             </figure>
 <p>造成这种结果的原因是 因为我们输入的%x 在我们用不安全的方式调用printf函数的时候 没有明确表示出哪里的参数是空缺的 这就会造成系统自动从左往右进行匹配 我们输入的%x 又正好是在 “格式化字符串” 这个参数内 系统就会将他当成默认的%x来进行输出</p>
 <blockquote>
@@ -267,21 +267,21 @@ int main(int argc,char **argv)
     return 0;
 }</string.h></stdio.h></code></pre><p>在这里我们是直接将flag数组的地址直接输出出来 相当于泄露了关键字符串的地址吧…<br>因为==所有的局部变量都是存放在栈中的== 首先第一步就是需要遍历栈中数据找到输入的数据 以达到后面控制输入变量的目的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923212726366.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923212726366.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt title class></a>
+                <p></p>
             </figure>这里发现栈中数据的第九位正好就是我们输入的数据 为了方便查看 也可以使用以下方式来查看第n位的回显
 
 <blockquote>
 <p>%< Number >$ formot string<br>注意此方法仅适用于Linux系统 且在命令行中使用需要转义$</p>
 </blockquote>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923213014599.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923213014599.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt title class></a>
+                <p></p>
             </figure>
 <p>在这里就可以控制输入的参数 将输入改为flag字符串的地址 同时根据上面所提过的 将%08x更改为%s直接读取到flag字符串具体的值</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092321331572.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092321331572.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt title class></a>
+                <p></p>
             </figure>
 <p>根据以上操作 如果条件允许的话 就可以做到任意内存读取</p>
 <h2 id="内存修改"><a href="#内存修改" class="headerlink" title="内存修改"></a>内存修改</h2><blockquote>
@@ -302,35 +302,35 @@ int main(int argc,char **argv)
     return 0;
 }</string.h></stdio.h></code></pre><p>首先运行一次程序 可以得知静态变量b的地址 然后尝试查看回显位 这里我的回显位是第十位</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924181656618.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924181656618.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt title class></a>
+                <p></p>
             </figure>尝试在运行程序时 使用printf写入地址
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418190293.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418190293.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt title class></a>
+                <p></p>
             </figure>
 <p>此时就可以使用之前介绍过的 格式说明符%n了 %n将他自身前字符的个数 赋值给地址为0x5655700c的静态变量b 以达到修改内存中值的目的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418215847.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418215847.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt title class></a>
+                <p></p>
             </figure>
 <p>同样的 如果我们想将b的值修改的更大 只需要在 ‘%10$n’ 前增加对应数量的0即可 </p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924182308483.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924182308483.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt title class></a>
+                <p></p>
             </figure>
 <h2 id="格式化字符串的应用"><a href="#格式化字符串的应用" class="headerlink" title="格式化字符串的应用"></a>格式化字符串的应用</h2><blockquote>
 <p>这里使用攻防世界 PWN模块的 CGfsb 作为例题</p>
 </blockquote>
 <p>首先载入IDA 通过阅读源码 发现关键判断 只要pwnme变量等于8 就能输出flag 同时发现程序崔仔格式化字符串漏洞 这里的条件和上面模块的条件类似</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 <p>双击pwnme变量 查看pwnme的具体地址 在得知了具体地址后 我们就可以开始写脚本了</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184625528.png" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184625528.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt title class></a>
+                <p></p>
             </figure>
 
 <blockquote>
@@ -404,8 +404,8 @@ sh.send(pwnme+"0000%10$n")
 #程序持续运行
 sh.interactive()</code></pre><p>运行脚本 得到flag</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title="在这里插入图片描述" data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" title class></a>
-                <p>在这里插入图片描述</p>
+                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <p></p>
             </figure>
 
 <script>
@@ -433,7 +433,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-10-08T12:17:41.347Z" itemprop="dateUpdated">2019-10-08 20:17:41</time>
+    最后更新时间：<time datetime="2019-10-08T12:26:19.211Z" itemprop="dateUpdated">2019-10-08 20:26:19</time>
 </span><br>
 
 
@@ -452,7 +452,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
         
         <div class="post-footer">
             
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RE/">RE</a></li></ul>
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
 
             <div class="page-share-wrap">
     
@@ -510,7 +510,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
     <div class="next">
       <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" id="post-next" class="post-nav-link">
         <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
-        <h4 class="title">No title</h4>
+        <h4 class="title">逆向常见的算法</h4>
       </a>
     </div>
   
