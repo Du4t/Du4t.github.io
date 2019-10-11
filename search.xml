@@ -3,6 +3,55 @@
   
     
     <entry>
+      <title><![CDATA[栈溢出漏洞及利用]]></title>
+      <url>/2019/10/11/zhan-yi-chu/</url>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="简述漏洞形成"><a href="#简述漏洞形成" class="headerlink" title="简述漏洞形成"></a>简述漏洞形成</h2><blockquote>
+<p>想要了解栈溢出漏洞是怎么形成的首先要先了解下在汇编层面的函数调用和栈相关的知识</p>
+<p>栈的生长方向是向低地址生长 也就是压栈时数据是先放到高地址的地方<br>这里栈的概念是和数据结构中的栈一致的 即一种<strong>FILO</strong>(first in last out)的数据结构</p>
+<p>而在汇编层面上 函数调用时会进行保存现场操作 即保存函数调用前寄存器的状态 通常在进入函数体时 栈内就已经有数据了 通常的排布如下</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H55d75d798d1e4c43b34aca1f3bc96baeA.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>这里参数是从左向右入栈还是从右向左入栈取决于调用方法 在这里我们不做讨论 EBP保存的是在函数调用前栈底的位置 <em>当栈清空时栈顶自然回位所以不必保存栈顶指针</em> EIP则保存的是当函数调用完毕后<strong>需要执行</strong>的指令地址 </p>
+</blockquote>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></body></html>]]></content>
+      
+        <categories>
+            
+            <category> PWN </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> PWN </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[攻防世界PWN新手练习区WP]]></title>
       <url>/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/</url>
       <content type="html"><![CDATA[<html><head></head><body><a id="more"></a>

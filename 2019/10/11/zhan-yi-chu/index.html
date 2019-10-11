@@ -2,10 +2,10 @@
     <meta charset="utf-8">
     
     
-    <title>Tags: PWN | Du4t的博客 | Du4t~~~~</title>
+    <title>栈溢出漏洞及利用 | Du4t的博客 | Du4t~~~~</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-    <meta name="keywords" content="Du4t~~~~">
+    <meta name="keywords" content="PWN">
     <link rel="shortcut icon" href="/img/favicon.ico">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
     <link rel="stylesheet" href="/css/style.css?v=1.4.4">
@@ -111,7 +111,7 @@
               </a>
             </li>
         
-            <li class=" active">
+            <li class>
               <a href="/tags">
                 <i class="icon icon-lg icon-tags"></i>
                 TAGS
@@ -137,7 +137,7 @@
           <i class="icon icon-lg icon-navicon"></i>
         </a>
         <div class="flex-col header-title ellipsis">
-            <span>Tags: PWN</span>
+            <span>栈溢出漏洞及利用</span>
             
         </div>
         
@@ -147,37 +147,24 @@
         
     </div>
 </header>
-<header class="content-header tags-header">
+<header class="content-header post-header">
     <img src="/img/banner.jpg" class="header-bg">
     <div class="container fade-scale">
-        <h1 class="title">Tags: PWN</h1>
+        <h1 class="title">栈溢出漏洞及利用</h1>
         <h5 class="subtitle">
+            
+                <time datetime="2019-10-11T11:28:09.000Z" itemprop="datePublished" class="page-time">
+  2019-10-11
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PWN/">PWN</a></li></ul>
+
             
         </h5>
         
     </div>
     
-<div class="tabs-bar container">
-    <nav class="tags-list">
-        <a href="/tags" style="-webkit-order:-1;order:-1" class="tags-list-item waves-effect waves-button waves-light
-            ">全部</a>
-        
-            <a href="/tags/PWN/" backup-style="-webkit-order:0;order:0" class="tags-list-item waves-effect waves-button waves-light active">PWN</a>
-            
-        
-            <a href="/tags/Others/" backup-style="-webkit-order:1;order:1" class="tags-list-item waves-effect waves-button waves-light">Others</a>
-            
-        
-            <a href="/tags/RE/" backup-style="-webkit-order:2;order:2" class="tags-list-item waves-effect waves-button waves-light">RE</a>
-            
-        
-    </nav>
-    <!-- PC show more-->
-    <div class="tags-list-more">
-        <a href="javascript:;" class="action tags-list-item waves-effect waves-circle waves-light"><i class="icon icon-ellipsis-h"></i></a>
-    </div>
-</div>
-
 
 </header>
 
@@ -194,107 +181,155 @@
     <div id="local-search-result"></div>
 </div>
 
-<div class="container body-wrap fade">
-    
-            <div class="waterfall">
-                
-                <div class="waterfall-item">
-  <article class="article-card archive-article">
-    <div class="post-meta">
-      <time class="post-time" title="2019-10-11 19:28:09" datetime="2019-10-11T11:28:09.000Z" itemprop="datePublished">2019-10-11</time>
 
-      
+<div class="container body-wrap">
+    <article id="post-栈溢出" class="post-article article-type-post" itemprop="blogPost">
+    <div class="post-card">
+        <h1 class="post-card-title">栈溢出漏洞及利用</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-10-11 19:28:09" datetime="2019-10-11T11:28:09.000Z" itemprop="datePublished">2019-10-11</time>
+
+            
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PWN/">PWN</a></li></ul>
 
 
 
-    </div>
-    
+            
+
+            
 
 
-  
-    <h3 class="post-title " itemprop="name">
-      <a class="post-title-link" href="/2019/10/11/zhan-yi-chu/">栈溢出漏洞及利用</a>
-    </h3>
-  
+            
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            
+            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="简述漏洞形成"><a href="#简述漏洞形成" class="headerlink" title="简述漏洞形成"></a>简述漏洞形成</h2><blockquote>
+<p>想要了解栈溢出漏洞是怎么形成的首先要先了解下在汇编层面的函数调用和栈相关的知识</p>
+<p>栈的生长方向是向低地址生长 也就是压栈时数据是先放到高地址的地方<br>这里栈的概念是和数据结构中的栈一致的 即一种<strong>FILO</strong>(first in last out)的数据结构</p>
+<p>而在汇编层面上 函数调用时会进行保存现场操作 即保存函数调用前寄存器的状态 通常在进入函数体时 栈内就已经有数据了 通常的排布如下</p>
+<figure class="image-box">
+                <a rel="栈溢出漏洞及利用" href="https://ae01.alicdn.com/kf/H55d75d798d1e4c43b34aca1f3bc96baeA.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H55d75d798d1e4c43b34aca1f3bc96baeA.png" alt title class></a>
+                <p></p>
+            </figure>
 
-
-
-    
-    <div class="post-footer">
+<p>这里参数是从左向右入栈还是从右向左入栈取决于调用方法 在这里我们不做讨论 EBP保存的是在函数调用前栈底的位置 <em>当栈清空时栈顶自然回位所以不必保存栈顶指针</em> EIP则保存的是当函数调用完毕后<strong>需要执行</strong>的指令地址 </p>
+</blockquote>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script>
+        </div>
         
+<blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-11T11:42:16.458Z" itemprop="dateUpdated">2019-10-11 19:42:16</time>
+</span><br>
+
+
+        
+        转载注明出处，原文地址：<a href="/2019/10/11/zhan-yi-chu/" target="_blank" rel="external">http://Du4t.github.io/2019/10/11/zhan-yi-chu/</a>
+        
+    </div>
+    <footer>
+        <a href="http://Du4t.github.io">
+            <img src="/img/100.jpg" alt="Du4t">
+            Du4t
+        </a>
+    </footer>
+</blockquote>
+
+        
+        <div class="post-footer">
+            
 	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
 
-    </div>
+            <div class="page-share-wrap">
     
-  </article>
-</div>
-        
-                <div class="waterfall-item">
-  <article class="article-card archive-article">
-    <div class="post-meta">
-      <time class="post-time" title="2019-10-08 20:17:25" datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished">2019-10-08</time>
 
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
       
-
-
-    </div>
-    
-
-
-  
-    <h3 class="post-title " itemprop="name">
-      <a class="post-title-link" href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/">攻防世界PWN新手练习区WP</a>
-    </h3>
-  
-
-
-
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
-
-    </div>
-    
-  </article>
-</div>
-        
-                <div class="waterfall-item">
-  <article class="article-card archive-article">
-    <div class="post-meta">
-      <time class="post-time" title="2019-10-08 20:16:25" datetime="2019-10-08T12:16:25.000Z" itemprop="datePublished">2019-10-08</time>
-
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/11/zhan-yi-chu/&title=《栈溢出漏洞及利用》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
       
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/11/zhan-yi-chu/&title=《栈溢出漏洞及利用》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
 
 
-    </div>
-    
 
-
-  
-    <h3 class="post-title " itemprop="name">
-      <a class="post-title-link" href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/">格式化字符串漏洞</a>
-    </h3>
-  
-
-
-
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
-
-    </div>
-    
-  </article>
-</div>
-        
-            </div>
-        
-    
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
 </div>
 
+        </div>
+        
+            
+
+
+        
+    </div>
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="next">
+      <a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">攻防世界PWN新手练习区WP</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+    
+    
+        <aside class="post-widget">
+            <nav class="post-toc-wrap" id="post-toc">
+                <strong>目录</strong>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#简述漏洞形成"><span class="post-toc-number">1.</span> <span class="post-toc-text">简述漏洞形成</span></a></li></ol>
+            </nav>
+            <div class="toc-bar"><div>
+        </div></div></aside>
+    
+</article>
+
+
+</div>
 
     </main>
     <footer class="footer ">
@@ -342,7 +377,7 @@
     <ul class="reset share-icons">
       
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/tags/PWN/&title=Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/11/zhan-yi-chu/&title=《栈溢出漏洞及利用》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -354,7 +389,7 @@
       </li>
       
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/tags/PWN/&title=Du4t的博客&source=" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/11/zhan-yi-chu/&title=《栈溢出漏洞及利用》 — Du4t的博客&source=" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
@@ -366,7 +401,7 @@
 <div class="page-modal wx-share" id="wxShare">
     <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAK4AAACuCAAAAACKZ2kyAAABvUlEQVR42u3awa6DMAwEQP7/p3nXSq+l65hYqJqcUKEwuVjOJscRj/Nl/P+lc/fYMXBxcdvc83K8PvPp+hp6/d3cgIuLO8+tvq5KT8ritQEXF/fJ3ORfyZRwcXF/g/vp+c7EcHFxn8ztBxnVu9vXari4uA1unlLuu96S7+Li4i5xz6XRaW7y4vXmu7i4uCPcatFZ21K9piftFC4u7iS3GoDm2yRJkJof7yjnKLi4uA1ufgyrWozyaVffg4uLO8OtHqeobsNUN2K/FFlcXNxBbh9a+OTSBHBxcWe4ayFpvyVa24jFxcWd5+aLkGp4mm+lfAlEcHFxB7l58nBvY5RM++NWCi4u7iC306y0MtrkDbi4uI/hVluZZBqLb8PFxR3hVhckSRmqRiflAAUXF3czNy861QXS2pKptfjBxcW9ids/QlElVjdm3vwLFxd3M/csjmqLs3aIMzongouLu427FmVWl0/3Nkm4uLgz3GqgWe6hbopicXFx57l5oVk7jHVbq4SLi/swbh5u5vRk8ri4uE/mdgKRvMAVjl/g4uJu5q4dnLpuevLtmbxQ4uLiznDzwDTBJZNZK464uLgj3D89jr5V4xx96wAAAABJRU5ErkJggg==" alt="微信分享二维码">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACLElEQVR42u3aQY6EMAwFUe5/aeYALUJ9G0bCKVaIzog8Fh7b8XHg6/y51r+m63+fH29cMmTI+CyDvD5ds35ydV97rwwZMvZhXEWwqzXrLZIwvY6ZfG8yZMiQsV5TS/VqQVmGDBkyOAMlajiYEqQMGTJk8AJ1vUWe5PGP8kotLkOGjA8yeNf9/+9fOd+QIUPGpxhneNVSOhIiz8YlQ4aM2Qwe4HjimG66FnBlyJCxD6Pf8OK/rt/SKlllyJCxDYOXjrVaOW3A8YEPGTJkzGbw0FkLozyk1lLM+D+ADBkyPsvggxfrVLKWRPJPFoR7GTJkDGLwwJcWousAzYNscVpEhgwZgxjpy/hxZi2gp623myJWhgwZIxh8qKLGSD8Q7/OjmREZMmSMYKyTszSM1sa/eGhGea4MGTKGMlISv+ehM00oZciQsTODJ3C8iO034IoHnDJkyBjESMvXfuH67F/JkCFjNoMPNHSo/WPOm1JWhgwZoxl8Q518E52j4gQ0mByRIUPGUEb6gvRD1Jp66IkMGTI2YJClaYgkTfxgnILU4jJkyNiGkaZonQCdHmRerpQhQ8ZQRqdlVjuqfLbolSFDxg4Mfj2VAvJD0AdmRmTIkDGI0T8SSBO+NAGNu4YyZMgYyuCBj6eGZNNp2nczbCFDhgwZ7eGJ2hP0WWXIkCFjyegcgvIge1NUy5AhYwMG2Vx/5Kt25InafzJkyBjNSEMeT+bSRlsaZGXIkLEB4w8ZB4mHwdBNjgAAAABJRU5ErkJggg==" alt="微信分享二维码">
 </div>
 
 
