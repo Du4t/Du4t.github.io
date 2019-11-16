@@ -303,8 +303,8 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>第二种方法就是利用溢出 直接将字符串覆盖到Canary值 然后在输出的时候直接输出出来 这种方法的局限性是要求读入字符串的函数 不会将00加入到字符串尾 不然会直接截断字符串 导致不能将Canary值带出来 </p>
 <p>下面分别给出两种情况的案例 来绕过Canary保护</p>
 <h3 id="配合格式化字符串绕过"><a href="#配合格式化字符串绕过" class="headerlink" title="配合格式化字符串绕过"></a>配合格式化字符串绕过</h3><p>首先给出案例代码</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">void</span> <span class="token function">pwn</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -361,8 +361,8 @@ sh<span class="token punctuation">.</span>recvuntil<span class="token punctuatio
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'1'</span><span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <h3 id="溢出覆盖绕过Canary保护"><a href="#溢出覆盖绕过Canary保护" class="headerlink" title="溢出覆盖绕过Canary保护"></a>溢出覆盖绕过Canary保护</h3><p>先给出样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">void</span> <span class="token function">pwn</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>

