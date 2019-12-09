@@ -1,209 +1,106 @@
 <!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
-    <meta charset="utf-8">
-    
-    
-    <title>如何泄漏PWN中的一些信息 | Du4t的博客 | Du4t~~~~</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    
-    <meta name="keywords" content="PWN">
-    <link rel="shortcut icon" href="/img/favicon.ico">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
-    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
-    
-    <script type="text/javascript">
-        // Data Center
-        var DC = {
-            reward:	false,
-            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
-            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
-            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
-            d: JSON.parse('{"app_id":null}')
-        };
-    </script>
-    <script type="text/javascript">
-        window.lazyScripts=[];
-    </script>
-    
+  <meta charset="utf-8">
+  
+
+  
+  <title>如何泄漏PWN中的一些信息 | Du4t的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="敏感函数一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数 putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注意的是 puts的截断标准是遇到 \0 即从某个地址开始一直输出 直到遇到\0为止 writewrite函数也是大部分泄漏时利用的函数 函数原型: write(int fd,const void *buf,size_t size)">
+<meta name="keywords" content="PWN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何泄漏PWN中的一些信息">
+<meta property="og:url" content="http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/index.html">
+<meta property="og:site_name" content="Du4t的博客">
+<meta property="og:description" content="敏感函数一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数 putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注意的是 puts的截断标准是遇到 \0 即从某个地址开始一直输出 直到遇到\0为止 writewrite函数也是大部分泄漏时利用的函数 函数原型: write(int fd,const void *buf,size_t size)">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png">
+<meta property="og:updated_time" content="2019-11-12T12:06:35.395Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何泄漏PWN中的一些信息">
+<meta name="twitter:description" content="敏感函数一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数 putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注意的是 puts的截断标准是遇到 \0 即从某个地址开始一直输出 直到遇到\0为止 writewrite函数也是大部分泄漏时利用的函数 函数原型: write(int fd,const void *buf,size_t size)">
+<meta name="twitter:image" content="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Du4t的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-
-
 <body>
-    <div id="loading" class="active"></div>
 
-    <aside id="menu" class>
-  <div class="inner flex-row-vertical">
-    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
-        <i class="icon icon-lg icon-close"></i>
-    </a>
-    <div class="brand-wrap">
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Du4t的博客</a>
+      </h1>
       
-      <img src="/img/brand.jpg" class="brand-bg">
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Du4t~~~~</a>
+        </h2>
       
-      <div class="brand">
-        <a href="/" class="avatar waves-effect waves-circle waves-light">
-          <img src="/img/100.jpg">
-        </a>
-        <hgroup class="introduce">
-          <h5 class="nickname">Du4t</h5>
-          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
-            
-              <span>6</span>
-            
-              <span>1</span>
-            
-              <span>0</span>
-            
-              <span>1</span>
-            
-              <span>0</span>
-            
-              <span>9</span>
-            
-              <span>6</span>
-            
-              <span>1</span>
-            
-              <span>5</span>
-            
-              <span>@</span>
-            
-              <span>q</span>
-            
-              <span>q</span>
-            
-              <span>.</span>
-            
-              <span>c</span>
-            
-              <span>o</span>
-            
-              <span>m</span>
-            
-          </a>
-        </hgroup>
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
         
-        <ul class="menu-link">
-          
-              <li>
-                <a href="https://github.com/Du4t" target="_blank">
-                  <i class="icon icon-lg icon-github"></i>
-                </a>
-              </li>
-            
-        </ul>
+          <a class="main-nav-link" href="/">Home</a>
         
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit"></button><input type="hidden" name="sitesearch" value="http://Du4t.github.io"></form>
       </div>
     </div>
-    <div class="scroll-wrap flex-col">
-      <ul class="nav">
-        
-            <li class>
-              <a href="/">
-                <i class="icon icon-lg icon-home"></i>
-                HOME
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/categories">
-                <i class="icon icon-lg icon-th-list"></i>
-                CATEGORIES
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/tags">
-                <i class="icon icon-lg icon-tags"></i>
-                TAGS
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/archives">
-                <i class="icon icon-lg icon-archives"></i>
-                ARCHIVES
-              </a>
-            </li>
-        
-      </ul>
-    </div>
   </div>
-</aside>
-
-    <main id="main">
-        <header class="top-header" id="header">
-    <div class="flex-row clearfix">
-        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
-          <i class="icon icon-lg icon-navicon"></i>
-        </a>
-        <div class="flex-col header-title ellipsis">
-            <span>如何泄漏PWN中的一些信息</span>
-            
-        </div>
-        
-        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
-            <i class="icon icon-lg icon-search"></i>
-        </a>
-        
-    </div>
 </header>
-<header class="content-header post-header">
-    <img src="/img/banner.jpg" class="header-bg">
-    <div class="container fade-scale">
-        <h1 class="title">如何泄漏PWN中的一些信息</h1>
-        <h5 class="subtitle">
-            
-                <time datetime="2019-11-01T11:57:15.000Z" itemprop="datePublished" class="page-time">
-  2019-11-01
-</time>
-
-
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PWN/">PWN</a></li></ul>
-
-            
-        </h5>
-        
-    </div>
+      <div class="outer">
+        <section id="main"><article id="post-如何泄漏PWN中的一些信息" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/" class="article-date">
+  <time datetime="2019-11-01T11:57:15.000Z" itemprop="datePublished">2019-11-01</time>
+</a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/PWN/">PWN</a>
+  </div>
 
-</header>
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      如何泄漏PWN中的一些信息
+    </h1>
+  
 
-<div id="site_search">
-    <div class="search-title clearfix">
-        <span class="pull-left">
-          <i class="icon icon-lg icon-search"></i>
-        </span>
-        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
-        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
-          <i class="icon icon-lg icon-close"></i>
-        </a>
-    </div>
-    <div id="local-search-result"></div>
-</div>
-
-
-<div class="container body-wrap">
-    <article id="post-如何泄漏PWN中的一些信息" class="post-article article-type-post" itemprop="blogPost">
-    <div class="post-card">
-        <h1 class="post-card-title">如何泄漏PWN中的一些信息</h1>
-        <div class="post-meta">
-            <time class="post-time" title="2019-11-01 19:57:15" datetime="2019-11-01T11:57:15.000Z" itemprop="datePublished">2019-11-01</time>
-
-            
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PWN/">PWN</a></li></ul>
-
-
-
-            
-
-            
-
-
-            
-        </div>
-        <div class="post-content" id="post-content" itemprop="postContent">
-            
-            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="敏感函数"><a href="#敏感函数" class="headerlink" title="敏感函数"></a>敏感函数</h2><p>一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数</p>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="敏感函数"><a href="#敏感函数" class="headerlink" title="敏感函数"></a>敏感函数</h2><p>一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数</p>
 <h3 id="puts"><a href="#puts" class="headerlink" title="puts"></a>puts</h3><p>puts函数嘛…我们的老常客..大部分漏洞都会用到它 需要注意的是 puts的截断标准是遇到 <strong>\0</strong> 即从某个地址开始一直输出 直到遇到\0为止</p>
 <h3 id="write"><a href="#write" class="headerlink" title="write"></a>write</h3><p>write函数也是大部分泄漏时利用的函数</p>
 <p>函数原型: write(int fd,const void *buf,size_t size)</p>
@@ -238,7 +135,7 @@
 </blockquote>
 <p>首先使用checksec查看一下保护</p>
 <figure class="image-box">
-                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" alt title class>
                 <p></p>
             </figure>
 
@@ -296,13 +193,13 @@ constchar<span class="token operator">*</span>msg<span class="token punctuation"
 <h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><p>这里使用 Jarvis OJ 的题目Smashes 进行演示</p>
 <p>首先checksec 查看保护</p>
 <figure class="image-box">
-                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" alt title class>
                 <p></p>
             </figure>
 
 <p>发现开有Canary保护 不能直接进行ROP 载入IDA 发现没有任何能用于输出flag的方式 但是发现一个奇怪的字符串</p>
 <figure class="image-box">
-                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" alt title class>
                 <p></p>
             </figure>
 
@@ -310,13 +207,13 @@ constchar<span class="token operator">*</span>msg<span class="token punctuation"
 <p>联系到SSP leak 我们可以故意触发stack_chk_fail函数 然后将指针指向这个地址就能利用报错信息输出flag了</p>
 <p>但是看到主函数的最后一句 发现这个位置的flag会在主函数返回之前就清除掉 这个时候就需要用到ELF的重映射了</p>
 <figure class="image-box">
-                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" alt title class>
                 <p></p>
             </figure>
 
 <p>我们使用gdb 看看程序是否有flag的重映射</p>
 <figure class="image-box">
-                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" alt title class>
                 <p></p>
             </figure>
 
@@ -331,7 +228,7 @@ r<span class="token punctuation">.</span>sendline<span class="token punctuation"
 r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本即可</p>
 <figure class="image-box">
-                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" alt title class>
                 <p></p>
             </figure>
 
@@ -400,7 +297,7 @@ sh.recvuntil('a'*0x68)
 canary=u64(sh.recv(8))-0x0a
 log.info("canary:"+hex(canary))</code></pre>
 <p>这样 就可以利用栈溢出 覆盖掉Canary的\x00 然后成功泄漏出Canary值 </p>
-<p><a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png" alt></a></p>
+<p><img src="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png" alt></p>
 <p>在有了Canary值后 就可以肆无忌惮的进行栈溢出 不用怕chk_stack_fail了… 那么下一步就是为了泄漏libc基地址做准备 回看一下程序源码 发现puts函数和read函数是执行过的 可以根据个人喜好自己泄漏相对于的真实地址 这里我选择的是puts地址 </p>
 <pre class=" language-python">sh.recvuntil("><code class="language-python">sh.recvuntil(">> ")
 sh.sendline("1")
@@ -415,7 +312,7 @@ sh.sendline('3')
 puts_got=u64(sh.recv(6).ljust(8,'\x00'))
 log.info("puts_got:"+hex(puts_got))</code></pre>
 <figure class="image-box">
-                <a rel="如何泄漏PWN中的一些信息" href="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" alt title class>
                 <p></p>
             </figure>
 
@@ -519,274 +416,147 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             document.body.appendChild(img);
           });
       </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
-        </div>
-        
-<blockquote class="post-copyright">
-    <div class="content">
-        
-<span class="post-time">
-    最后更新时间：<time datetime="2019-11-12T12:06:35.395Z" itemprop="dateUpdated">2019-11-12 20:06:35</time>
-</span><br>
-
-
-        
-        转载注明出处，原文地址：<a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/" target="_blank" rel="external">http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/</a>
-        
+      
     </div>
-    <footer>
-        <a href="http://Du4t.github.io">
-            <img src="/img/100.jpg" alt="Du4t">
-            Du4t
-        </a>
+    <footer class="article-footer">
+      <a data-url="http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/" data-id="ck3y8593y00025gvtcdtj9rgk" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
+
     </footer>
-</blockquote>
-
-        
-        <div class="post-footer">
-            
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
-
-            <div class="page-share-wrap">
+  </div>
+  
     
-
-<div class="page-share" id="pageShare">
-    <ul class="reset share-icons">
-      
-      <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/&title=《如何泄漏PWN中的一些信息》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
-          <i class="icon icon-weibo"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-          <i class="icon icon-weixin"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/&title=《如何泄漏PWN中的一些信息》 — Du4t的博客&source=" data-title=" QQ">
-          <i class="icon icon-qq"></i>
-        </a>
-      </li>
-      
-    </ul>
- </div>
-
-
-
-    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
-        <i class="icon icon-share-alt icon-lg"></i>
+<nav id="article-nav">
+  
+    <a href="/2019/11/16/rop-ji-zhu/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          ROP技术
+        
+      </div>
     </a>
-</div>
-
-        </div>
-        
-            
-
-
-        
-    </div>
-    
-<nav class="post-nav flex-row flex-justify-between">
   
-    <div class="prev">
-      <a href="/2019/11/16/rop-ji-zhu/" id="post-prev" class="post-nav-link">
-        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
-        <h4 class="title">ROP技术</h4>
-      </a>
-    </div>
   
-
-  
-    <div class="next">
-      <a href="/2019/10/26/unctf-wp/" id="post-next" class="post-nav-link">
-        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
-        <h4 class="title">UNCTF-WP</h4>
-      </a>
-    </div>
+    <a href="/2019/10/26/unctf-wp/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">UNCTF-WP</div>
+    </a>
   
 </nav>
 
-
-    
-    
-        <aside class="post-widget">
-            <nav class="post-toc-wrap" id="post-toc">
-                <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#敏感函数"><span class="post-toc-number">1.</span> <span class="post-toc-text">敏感函数</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#puts"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">puts</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#write"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">write</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#泄漏Canary"><span class="post-toc-number">2.</span> <span class="post-toc-text">泄漏Canary</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#泄漏Canary值"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">泄漏Canary值</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#利用stack-chk-fail漏洞"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">利用stack_chk_fail漏洞</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#实例"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">实例</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#泄漏libc"><span class="post-toc-number">3.</span> <span class="post-toc-text">泄漏libc</span></a></li></ol>
-            </nav>
-            <div class="toc-bar"><div>
-        </div></div></aside>
-    
+  
 </article>
 
-
-</div>
-
-    </main>
-    <footer class="footer ">
+</section>
+        
+          <aside id="sidebar">
+  
     
-    <div class="bottom">
-        <p>
-            <span>
-                Du4t © 2019
-            </span>
-        		
-           	
-            
-            
-            <span>
-	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
-            </span>
-            
-            
-            
-
-            
-                
-<span class="site-uv" title="总访客量">
-    <i class="icon icon-user"></i>
-    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
-</span>
-
-
-<span class="site-pv" title="总访问量">
-    <i class="icon icon-eye"></i>
-    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
-</span>
-
-            
-        </p>
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Others/">Others</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/PWN/">PWN</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/RE/">RE</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/WP/">WP</a></li></ul>
     </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Others/">Others</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RE/">RE</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WP/">WP</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Others/" style="font-size: 10px;">Others</a> <a href="/tags/PWN/" style="font-size: 20px;">PWN</a> <a href="/tags/RE/" style="font-size: 10px;">RE</a> <a href="/tags/WP/" style="font-size: 15px;">WP</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/12/08/kmp-suan-fa/">KMP算法</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/07/ji-yu-mou-ctf-ti-de-ge-shi-hua-zi-fu-chuan-lou-dong-zai-xue-xi/">基于某CTF题的格式化字符串漏洞再学习</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/28/njupt-ctf/">NJUPT_CTF-WP</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/16/rop-ji-zhu/">ROP技术</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/">如何泄漏PWN中的一些信息</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      © 2019 Du4t<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
 </footer>
-
-    <div class="mask" id="mask"></div>
-<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
-
-
-
-<div class="global-share" id="globalShare">
-    <ul class="reset share-icons">
-      
-      <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/&title=《如何泄漏PWN中的一些信息》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
-          <i class="icon icon-weibo"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-          <i class="icon icon-weixin"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/&title=《如何泄漏PWN中的一些信息》 — Du4t的博客&source=" data-title=" QQ">
-          <i class="icon icon-qq"></i>
-        </a>
-      </li>
-      
-    </ul>
- </div>
-
-
-<div class="page-modal wx-share" id="wxShare">
-    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACqklEQVR42u3aUU/DUAgG0P3/P62Jr6btB1w2TU6fljk7zjUpCLxe8fX1c+Xv/H6d3+H3+1efP3bh4eHhtUK/uq4+k4R1H+j9N95/b34HPDw8vD3e/YP44Ra3X5kEen9YyW9dvo+Hh4f3Ud49qVdq5+UyHh4e3v/lTRLAfWrpNTvw8PDwPsVLgq4G2jug3iEe6LXg4eHhxbzqAOwvvF6c7+Hh4eENpup5kkjGYHkZnSeJh2jx8PDwFnjV0VQyoOq1IapHlh8NHh4e3javGm4y/u81ZMuMq2YuHh4e3lFe79/+6vpUNKYKRl/lZi4eHh7eMu/UylTvQd/jPdwBDw8Pb41XDW7e0q0uLjSbFHh4eHhv4W0/uKupaDIkw8PDw9vgTQC9cnwSehWJh4eHt8FLfi1ZIEiWA3rDtt4wDA8PD2+bl6+lJolhsjLVO+KH1QE8PDy8BV51OWDSrp03hQv3wcPDw1vmVR/9SXFcTQDJJ/MEhoeHh7fHywdgSUDVtkLCaC434OHh4S3wJtckDeSrWmf/AHh4eHhz3qm2bC8N9D5TGKHh4eHhvYVXfdwnPz01SCsvE+Dh4eEt8M62Hu55CWmyRoCHh4f3KV4SYq+MztPMPEXh4eHhvYeXrwJM2hOTpm0OxsPDw9vjnR1fVYvjeQO3MADDw8PDeyMvL3nz4JIjmKSlVzXP4OHh4Y1XrE6B523fV/FqtnHx8PDwjq4O5E2KapGdHO6oOYKHh4e3wJtUob1A8+NIGJNDxMPDw5vweskgXy+o1vjVxPBQjuPh4eGt8fLSNh/8V8GTA2p2VvDw8PCWedVBV3Vg1iujH2LDw8PD+8O85IHeWzLIh2SjkhoPDw+vyMubEUmgk4ZFdZng4Q54eHh4C7zJAGz+xb3CerKYhYeHhzfgfQNnMDXKfYnJ8AAAAABJRU5ErkJggg==" alt="微信分享二维码">
-</div>
-
-
-    
-    <!-- main-js -->
-<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
-<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
-<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
-<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
-
-<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
-
-<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
-<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
-
-<!-- third-party -->
-
-
-
-
-
-
-<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
-<script type="text/javascript">
-	var search_path = "search.xml";
-	if (search_path.length === 0) {
-		search_path = "search.xml";
-	}
-	var path = "/" + search_path;
-	searchFunc(path, "local-search-input", "local-search-result");
-</script>
-
-
-
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-    
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
     
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
 
 
 
-
-    <!-- mathjax config similar to math.stackexchange -->
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-            processEscapes: true,
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-
-
-
-    <script>
-    (function() {
-        var OriginTitile = document.title, titleTime;
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                document.title = '死鬼去哪里了！';
-                clearTimeout(titleTime);
-            } else {
-                document.title = '(つェ⊂)咦!又好了!';
-                titleTime = setTimeout(function() {
-                    document.title = OriginTitile;
-                },2000);
-            }
-        });
-    })();
-</script>
-
-
-
-
-
-    
+  </div>
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
-
 <script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>

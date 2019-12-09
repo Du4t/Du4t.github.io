@@ -1,226 +1,165 @@
 <!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
-    <meta charset="utf-8">
-    
-    
-    <title>攻防世界PWN新手练习区WP | Du4t的博客 | Du4t~~~~</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    
-    <meta name="keywords" content="WP">
-    <link rel="shortcut icon" href="/img/favicon.ico">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
-    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
-    
-    <script type="text/javascript">
-        // Data Center
-        var DC = {
-            reward:	false,
-            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
-            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
-            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
-            d: JSON.parse('{"app_id":null}')
-        };
-    </script>
-    <script type="text/javascript">
-        window.lazyScripts=[];
-    </script>
-    
+  <meta charset="utf-8">
+  
+
+  
+  <title>攻防世界PWN新手练习区WP | Du4t的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果  CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息发现无壳 但是存在Canary保护和NX保护                                                   这里先讲一下什么是Canary保护Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调">
+<meta name="keywords" content="WP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="攻防世界PWN新手练习区WP">
+<meta property="og:url" content="http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/index.html">
+<meta property="og:site_name" content="Du4t的博客">
+<meta property="og:description" content="近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果  CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息发现无壳 但是存在Canary保护和NX保护                                                   这里先讲一下什么是Canary保护Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928185721986.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928190438694.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928190855410.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928191119916.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190928205109233.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png">
+<meta property="og:updated_time" content="2019-11-12T12:06:52.425Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="攻防世界PWN新手练习区WP">
+<meta name="twitter:description" content="近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果  CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息发现无壳 但是存在Canary保护和NX保护                                                   这里先讲一下什么是Canary保护Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+  
+    <link rel="alternate" href="/atom.xml" title="Du4t的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-
-
 <body>
-    <div id="loading" class="active"></div>
 
-    <aside id="menu" class>
-  <div class="inner flex-row-vertical">
-    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
-        <i class="icon icon-lg icon-close"></i>
-    </a>
-    <div class="brand-wrap">
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Du4t的博客</a>
+      </h1>
       
-      <img src="/img/brand.jpg" class="brand-bg">
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Du4t~~~~</a>
+        </h2>
       
-      <div class="brand">
-        <a href="/" class="avatar waves-effect waves-circle waves-light">
-          <img src="/img/100.jpg">
-        </a>
-        <hgroup class="introduce">
-          <h5 class="nickname">Du4t</h5>
-          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
-            
-              <span>6</span>
-            
-              <span>1</span>
-            
-              <span>0</span>
-            
-              <span>1</span>
-            
-              <span>0</span>
-            
-              <span>9</span>
-            
-              <span>6</span>
-            
-              <span>1</span>
-            
-              <span>5</span>
-            
-              <span>@</span>
-            
-              <span>q</span>
-            
-              <span>q</span>
-            
-              <span>.</span>
-            
-              <span>c</span>
-            
-              <span>o</span>
-            
-              <span>m</span>
-            
-          </a>
-        </hgroup>
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
         
-        <ul class="menu-link">
-          
-              <li>
-                <a href="https://github.com/Du4t" target="_blank">
-                  <i class="icon icon-lg icon-github"></i>
-                </a>
-              </li>
-            
-        </ul>
+          <a class="main-nav-link" href="/">Home</a>
         
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit"></button><input type="hidden" name="sitesearch" value="http://Du4t.github.io"></form>
       </div>
     </div>
-    <div class="scroll-wrap flex-col">
-      <ul class="nav">
-        
-            <li class>
-              <a href="/">
-                <i class="icon icon-lg icon-home"></i>
-                HOME
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/categories">
-                <i class="icon icon-lg icon-th-list"></i>
-                CATEGORIES
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/tags">
-                <i class="icon icon-lg icon-tags"></i>
-                TAGS
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/archives">
-                <i class="icon icon-lg icon-archives"></i>
-                ARCHIVES
-              </a>
-            </li>
-        
-      </ul>
-    </div>
   </div>
-</aside>
-
-    <main id="main">
-        <header class="top-header" id="header">
-    <div class="flex-row clearfix">
-        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
-          <i class="icon icon-lg icon-navicon"></i>
-        </a>
-        <div class="flex-col header-title ellipsis">
-            <span>攻防世界PWN新手练习区WP</span>
-            
-        </div>
-        
-        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
-            <i class="icon icon-lg icon-search"></i>
-        </a>
-        
-    </div>
 </header>
-<header class="content-header post-header">
-    <img src="/img/banner.jpg" class="header-bg">
-    <div class="container fade-scale">
-        <h1 class="title">攻防世界PWN新手练习区WP</h1>
-        <h5 class="subtitle">
-            
-                <time datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished" class="page-time">
-  2019-10-08
-</time>
-
-
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/WP/">WP</a></li></ul>
-
-            
-        </h5>
-        
-    </div>
+      <div class="outer">
+        <section id="main"><article id="post-攻防世界PWN新手练习区WP" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" class="article-date">
+  <time datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished">2019-10-08</time>
+</a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/WP/">WP</a>
+  </div>
 
-</header>
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      攻防世界PWN新手练习区WP
+    </h1>
+  
 
-<div id="site_search">
-    <div class="search-title clearfix">
-        <span class="pull-left">
-          <i class="icon icon-lg icon-search"></i>
-        </span>
-        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
-        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
-          <i class="icon icon-lg icon-close"></i>
-        </a>
-    </div>
-    <div id="local-search-result"></div>
-</div>
-
-
-<div class="container body-wrap">
-    <article id="post-攻防世界PWN新手练习区WP" class="post-article article-type-post" itemprop="blogPost">
-    <div class="post-card">
-        <h1 class="post-card-title">攻防世界PWN新手练习区WP</h1>
-        <div class="post-meta">
-            <time class="post-time" title="2019-10-08 20:17:25" datetime="2019-10-08T12:17:25.000Z" itemprop="datePublished">2019-10-08</time>
-
-            
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/WP/">WP</a></li></ul>
-
-
-
-            
-
-            
-
-
-            
-        </div>
-        <div class="post-content" id="post-content" itemprop="postContent">
-            
-            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
 <blockquote>
 <p>近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果</p>
 </blockquote>
 <h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 
 <blockquote>
 <p>这里先讲一下什么是Canary保护<br>Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调用函数的时候 会在栈中压入一个随机Canary值 在函数结束的时候程序会判断Canary值是否发生变动 如果发生变动就认为是程序遭到了攻击 程序直接异常退出 Canary值通常和函数返回地址在栈中相连 主要是防护攻击者更改程序返回地址来执行shellcode<br>这里我们直接拿本题做例子</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>可以明确看到程序现在在存储Canary值 我们在数据下硬件读写断点 然后让程序跑起来
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928185721986.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt title class>
                 <p></p>
             </figure>这里在函数末尾取出Canary值 如果与刚开始的值不一致 执行stack_chk_fail函数 
 <p>对于如何绕过Canary保护 基本思路是利用各种漏洞 先泄漏出来Canary的地址 然后取出值 等溢出过后再还原 当然具体如何利用还得就题论题</p>
@@ -230,22 +169,22 @@
 </blockquote>
 <p>回到本题 先随便执行下 就是输入用户名和留言 然后程序原样打印出来</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190438694.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt title class>
                 <p></p>
             </figure>
 <p>没什么世纪大发现 那就常规操作 载入IDA吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 <p>发现程序存在格式化字符串漏洞 然后理解下程序逻辑 简单来说就是将pwnme变量的值更改为8就能拿到flag了 双击pwnme看一下 发现pwnme变量还是一个在bss段的全局变量 那基本思路已经有了</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928190855410.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt title class>
                 <p></p>
             </figure>
 <p>解法基本就是通过格式化字符串漏洞更改pwnme的值了 那第一步就是测试程序的回显位了 这里我的回显位是在第十位</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191119916.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt title class>
                 <p></p>
             </figure>
 <p>那基本信息获取的差不多了 就可以开始编写脚本了</p>
@@ -261,30 +200,30 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>执行脚本即可</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 <p>得到flag:cyberpeace{bb8c9af83fb8e8913ed25c1d5cc41751}</p>
 <h2 id="when-did-you-born"><a href="#when-did-you-born" class="headerlink" title="when_did_you_born"></a>when_did_you_born</h2><p>照例 日常开局…</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 <p>跑一下 没啥思路 直接载入IDA吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 <p>简单理解下 就是程序要求变量v5的值最后为1926 而程序开始的输入不允许输入1926…初看是自相矛盾的..话说哪道Pwn题给的初始条件不是自相矛盾的… 在代码中发现gets函数..因为gets函数不会限制输入的字符个数 初步怀疑是栈溢出 双击v4查看程序栈图</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 <p>没跑了 栈溢出 直接开始写脚本吧</p>
 <blockquote>
 <p>这里解释下为什么程序开启了Canary保护依然可以使用栈溢出漏洞 这是因为Canary保护主要是防护函数的返回地址不被篡改的 从这里程序的栈图就能看出 Canary值的变量名就是var_8 如果我们切换到汇编窗口 就能看到最后的校验使用的就是这个var_8变量</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 </blockquote>
@@ -300,25 +239,25 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>执行即可 </p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://img-blog.csdnimg.cn/20190928205109233.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt title class>
                 <p></p>
             </figure>
 <p>得到flag:cyberpeace{5f65371d87fafa327d2c0d3e254cfab5}</p>
 <h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>正常起手式 查保护</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" alt title class>
                 <p></p>
             </figure>
 
 <p>就开着NX保护 载入IDA看下</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" alt title class>
                 <p></p>
             </figure>
 
 <p>简单理解下逻辑 就是判断一个程序中没有涉及到的变量 然后判断他的值 这明显就是在暗示是溢出 双击 dword_60106C看一下位置 发现是在bss段的全局变量 </p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" alt title class>
                 <p></p>
             </figure>
 
@@ -332,32 +271,32 @@ a<span class="token punctuation">.</span>sendline<span class="token punctuation"
 a<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本获得结果</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" alt title class>
                 <p></p>
             </figure>
 
 <p>得到flag:cyberpeace{57c7b3fd167ec0630431800825423de0}</p>
 <h2 id="level0"><a href="#level0" class="headerlink" title="level0"></a>level0</h2><p>老样子 先查保护 发现除了NX全关 尝试着运行下程序 连个回显都没有 啥都看不出来 载入IDA</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" alt title class>
                 <p></p>
             </figure>
 
 <p>发现主函数空空如也 有点头疼</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" alt title class>
                 <p></p>
             </figure>
 
 <p>但是发现在函数表中 有个敏感函数<em>callsystem</em></p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" alt title class>
                 <p></p>
             </figure>
 
 <p>菜鸡此时就有点思路了 应该是劫持返回地址 然后让程序执行到callsystem函数 那么继续在主函数跟下去</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" alt title class>
                 <p></p>
             </figure>
 
@@ -370,27 +309,27 @@ sh<span class="token punctuation">.</span>send<span class="token punctuation">(<
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本得到结果 注意 因为程序是执行了 <em>/bin/sh</em>也就是打开了个终端 需要我们自己去执行获得flag..别说了..刚开始菜鸡等了半天..</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" alt title class>
                 <p></p>
             </figure>
 
 <p>得到flag:cyberpeace{c07387d32eabb849023878563a5400ef}</p>
 <h2 id="level-2"><a href="#level-2" class="headerlink" title="level 2"></a>level 2</h2><p>习惯性起手式</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" alt title class>
                 <p></p>
             </figure>
 
 <p>一样没有开地址随机化 直接载入IDA </p>
-<p><a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png" alt></a></p>
+<p><img src="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png" alt></p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" alt title class>
                 <p></p>
             </figure>
 
 <p>本来没啥头绪 后来发现函数表中有敏感函数<em>system</em> 那大致思路形成 就是和上题差不多 但是我们在覆盖返回地址的同时 直接把栈修改成正常调用system(“/bin/sh”)的样子 同时发现在程序内存中也存有 <em>/bin/sh</em> 那开始写脚本吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" alt title class>
                 <p></p>
             </figure>
 
@@ -409,35 +348,35 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 </blockquote>
 <p>执行脚本得到结果</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" alt title class>
                 <p></p>
             </figure>
 
 <p>flag:cyberpeace{984f929f5fdae818c75ee89278e36753}</p>
 <h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>基本起手式 查保护 发现除了地址随机化 其他保护全开</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" alt title class>
                 <p></p>
             </figure>
 
 <p>先尝试着跑了一遍 发现有点像一个古董级别的RPG游戏…没啥思路</p>
 <p>那就不多说了 直接载入IDA吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" alt title class>
                 <p></p>
             </figure>
 
 <p>主函数没啥看的 主要就是泄漏了一个数组的地址 继续向sub_400D72步入</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" alt title class>
                 <p></p>
             </figure>
 
 <p>这里就是常见角色了 稍微步入看下 发现sub_400A7D函数 就是仅仅是在输出和限制我们的选择 如果想继续玩下去就得输入east 没什么好分析的 步入sub_400BB9进行分析 </p>
-<p><a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png" alt></a></p>
+<p><img src="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png" alt></p>
 <p>哦吼 看了这么久终于看见一个漏洞 先记录下来 在sub_400BB9中存在格式化字符串漏洞 但是就代码阅读到这里 还是没什么利用思路 继续向下看 终于在sub_400CA6发现关键判断</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" alt title class>
                 <p></p>
             </figure>
 
@@ -460,7 +399,7 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 </code></pre>
 <p>运行脚本 这里我的回显位是8</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" alt title class>
                 <p></p>
             </figure>
 
@@ -509,20 +448,20 @@ sh<span class="token punctuation">.</span>sendafter<span class="token punctuatio
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本得到终端 自己cat flag即可</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" alt title class>
                 <p></p>
             </figure>
 
 <p>得到flag:cyberpeace{d35672c5e758a40ea0c05f6dbbe77015}</p>
 <h2 id="guess-num"><a href="#guess-num" class="headerlink" title="guess_num"></a>guess_num</h2><p>老样子 查保护 看位数</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" alt title class>
                 <p></p>
             </figure>
 
 <p>保护开得很全… 先跑一下 先是输入名字 然后输出自己猜的数…果断GG掉了…那载入IDA吧…</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" alt title class>
                 <p></p>
             </figure>
 
@@ -535,7 +474,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>先是利用溢出 覆盖掉种子的值 从而达到控制随机数的目的 那么就开始写脚本吧 首先确定偏移地址</p>
 <p>双击v9进入栈图 我们的目的是覆盖seed的值</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" alt title class>
                 <p></p>
             </figure>
 
@@ -559,44 +498,44 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>这个脚本的关键就是如何在python中使用c的函数 我选择的解决方法是 使用ctypes库 </p>
 <p>这个库可以方便我们直接在程序中使用C的函数 但是我们首先要确定libc共享库的版本号 这里我是用的是ldd指令进行的查询<br>如果懒的话也可以通过在程序中使用elf.libc来获取</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" alt title class>
                 <p></p>
             </figure>
 </blockquote>
 <p>运行脚本即可</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" alt title class>
                 <p></p>
             </figure>
 
 <p>得到flag:cyberpeace{de6b4ebe0aab9472c1dda38729fc76ef}</p>
 <h2 id="int-overflow"><a href="#int-overflow" class="headerlink" title="int_overflow"></a>int_overflow</h2><figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png" alt title class>
                 <p></p>
             </figure>
 
 <p>先跑下 发现是一个类似登陆的系统 要求输入密码bulabula…没啥直接思路</p>
 <p>32位的程序 丢进IDA看下程序流程</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png" alt title class>
                 <p></p>
             </figure>
 
 <p>主函数还是一样的寂寞..什么有价值的都没有呢…但是在函数表里发现一个敏感函数what_is_this</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png" alt title class>
                 <p></p>
             </figure>
 
 <p>那起码能确定肯定是溢出类的题目了 最后劫持程序流向what_is_this函数</p>
 <p>跟进login函数 也没啥发现 check函数主要就是录入了用户名和密码 本来看见read函数 以为溢出点就在这里了..打开栈图一看发现覆盖不到返回地址…继续向下跟进check_passwd函数</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png" alt title class>
                 <p></p>
             </figure>
 
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png" alt title class>
                 <p></p>
             </figure>
 
@@ -620,26 +559,26 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本即可</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png" alt title class>
                 <p></p>
             </figure>
 
 <p>得到flag:cyberpeace{85f5a37cbe589f048f01f85b41e6f421}</p>
 <h2 id="cgpwn2"><a href="#cgpwn2" class="headerlink" title="cgpwn2"></a>cgpwn2</h2><p>保护</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png" alt title class>
                 <p></p>
             </figure>
 
 <p>运行程序啥都看不出来 就让输入个用户名和留言 拖入IDA吧</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png" alt title class>
                 <p></p>
             </figure>
 
 <p>主函数什么都没有 直接往下跟</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png" alt title class>
                 <p></p>
             </figure>
 
@@ -662,7 +601,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>这里解释下脚本为什么在名字部分写入/bin/sh而binaddr又是什么东西<br>因为在编写脚本的时候 我们不可能直接将字符串写入栈 让system函数去调用 需要我们提前将/bin/sh写入程序 而上面的名字录入就是一个最好的位置</p>
 <p>我们可以看一下name变量存在的位置</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png" alt title class>
                 <p></p>
             </figure>
 
@@ -670,7 +609,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 </blockquote>
 <p>执行脚本即可</p>
 <figure class="image-box">
-                <a rel="攻防世界PWN新手练习区WP" href="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png" title data-fancybox="images"><img src="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png" alt title class></a>
+                <img src="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png" alt title class>
                 <p></p>
             </figure>
 
@@ -695,274 +634,147 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             document.body.appendChild(img);
           });
       </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
-        </div>
-        
-<blockquote class="post-copyright">
-    <div class="content">
-        
-<span class="post-time">
-    最后更新时间：<time datetime="2019-11-12T12:06:52.425Z" itemprop="dateUpdated">2019-11-12 20:06:52</time>
-</span><br>
-
-
-        
-        转载注明出处，原文地址：<a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" target="_blank" rel="external">http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/</a>
-        
+      
     </div>
-    <footer>
-        <a href="http://Du4t.github.io">
-            <img src="/img/100.jpg" alt="Du4t">
-            Du4t
-        </a>
+    <footer class="article-footer">
+      <a data-url="http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" data-id="ck3y8594d000g5gvtrd10ufls" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WP/">WP</a></li></ul>
+
     </footer>
-</blockquote>
-
-        
-        <div class="post-footer">
-            
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WP/">WP</a></li></ul>
-
-            <div class="page-share-wrap">
+  </div>
+  
     
-
-<div class="page-share" id="pageShare">
-    <ul class="reset share-icons">
-      
-      <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/&title=《攻防世界PWN新手练习区WP》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
-          <i class="icon icon-weibo"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-          <i class="icon icon-weixin"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/&title=《攻防世界PWN新手练习区WP》 — Du4t的博客&source=" data-title=" QQ">
-          <i class="icon icon-qq"></i>
-        </a>
-      </li>
-      
-    </ul>
- </div>
-
-
-
-    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
-        <i class="icon icon-share-alt icon-lg"></i>
+<nav id="article-nav">
+  
+    <a href="/2019/10/11/zhan-yi-chu/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          栈溢出漏洞及利用
+        
+      </div>
     </a>
-</div>
-
-        </div>
-        
-            
-
-
-        
-    </div>
-    
-<nav class="post-nav flex-row flex-justify-between">
   
-    <div class="prev">
-      <a href="/2019/10/11/zhan-yi-chu/" id="post-prev" class="post-nav-link">
-        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
-        <h4 class="title">栈溢出漏洞及利用</h4>
-      </a>
-    </div>
   
-
-  
-    <div class="next">
-      <a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" id="post-next" class="post-nav-link">
-        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
-        <h4 class="title">格式化字符串漏洞</h4>
-      </a>
-    </div>
+    <a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">格式化字符串漏洞</div>
+    </a>
   
 </nav>
 
-
-    
-    
-        <aside class="post-widget">
-            <nav class="post-toc-wrap" id="post-toc">
-                <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CGfsb"><span class="post-toc-number">1.</span> <span class="post-toc-text">CGfsb</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#when-did-you-born"><span class="post-toc-number">2.</span> <span class="post-toc-text">when_did_you_born</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#hello-pwn"><span class="post-toc-number">3.</span> <span class="post-toc-text">hello_pwn</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level0"><span class="post-toc-number">4.</span> <span class="post-toc-text">level0</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level-2"><span class="post-toc-number">5.</span> <span class="post-toc-text">level 2</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#string"><span class="post-toc-number">6.</span> <span class="post-toc-text">string</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#guess-num"><span class="post-toc-number">7.</span> <span class="post-toc-text">guess_num</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#int-overflow"><span class="post-toc-number">8.</span> <span class="post-toc-text">int_overflow</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#cgpwn2"><span class="post-toc-number">9.</span> <span class="post-toc-text">cgpwn2</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#level-3"><span class="post-toc-number">10.</span> <span class="post-toc-text">level_3</span></a></li></ol>
-            </nav>
-            <div class="toc-bar"><div>
-        </div></div></aside>
-    
+  
 </article>
 
-
-</div>
-
-    </main>
-    <footer class="footer ">
+</section>
+        
+          <aside id="sidebar">
+  
     
-    <div class="bottom">
-        <p>
-            <span>
-                Du4t © 2019
-            </span>
-        		
-           	
-            
-            
-            <span>
-	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
-            </span>
-            
-            
-            
-
-            
-                
-<span class="site-uv" title="总访客量">
-    <i class="icon icon-user"></i>
-    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
-</span>
-
-
-<span class="site-pv" title="总访问量">
-    <i class="icon icon-eye"></i>
-    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
-</span>
-
-            
-        </p>
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Others/">Others</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/PWN/">PWN</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/RE/">RE</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/WP/">WP</a></li></ul>
     </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Others/">Others</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RE/">RE</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WP/">WP</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Others/" style="font-size: 10px;">Others</a> <a href="/tags/PWN/" style="font-size: 20px;">PWN</a> <a href="/tags/RE/" style="font-size: 10px;">RE</a> <a href="/tags/WP/" style="font-size: 15px;">WP</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/12/08/kmp-suan-fa/">KMP算法</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/07/ji-yu-mou-ctf-ti-de-ge-shi-hua-zi-fu-chuan-lou-dong-zai-xue-xi/">基于某CTF题的格式化字符串漏洞再学习</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/28/njupt-ctf/">NJUPT_CTF-WP</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/16/rop-ji-zhu/">ROP技术</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/">如何泄漏PWN中的一些信息</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      © 2019 Du4t<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
 </footer>
-
-    <div class="mask" id="mask"></div>
-<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
-
-
-
-<div class="global-share" id="globalShare">
-    <ul class="reset share-icons">
-      
-      <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/&title=《攻防世界PWN新手练习区WP》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
-          <i class="icon icon-weibo"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-          <i class="icon icon-weixin"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/&title=《攻防世界PWN新手练习区WP》 — Du4t的博客&source=" data-title=" QQ">
-          <i class="icon icon-qq"></i>
-        </a>
-      </li>
-      
-    </ul>
- </div>
-
-
-<div class="page-modal wx-share" id="wxShare">
-    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACpUlEQVR42u3aO44jMQwFwLn/pXeBjTZxz3ukZM8A1ZGD/pUMiGySX1/x8eff8f/vV8fzOcmd2zscOPDw8PBGr568bo5vlyY/P39nPDw8vNu8G8Fgs/W/OjN/Zzw8PLyfwJulwskCPQcJPDw8vN/Le378frFmC4qHh4f3KV6eLm8S8aTKuiny4uHh4b2HN2uAffb39f4eHh4e3qirvtmyZwFjNo7w8io8PDy8C7zksz8vquZDAO2dNy0xPDw8vNu8sx/8z2fOSh51MRcPDw/vKK+9eNYqy5PmTfh5+cWAh4eHd5nXbu45Ka+yJul+ck88PDy827xNGJi1yk4l0HXXDg8PD+/Q6EC01cYlhtlWnpw5DGB4eHh4h3ht275t/Ccp+OyIGm94eHh4b+HNigWzYal9aPnmz8DDw8O7wGs/8ttkty0lnBpiwMPDw7vN24wFtAMEeWlj1kJb/TN4eHh4Aa9NXtsEtx3GwsPDw/v5vCTBbTf3s42ufLygHjLAw8PDW/M2n/rDrTle1tk8AB4eHt49XpsEtw3+FtAm998EJzw8PLy389pBgfYl2mvrxhgeHh7eUd6wDR+XLWaNtH2RFw8PD+/9vOfbtc2ndmggL1jg4eHhfYqXNK42Ce6quryvB+Ph4eFd5rVbfD5e0C5cO74QBQY8PDy8NW9T/c2Hn/Ky76Y0HFWp8fDw8Na8zbY+G4fKn5g/PRoawMPDw7vAm73QBtlGsDqJx8PDw7vAO9twypPsvJGWFCzaQQc8PDy8Pe/G9r0Z0soLFlFgwMPDw7vGa5PjTTF3xh5ehYeHh/dRXhtO2v357IgYHh4e3k/jzV69HRGYDWwdCAx4eHh4AW/WfMrLBJuNPl8CPDw8vPfw2nR2VnrIC8HPTxl28PDw8PDO8P4CXIVK39T0BCEAAAAASUVORK5CYII=" alt="微信分享二维码">
-</div>
-
-
-    
-    <!-- main-js -->
-<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
-<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
-<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
-<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
-
-<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
-
-<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
-<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
-
-<!-- third-party -->
-
-
-
-
-
-
-<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
-<script type="text/javascript">
-	var search_path = "search.xml";
-	if (search_path.length === 0) {
-		search_path = "search.xml";
-	}
-	var path = "/" + search_path;
-	searchFunc(path, "local-search-input", "local-search-result");
-</script>
-
-
-
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-    
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
     
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
 
 
 
-
-    <!-- mathjax config similar to math.stackexchange -->
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-            processEscapes: true,
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-
-
-
-    <script>
-    (function() {
-        var OriginTitile = document.title, titleTime;
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                document.title = '死鬼去哪里了！';
-                clearTimeout(titleTime);
-            } else {
-                document.title = '(つェ⊂)咦!又好了!';
-                titleTime = setTimeout(function() {
-                    document.title = OriginTitile;
-                },2000);
-            }
-        });
-    })();
-</script>
-
-
-
-
-
-    
+  </div>
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
-
 <script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>

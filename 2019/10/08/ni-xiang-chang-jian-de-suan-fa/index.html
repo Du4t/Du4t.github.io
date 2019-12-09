@@ -1,215 +1,105 @@
 <!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
-    <meta charset="utf-8">
-    
-    
-    <title>逆向常见的算法 | Du4t的博客 | Du4t~~~~</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    
-    <meta name="keywords" content="RE">
-    <link rel="shortcut icon" href="/img/favicon.ico">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
-    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
-    
-    <script type="text/javascript">
-        // Data Center
-        var DC = {
-            reward:	false,
-            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
-            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
-            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
-            d: JSON.parse('{"app_id":null}')
-        };
-    </script>
-    <script type="text/javascript">
-        window.lazyScripts=[];
-    </script>
-    
+  <meta charset="utf-8">
+  
+
+  
+  <title>逆向常见的算法 | Du4t的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Base64对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节== 在重新分配完6个字节后 会在==6位字节前部补0== 将字节补成八位 也就是说 此时字节最大值为 00111111=63此时 Base64">
+<meta name="keywords" content="RE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向常见的算法">
+<meta property="og:url" content="http://Du4t.github.io/2019/10/08/ni-xiang-chang-jian-de-suan-fa/index.html">
+<meta property="og:site_name" content="Du4t的博客">
+<meta property="og:description" content="Base64对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节== 在重新分配完6个字节后 会在==6位字节前部补0== 将字节补成八位 也就是说 此时字节最大值为 00111111=63此时 Base64">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png">
+<meta property="og:updated_time" content="2019-11-12T12:07:00.153Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="逆向常见的算法">
+<meta name="twitter:description" content="Base64对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节== 在重新分配完6个字节后 会在==6位字节前部补0== 将字节补成八位 也就是说 此时字节最大值为 00111111=63此时 Base64">
+<meta name="twitter:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png">
+  
+    <link rel="alternate" href="/atom.xml" title="Du4t的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-
-
 <body>
-    <div id="loading" class="active"></div>
 
-    <aside id="menu" class>
-  <div class="inner flex-row-vertical">
-    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
-        <i class="icon icon-lg icon-close"></i>
-    </a>
-    <div class="brand-wrap">
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Du4t的博客</a>
+      </h1>
       
-      <img src="/img/brand.jpg" class="brand-bg">
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Du4t~~~~</a>
+        </h2>
       
-      <div class="brand">
-        <a href="/" class="avatar waves-effect waves-circle waves-light">
-          <img src="/img/100.jpg">
-        </a>
-        <hgroup class="introduce">
-          <h5 class="nickname">Du4t</h5>
-          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
-            
-              <span>6</span>
-            
-              <span>1</span>
-            
-              <span>0</span>
-            
-              <span>1</span>
-            
-              <span>0</span>
-            
-              <span>9</span>
-            
-              <span>6</span>
-            
-              <span>1</span>
-            
-              <span>5</span>
-            
-              <span>@</span>
-            
-              <span>q</span>
-            
-              <span>q</span>
-            
-              <span>.</span>
-            
-              <span>c</span>
-            
-              <span>o</span>
-            
-              <span>m</span>
-            
-          </a>
-        </hgroup>
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
         
-        <ul class="menu-link">
-          
-              <li>
-                <a href="https://github.com/Du4t" target="_blank">
-                  <i class="icon icon-lg icon-github"></i>
-                </a>
-              </li>
-            
-        </ul>
+          <a class="main-nav-link" href="/">Home</a>
         
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit"></button><input type="hidden" name="sitesearch" value="http://Du4t.github.io"></form>
       </div>
     </div>
-    <div class="scroll-wrap flex-col">
-      <ul class="nav">
-        
-            <li class>
-              <a href="/">
-                <i class="icon icon-lg icon-home"></i>
-                HOME
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/categories">
-                <i class="icon icon-lg icon-th-list"></i>
-                CATEGORIES
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/tags">
-                <i class="icon icon-lg icon-tags"></i>
-                TAGS
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/archives">
-                <i class="icon icon-lg icon-archives"></i>
-                ARCHIVES
-              </a>
-            </li>
-        
-      </ul>
-    </div>
   </div>
-</aside>
-
-    <main id="main">
-        <header class="top-header" id="header">
-    <div class="flex-row clearfix">
-        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
-          <i class="icon icon-lg icon-navicon"></i>
-        </a>
-        <div class="flex-col header-title ellipsis">
-            <span>逆向常见的算法</span>
-            
-        </div>
-        
-        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
-            <i class="icon icon-lg icon-search"></i>
-        </a>
-        
-    </div>
 </header>
-<header class="content-header post-header">
-    <img src="/img/banner.jpg" class="header-bg">
-    <div class="container fade-scale">
-        <h1 class="title">逆向常见的算法</h1>
-        <h5 class="subtitle">
-            
-                <time datetime="2019-10-08T12:15:25.000Z" itemprop="datePublished" class="page-time">
-  2019-10-08
-</time>
-
-
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/RE/">RE</a></li></ul>
-
-            
-        </h5>
-        
-    </div>
+      <div class="outer">
+        <section id="main"><article id="post-逆向常见的算法" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" class="article-date">
+  <time datetime="2019-10-08T12:15:25.000Z" itemprop="datePublished">2019-10-08</time>
+</a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/RE/">RE</a>
+  </div>
 
-</header>
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      逆向常见的算法
+    </h1>
+  
 
-<div id="site_search">
-    <div class="search-title clearfix">
-        <span class="pull-left">
-          <i class="icon icon-lg icon-search"></i>
-        </span>
-        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
-        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
-          <i class="icon icon-lg icon-close"></i>
-        </a>
-    </div>
-    <div id="local-search-result"></div>
-</div>
-
-
-<div class="container body-wrap">
-    <article id="post-逆向常见的算法" class="post-article article-type-post" itemprop="blogPost">
-    <div class="post-card">
-        <h1 class="post-card-title">逆向常见的算法</h1>
-        <div class="post-meta">
-            <time class="post-time" title="2019-10-08 20:15:25" datetime="2019-10-08T12:15:25.000Z" itemprop="datePublished">2019-10-08</time>
-
-            
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/RE/">RE</a></li></ul>
-
-
-
-            
-
-            
-
-
-            
-        </div>
-        <div class="post-content" id="post-content" itemprop="postContent">
-            
-            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
 
 <h2 id="Base64"><a href="#Base64" class="headerlink" title="Base64"></a>Base64</h2><pre><code>对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的
 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到</code></pre><p>Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节==</p>
 <p>在重新分配完6个字节后 会在==6位字节前部补0== 将字节补成八位 也就是说 此时字节最大值为 <em>00111111=63</em><br>此时 Base64算法会将此时的字节所代表的的十进制数作为下标来索引表中进行替换 索引表如下<br>| 编号 | 字符 | 编号 | 字符 | 编号 | 字符 | 编号 | 字符 |<br>|—-|—-|—-|—-|—-|—-|—-|—-|<br>| 0  | A  | 16 | Q  | 32 | g  | 48 | w  |<br>| 1  | B  | 17 | R  | 33 | h  | 49 | x  |<br>| 2  | C  | 18 | S  | 34 | i  | 50 | y  |<br>| 3  | D  | 19 | T  | 35 | j  | 51 | z  |<br>| 4  | E  | 20 | U  | 36 | k  | 52 | 0  |<br>| 5  | F  | 21 | V  | 37 | l  | 53 | 1  |<br>| 6  | G  | 22 | W  | 38 | m  | 54 | 2  |<br>| 7  | H  | 23 | X  | 39 | n  | 55 | 3  |<br>| 8  | I  | 24 | Y  | 40 | o  | 56 | 4  |<br>| 9  | J  | 25 | Z  | 41 | p  | 57 | 5  |<br>| 10 | K  | 26 | a  | 42 | q  | 58 | 6  |<br>| 11 | L  | 27 | b  | 43 | r  | 59 | 7  |<br>| 12 | M  | 28 | c  | 44 | s  | 60 | 8  |<br>| 13 | N  | 29 | d  | 45 | t  | 61 | 9  |<br>| 14 | O  | 30 | e  | 46 | u  | 62 |+  |<br>| 15 | P  | 31 | f  | 47 | v  | 63 |/|</p>
 <figure class="image-box">
-                <a rel="逆向常见的算法" href="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" title data-fancybox="images"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" alt title class></a>
+                <img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" alt title class>
                 <p></p>
             </figure>
 <p>Base64算法在逆向中的体现 主要就在于==程序内存中存在一个索引表==<br><em>同理 如果是Base64解密 内存中当然存在一个解密表</em></p>
@@ -395,274 +285,147 @@ void decrypt (uint32_t* v, uint32_t* k) {
             document.body.appendChild(img);
           });
       </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
-        </div>
-        
-<blockquote class="post-copyright">
-    <div class="content">
-        
-<span class="post-time">
-    最后更新时间：<time datetime="2019-11-12T12:07:00.153Z" itemprop="dateUpdated">2019-11-12 20:07:00</time>
-</span><br>
-
-
-        
-        转载注明出处，原文地址：<a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" target="_blank" rel="external">http://Du4t.github.io/2019/10/08/ni-xiang-chang-jian-de-suan-fa/</a>
-        
+      
     </div>
-    <footer>
-        <a href="http://Du4t.github.io">
-            <img src="/img/100.jpg" alt="Du4t">
-            Du4t
-        </a>
+    <footer class="article-footer">
+      <a data-url="http://Du4t.github.io/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" data-id="ck3y8594g000j5gvtn5ecpatp" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RE/">RE</a></li></ul>
+
     </footer>
-</blockquote>
-
-        
-        <div class="post-footer">
-            
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RE/">RE</a></li></ul>
-
-            <div class="page-share-wrap">
+  </div>
+  
     
-
-<div class="page-share" id="pageShare">
-    <ul class="reset share-icons">
-      
-      <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/ni-xiang-chang-jian-de-suan-fa/&title=《逆向常见的算法》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
-          <i class="icon icon-weibo"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-          <i class="icon icon-weixin"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/ni-xiang-chang-jian-de-suan-fa/&title=《逆向常见的算法》 — Du4t的博客&source=" data-title=" QQ">
-          <i class="icon icon-qq"></i>
-        </a>
-      </li>
-      
-    </ul>
- </div>
-
-
-
-    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
-        <i class="icon icon-share-alt icon-lg"></i>
+<nav id="article-nav">
+  
+    <a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          格式化字符串漏洞
+        
+      </div>
     </a>
-</div>
-
-        </div>
-        
-            
-
-
-        
-    </div>
-    
-<nav class="post-nav flex-row flex-justify-between">
   
-    <div class="prev">
-      <a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" id="post-prev" class="post-nav-link">
-        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
-        <h4 class="title">格式化字符串漏洞</h4>
-      </a>
-    </div>
   
-
-  
-    <div class="next">
-      <a href="/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/" id="post-next" class="post-nav-link">
-        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
-        <h4 class="title">使用Hexo配合Github搭建自己的博客</h4>
-      </a>
-    </div>
+    <a href="/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">使用Hexo配合Github搭建自己的博客</div>
+    </a>
   
 </nav>
 
-
-    
-    
-        <aside class="post-widget">
-            <nav class="post-toc-wrap" id="post-toc">
-                <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Base64"><span class="post-toc-number">1.</span> <span class="post-toc-text">Base64</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Tea"><span class="post-toc-number">2.</span> <span class="post-toc-text">Tea</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MD5"><span class="post-toc-number">3.</span> <span class="post-toc-text">MD5</span></a></li></ol>
-            </nav>
-            <div class="toc-bar"><div>
-        </div></div></aside>
-    
+  
 </article>
 
-
-</div>
-
-    </main>
-    <footer class="footer ">
+</section>
+        
+          <aside id="sidebar">
+  
     
-    <div class="bottom">
-        <p>
-            <span>
-                Du4t © 2019
-            </span>
-        		
-           	
-            
-            
-            <span>
-	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
-            </span>
-            
-            
-            
-
-            
-                
-<span class="site-uv" title="总访客量">
-    <i class="icon icon-user"></i>
-    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
-</span>
-
-
-<span class="site-pv" title="总访问量">
-    <i class="icon icon-eye"></i>
-    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
-</span>
-
-            
-        </p>
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Others/">Others</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/PWN/">PWN</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/RE/">RE</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/WP/">WP</a></li></ul>
     </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Others/">Others</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RE/">RE</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WP/">WP</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Others/" style="font-size: 10px;">Others</a> <a href="/tags/PWN/" style="font-size: 20px;">PWN</a> <a href="/tags/RE/" style="font-size: 10px;">RE</a> <a href="/tags/WP/" style="font-size: 15px;">WP</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/12/08/kmp-suan-fa/">KMP算法</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/07/ji-yu-mou-ctf-ti-de-ge-shi-hua-zi-fu-chuan-lou-dong-zai-xue-xi/">基于某CTF题的格式化字符串漏洞再学习</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/28/njupt-ctf/">NJUPT_CTF-WP</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/16/rop-ji-zhu/">ROP技术</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/">如何泄漏PWN中的一些信息</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      © 2019 Du4t<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
 </footer>
-
-    <div class="mask" id="mask"></div>
-<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
-
-
-
-<div class="global-share" id="globalShare">
-    <ul class="reset share-icons">
-      
-      <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/ni-xiang-chang-jian-de-suan-fa/&title=《逆向常见的算法》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
-          <i class="icon icon-weibo"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-          <i class="icon icon-weixin"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/ni-xiang-chang-jian-de-suan-fa/&title=《逆向常见的算法》 — Du4t的博客&source=" data-title=" QQ">
-          <i class="icon icon-qq"></i>
-        </a>
-      </li>
-      
-    </ul>
- </div>
-
-
-<div class="page-modal wx-share" id="wxShare">
-    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACx0lEQVR42u3awW7bMBAE0Pz/T7dA0UOB1PLMLtkE6NPJUGSKTwHE9Sw/PuLjx6/j8+c/z3y+Jv/W5+N5DocPPDw8vNHUn2/z6sbJt159fsa0I7wcDQ8PD+8aLxk6QSZn8ivzZebleTw8PLwv5SWk2WNKymU8PDy8/4f3XIInGDw8PLzvyctjhdnNkighfxxXshY8PDy8rrs0bIB91ed/1N/Dw8PDK7vq7SKRj5BEFZt5/h4BDw8P7wJvE622Lf+2LG5L5OIXAx4eHt6C9/wi3rSm8sVgHwG//Mfg4eHhXeDNFoZkA9YmVkhK6mcYHh4e3m1ejmk3HMwC4rZtFs0NDw8P7xBv9TziflP70k8WqiiwwMPDw7vAm90gD1jbzVt5wZ2X3Xh4eHg3eG2A277080Uov2OCxMPDw7vBm02ofU23gexm4flLGIGHh4d3lNc2t2a/9PMNWG1APFz38PDw8Na8WQsqb2JtNiJsrsTDw8O7wcsj2n0x3Zbss+XkZRiBh4eHd4j3XM7mYesmRc7PDJtqeHh4eEd5yYRmk0ge3L4cfzMCHh4e3gXerGU124bVbhRox3kzEzw8PLxDvHYZiFLh2Yt707XLN13h4eHhrXnJcHk80R5t9DB7NHh4eHhneW2Zm7+aN62ynBTl03h4eHhHee2mgdli0JbsM/CbrQN4eHh4h3jtFqvZkpAA8oihjnHx8PDwrvHa1n7bvjq1KaGIJPDw8PAu8GZNrFNRbzty3mBb9ejw8PDwHnmzltUsrt0U0/kDelNS4+Hh4a15m9vst1u1xfHZ5QQPDw9vw5ttjWrb/O3U86L8zeKEh4eHd423uX1ejrdT3Dfe8PDw8L6WVzfvj4YXwy0OeHh4eN+A1/61DVjzhxWV/nh4eHjXeGfDiOT6KEoIiuyopMbDw8M7ymsj13YxSJaftlW26ubh4eHhzXk/ARA/sYYYm6LbAAAAAElFTkSuQmCC" alt="微信分享二维码">
-</div>
-
-
-    
-    <!-- main-js -->
-<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
-<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
-<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
-<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
-
-<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
-
-<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
-<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
-
-<!-- third-party -->
-
-
-
-
-
-
-<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
-<script type="text/javascript">
-	var search_path = "search.xml";
-	if (search_path.length === 0) {
-		search_path = "search.xml";
-	}
-	var path = "/" + search_path;
-	searchFunc(path, "local-search-input", "local-search-result");
-</script>
-
-
-
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-    
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
     
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
 
 
 
-
-    <!-- mathjax config similar to math.stackexchange -->
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-            processEscapes: true,
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-
-
-
-    <script>
-    (function() {
-        var OriginTitile = document.title, titleTime;
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                document.title = '死鬼去哪里了！';
-                clearTimeout(titleTime);
-            } else {
-                document.title = '(つェ⊂)咦!又好了!';
-                titleTime = setTimeout(function() {
-                    document.title = OriginTitile;
-                },2000);
-            }
-        });
-    })();
-</script>
-
-
-
-
-
-    
+  </div>
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
-
 <script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>

@@ -1,209 +1,111 @@
 <!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0">
-    <meta charset="utf-8">
-    
-    
-    <title>格式化字符串漏洞 | Du4t的博客 | Du4t~~~~</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    
-    <meta name="keywords" content="PWN">
-    <link rel="shortcut icon" href="/img/favicon.ico">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css">
-    <link rel="stylesheet" href="/css/style.css?v=1.4.4">
-    
-    <script type="text/javascript">
-        // Data Center
-        var DC = {
-            reward:	false,
-            lv: JSON.parse('{"enable":false,"app_id":null,"app_key":null,"icon":true}'),
-            v: JSON.parse('{"enable":false,"appid":null,"appkey":null,"notify":true,"verify":true,"placeholder":"give me some sugers plz...","avatar":"wavatar"}'),
-            g: JSON.parse('{"enable":false,"lazy":true,"owner":"Du4t","repo":"gitment","oauth":{"client_id":null,"client_secret":null},"perPage":10}'),
-            d: JSON.parse('{"app_id":null}')
-        };
-    </script>
-    <script type="text/javascript">
-        window.lazyScripts=[];
-    </script>
-    
+  <meta charset="utf-8">
+  
+
+  
+  <title>格式化字符串漏洞 | Du4t的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="漏洞成因对于正常且安全的使用==printf函数==是这样操作的 #include   int main(void) {     int n=5;     printf("%d",n);     return 0; }但是偏偏有些懒人喜欢偷懒 少打两个字写成这样子 #include   int main(void) {     char a[]="qwerdf";     printf(a);">
+<meta name="keywords" content="PWN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="格式化字符串漏洞">
+<meta property="og:url" content="http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/index.html">
+<meta property="og:site_name" content="Du4t的博客">
+<meta property="og:description" content="漏洞成因对于正常且安全的使用==printf函数==是这样操作的 #include   int main(void) {     int n=5;     printf("%d",n);     return 0; }但是偏偏有些懒人喜欢偷懒 少打两个字写成这样子 #include   int main(void) {     char a[]="qwerdf";     printf(a);">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190923195130178.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190923212726366.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190923213014599.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2019092321331572.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190924181656618.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2019092418190293.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2019092418215847.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190924182308483.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190924184625528.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-11-12T12:07:07.188Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="格式化字符串漏洞">
+<meta name="twitter:description" content="漏洞成因对于正常且安全的使用==printf函数==是这样操作的 #include   int main(void) {     int n=5;     printf("%d",n);     return 0; }但是偏偏有些懒人喜欢偷懒 少打两个字写成这样子 #include   int main(void) {     char a[]="qwerdf";     printf(a);">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70">
+  
+    <link rel="alternate" href="/atom.xml" title="Du4t的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-
-
 <body>
-    <div id="loading" class="active"></div>
 
-    <aside id="menu" class>
-  <div class="inner flex-row-vertical">
-    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
-        <i class="icon icon-lg icon-close"></i>
-    </a>
-    <div class="brand-wrap">
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Du4t的博客</a>
+      </h1>
       
-      <img src="/img/brand.jpg" class="brand-bg">
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Du4t~~~~</a>
+        </h2>
       
-      <div class="brand">
-        <a href="/" class="avatar waves-effect waves-circle waves-light">
-          <img src="/img/100.jpg">
-        </a>
-        <hgroup class="introduce">
-          <h5 class="nickname">Du4t</h5>
-          <a href="mailto:610109615@qq.com" title="610109615@qq.com" class="mail">
-            
-              <span>6</span>
-            
-              <span>1</span>
-            
-              <span>0</span>
-            
-              <span>1</span>
-            
-              <span>0</span>
-            
-              <span>9</span>
-            
-              <span>6</span>
-            
-              <span>1</span>
-            
-              <span>5</span>
-            
-              <span>@</span>
-            
-              <span>q</span>
-            
-              <span>q</span>
-            
-              <span>.</span>
-            
-              <span>c</span>
-            
-              <span>o</span>
-            
-              <span>m</span>
-            
-          </a>
-        </hgroup>
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
         
-        <ul class="menu-link">
-          
-              <li>
-                <a href="https://github.com/Du4t" target="_blank">
-                  <i class="icon icon-lg icon-github"></i>
-                </a>
-              </li>
-            
-        </ul>
+          <a class="main-nav-link" href="/">Home</a>
         
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit"></button><input type="hidden" name="sitesearch" value="http://Du4t.github.io"></form>
       </div>
     </div>
-    <div class="scroll-wrap flex-col">
-      <ul class="nav">
-        
-            <li class>
-              <a href="/">
-                <i class="icon icon-lg icon-home"></i>
-                HOME
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/categories">
-                <i class="icon icon-lg icon-th-list"></i>
-                CATEGORIES
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/tags">
-                <i class="icon icon-lg icon-tags"></i>
-                TAGS
-              </a>
-            </li>
-        
-            <li class>
-              <a href="/archives">
-                <i class="icon icon-lg icon-archives"></i>
-                ARCHIVES
-              </a>
-            </li>
-        
-      </ul>
-    </div>
   </div>
-</aside>
-
-    <main id="main">
-        <header class="top-header" id="header">
-    <div class="flex-row clearfix">
-        <a href="javascript:;" class="header-icon pull-left waves-effect waves-circle waves-light on" id="menu-toggle">
-          <i class="icon icon-lg icon-navicon"></i>
-        </a>
-        <div class="flex-col header-title ellipsis">
-            <span>格式化字符串漏洞</span>
-            
-        </div>
-        
-        <a href="javascript:;" id="site_search_btn" class="header-icon pull-right waves-effect waves-circle waves-light">
-            <i class="icon icon-lg icon-search"></i>
-        </a>
-        
-    </div>
 </header>
-<header class="content-header post-header">
-    <img src="/img/banner.jpg" class="header-bg">
-    <div class="container fade-scale">
-        <h1 class="title">格式化字符串漏洞</h1>
-        <h5 class="subtitle">
-            
-                <time datetime="2019-10-08T12:16:25.000Z" itemprop="datePublished" class="page-time">
-  2019-10-08
-</time>
-
-
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PWN/">PWN</a></li></ul>
-
-            
-        </h5>
-        
-    </div>
+      <div class="outer">
+        <section id="main"><article id="post-格式化字符串漏洞" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" class="article-date">
+  <time datetime="2019-10-08T12:16:25.000Z" itemprop="datePublished">2019-10-08</time>
+</a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/PWN/">PWN</a>
+  </div>
 
-</header>
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      格式化字符串漏洞
+    </h1>
+  
 
-<div id="site_search">
-    <div class="search-title clearfix">
-        <span class="pull-left">
-          <i class="icon icon-lg icon-search"></i>
-        </span>
-        <input type="text" id="local-search-input" name="q" results="0" placeholder="search my blog..." class="form-control pull-left">
-        <a href="javascript:;" class="close pull-right waves-effect waves-circle waves-light">
-          <i class="icon icon-lg icon-close"></i>
-        </a>
-    </div>
-    <div id="local-search-result"></div>
-</div>
-
-
-<div class="container body-wrap">
-    <article id="post-格式化字符串漏洞" class="post-article article-type-post" itemprop="blogPost">
-    <div class="post-card">
-        <h1 class="post-card-title">格式化字符串漏洞</h1>
-        <div class="post-meta">
-            <time class="post-time" title="2019-10-08 20:16:25" datetime="2019-10-08T12:16:25.000Z" itemprop="datePublished">2019-10-08</time>
-
-            
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/PWN/">PWN</a></li></ul>
-
-
-
-            
-
-            
-
-
-            
-        </div>
-        <div class="post-content" id="post-content" itemprop="postContent">
-            
-            <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
 <h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>对于正常且安全的使用==printf函数==是这样操作的</p>
 <pre><code>#include <stdio.h>
 
@@ -226,7 +128,7 @@ int main(void)
 </blockquote>
 <p>但是由于函数调用的关系 实参和形参结合的顺序是从左向右结合的 所以函数这样写也是可以正常输出的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>以上代码 本身没有什么问题 但是如果用户可以控制输入的话 就会造成一些意想不到的结果
 
@@ -238,12 +140,12 @@ int main(void)
     printf(a);
     return 0;
  } </stdio.h></code></pre><figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 <p>我们可以通过测试发现 程序输出了一些奇怪的输出 我们载入x32dbg查看下 程序到底输出的是什么<br>通过观察栈中 我们发现 其实程序输出的就是栈中的数据</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923195130178.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt title class>
                 <p></p>
             </figure>
 <p>造成这种结果的原因是 因为我们输入的%x 在我们用不安全的方式调用printf函数的时候 没有明确表示出哪里的参数是空缺的 这就会造成系统自动从左往右进行匹配 我们输入的%x 又正好是在 “格式化字符串” 这个参数内 系统就会将他当成默认的%x来进行输出</p>
@@ -272,7 +174,7 @@ int main(int argc,char **argv)
     return 0;
 }</string.h></stdio.h></code></pre><p>在这里我们是直接将flag数组的地址直接输出出来 相当于泄露了关键字符串的地址吧…<br>因为==所有的局部变量都是存放在栈中的== 首先第一步就是需要遍历栈中数据找到输入的数据 以达到后面控制输入变量的目的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923212726366.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt title class>
                 <p></p>
             </figure>这里发现栈中数据的第九位正好就是我们输入的数据 为了方便查看 也可以使用以下方式来查看第n位的回显
 
@@ -280,12 +182,12 @@ int main(int argc,char **argv)
 <p>%< Number >$ formot string<br>注意此方法仅适用于Linux系统 且在命令行中使用需要转义$</p>
 </blockquote>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190923213014599.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt title class>
                 <p></p>
             </figure>
 <p>在这里就可以控制输入的参数 将输入改为flag字符串的地址 同时根据上面所提过的 将%08x更改为%s直接读取到flag字符串具体的值</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092321331572.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt title class>
                 <p></p>
             </figure>
 <p>根据以上操作 如果条件允许的话 就可以做到任意内存读取</p>
@@ -307,21 +209,21 @@ int main(int argc,char **argv)
     return 0;
 }</string.h></stdio.h></code></pre><p>首先运行一次程序 可以得知静态变量b的地址 然后尝试查看回显位 这里我的回显位是第十位</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924181656618.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt title class>
                 <p></p>
             </figure>尝试在运行程序时 使用printf写入地址
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418190293.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt title class>
                 <p></p>
             </figure>
 <p>此时就可以使用之前介绍过的 格式说明符%n了 %n将他自身前字符的个数 赋值给地址为0x5655700c的静态变量b 以达到修改内存中值的目的</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/2019092418215847.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt title class>
                 <p></p>
             </figure>
 <p>同样的 如果我们想将b的值修改的更大 只需要在 ‘%10$n’ 前增加对应数量的0即可 </p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924182308483.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt title class>
                 <p></p>
             </figure>
 <h2 id="格式化字符串的应用"><a href="#格式化字符串的应用" class="headerlink" title="格式化字符串的应用"></a>格式化字符串的应用</h2><blockquote>
@@ -329,12 +231,12 @@ int main(int argc,char **argv)
 </blockquote>
 <p>首先载入IDA 通过阅读源码 发现关键判断 只要pwnme变量等于8 就能输出flag 同时发现程序崔仔格式化字符串漏洞 这里的条件和上面模块的条件类似</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 <p>双击pwnme变量 查看pwnme的具体地址 在得知了具体地址后 我们就可以开始写脚本了</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924184625528.png" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt title class>
                 <p></p>
             </figure>
 
@@ -409,7 +311,7 @@ sh.send(pwnme+"0000%10$n")
 #程序持续运行
 sh.interactive()</code></pre><p>运行脚本 得到flag</p>
 <figure class="image-box">
-                <a rel="格式化字符串漏洞" href="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" title data-fancybox="images"><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class></a>
+                <img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
                 <p></p>
             </figure>
 
@@ -432,274 +334,147 @@ sh.interactive()</code></pre><p>运行脚本 得到flag</p>
             document.body.appendChild(img);
           });
       </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
-        </div>
-        
-<blockquote class="post-copyright">
-    <div class="content">
-        
-<span class="post-time">
-    最后更新时间：<time datetime="2019-11-12T12:07:07.188Z" itemprop="dateUpdated">2019-11-12 20:07:07</time>
-</span><br>
-
-
-        
-        转载注明出处，原文地址：<a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" target="_blank" rel="external">http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/</a>
-        
+      
     </div>
-    <footer>
-        <a href="http://Du4t.github.io">
-            <img src="/img/100.jpg" alt="Du4t">
-            Du4t
-        </a>
+    <footer class="article-footer">
+      <a data-url="http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/" data-id="ck3y8594l000r5gvt5s8xzfvm" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
+
     </footer>
-</blockquote>
-
-        
-        <div class="post-footer">
-            
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PWN/">PWN</a></li></ul>
-
-            <div class="page-share-wrap">
+  </div>
+  
     
-
-<div class="page-share" id="pageShare">
-    <ul class="reset share-icons">
-      
-      <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/&title=《格式化字符串漏洞》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
-          <i class="icon icon-weibo"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-          <i class="icon icon-weixin"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/&title=《格式化字符串漏洞》 — Du4t的博客&source=" data-title=" QQ">
-          <i class="icon icon-qq"></i>
-        </a>
-      </li>
-      
-    </ul>
- </div>
-
-
-
-    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
-        <i class="icon icon-share-alt icon-lg"></i>
+<nav id="article-nav">
+  
+    <a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          攻防世界PWN新手练习区WP
+        
+      </div>
     </a>
-</div>
-
-        </div>
-        
-            
-
-
-        
-    </div>
-    
-<nav class="post-nav flex-row flex-justify-between">
   
-    <div class="prev">
-      <a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/" id="post-prev" class="post-nav-link">
-        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
-        <h4 class="title">攻防世界PWN新手练习区WP</h4>
-      </a>
-    </div>
   
-
-  
-    <div class="next">
-      <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" id="post-next" class="post-nav-link">
-        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
-        <h4 class="title">逆向常见的算法</h4>
-      </a>
-    </div>
+    <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">逆向常见的算法</div>
+    </a>
   
 </nav>
 
-
-    
-    
-        <aside class="post-widget">
-            <nav class="post-toc-wrap" id="post-toc">
-                <strong>目录</strong>
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#漏洞成因"><span class="post-toc-number">1.</span> <span class="post-toc-text">漏洞成因</span></a></li></ol><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#内存读取"><span class="post-toc-number"></span> <span class="post-toc-text">内存读取</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#内存修改"><span class="post-toc-number"></span> <span class="post-toc-text">内存修改</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#格式化字符串的应用"><span class="post-toc-number"></span> <span class="post-toc-text">格式化字符串的应用</span></a>
-            </li></nav>
-            <div class="toc-bar"><div>
-        </div></div></aside>
-    
+  
 </article>
 
-
-</div>
-
-    </main>
-    <footer class="footer ">
+</section>
+        
+          <aside id="sidebar">
+  
     
-    <div class="bottom">
-        <p>
-            <span>
-                Du4t © 2019
-            </span>
-        		
-           	
-            
-            
-            <span>
-	            Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/codefine/hexo-theme-mellow" target="_blank">mellow</a>
-            </span>
-            
-            
-            
-
-            
-                
-<span class="site-uv" title="总访客量">
-    <i class="icon icon-user"></i>
-    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
-</span>
-
-
-<span class="site-pv" title="总访问量">
-    <i class="icon icon-eye"></i>
-    <i class="busuanzi-value" id="busuanzi_value_site_pv"></i>
-</span>
-
-            
-        </p>
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Others/">Others</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/PWN/">PWN</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/RE/">RE</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/WP/">WP</a></li></ul>
     </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Others/">Others</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PWN/">PWN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RE/">RE</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WP/">WP</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Others/" style="font-size: 10px;">Others</a> <a href="/tags/PWN/" style="font-size: 20px;">PWN</a> <a href="/tags/RE/" style="font-size: 10px;">RE</a> <a href="/tags/WP/" style="font-size: 15px;">WP</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/12/08/kmp-suan-fa/">KMP算法</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/07/ji-yu-mou-ctf-ti-de-ge-shi-hua-zi-fu-chuan-lou-dong-zai-xue-xi/">基于某CTF题的格式化字符串漏洞再学习</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/28/njupt-ctf/">NJUPT_CTF-WP</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/16/rop-ji-zhu/">ROP技术</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/">如何泄漏PWN中的一些信息</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      © 2019 Du4t<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
 </footer>
-
-    <div class="mask" id="mask"></div>
-<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
-
-
-
-<div class="global-share" id="globalShare">
-    <ul class="reset share-icons">
-      
-      <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/&title=《格式化字符串漏洞》 — Du4t的博客&pic=http://Du4t.github.io/img/100.jpg" data-title="微博">
-          <i class="icon icon-weibo"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-          <i class="icon icon-weixin"></i>
-        </a>
-      </li>
-      
-      <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://Du4t.github.io/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/&title=《格式化字符串漏洞》 — Du4t的博客&source=" data-title=" QQ">
-          <i class="icon icon-qq"></i>
-        </a>
-      </li>
-      
-    </ul>
- </div>
-
-
-<div class="page-modal wx-share" id="wxShare">
-    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACpElEQVR42u3aMXIjMQwEQP3/077ksiutZwBSp6A3ckkil82AoAG8XvHz8+Zpf/k86vnzd7858ODh4eEdWvq/U7+DtZ88z5y8JR+Fh4eHd4+XH8r5FiSBpJ2/DjB4eHh4X8DLkftj/cDVHA8PD+8LeMlC2/ln78XDw8P7v7xZ+rUFz5beXt/x8PDwbvPyKtL3/H2lvoeHh4e3rqrP0gTPb9knGorV4uHh4V3g5QduW8TKR+WtBsN14uHh4R3lPQ/bBIzNgZ6X1n5J5uLh4eFd4CWLmAWP/XYkpbIDiQk8PDy8o4nanJof6Hko2mwlHh4e3j3e5sLaHvebjVsVwPDw8PCu8Z6RbTm/bdJqy2ZRCQ0PDw/vg7x86e1G7JOzRboEDw8P7wKvPcSfX3aqmSAfVWdZ8PDw8A7x9oWoPCQk384u1lHrAB4eHt6aN2tyaheXX8eT437YU4aHh4d3gTdLy+bFsNnGtQ0ERbzCw8PDG/FmB3EeDIpkQbmS/PKNh4eHd483Sy601M1b2sQuHh4e3g1e3jCa8DZJjU2gejsKDw8P7wIvn3rWBDBrvUrmLK7UeHh4eBd4bZk/CQ9JqjcPOTmv2F08PDy8Na9F5p+0Za1TLQh4eHh4n+G1S8zbDlrwT/n8kqXGw8PDu8DLy1ftNTqv4ycrGTZd4eHh4V3gtamE9ujPGbNUMh4eHt7neXmQ2Kdo9yGhSObi4eHhHeVt/uFPrs6bRW8u33+/xcPDw7vAO9yxNZohuaznAex1dnF4eHh4wYs3Ra99o0AehJIEMR4eHt5t3qwANvv9xQiGh4eH9/W8HJlg8rFFOhgPDw/vC3ibEzgPG5sWBDw8PLzP8DaF/3zpySYeblrFw8PDu8Br/6Nvj/L6ElwW3g6kM/Dw8PBS3h+ryA0Bx3Yh4wAAAABJRU5ErkJggg==" alt="微信分享二维码">
-</div>
-
-
-    
-    <!-- main-js -->
-<script type="text/javascript" src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
-<script type="text/javascript" src="/js/plugins/fastclick.js?v=1.4.4"></script>
-<script type="text/javascript" src="/js/plugins/ios-orientationchange-fix.js?v=1.4.4"></script>
-<script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js"></script>
-
-<script type="text/javascript" src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
-
-<script type="text/javascript" src="/js/method.js?v=1.4.4"></script>
-<script type="text/javascript" src="/js/blog.js?v=1.4.4"></script>
-
-<!-- third-party -->
-
-
-
-
-
-
-<script type="text/javascript" src="/js/plugins/local_search.js?v=1.4.4"></script>
-<script type="text/javascript">
-	var search_path = "search.xml";
-	if (search_path.length === 0) {
-		search_path = "search.xml";
-	}
-	var path = "/" + search_path;
-	searchFunc(path, "local-search-input", "local-search-result");
-</script>
-
-
-
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-    
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
     
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
 
 
 
-
-    <!-- mathjax config similar to math.stackexchange -->
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-            processEscapes: true,
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-
-
-
-    <script>
-    (function() {
-        var OriginTitile = document.title, titleTime;
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                document.title = '死鬼去哪里了！';
-                clearTimeout(titleTime);
-            } else {
-                document.title = '(つェ⊂)咦!又好了!';
-                titleTime = setTimeout(function() {
-                    document.title = OriginTitile;
-                },2000);
-            }
-        });
-    })();
-</script>
-
-
-
-
-
-    
+  </div>
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
-
 <script type="text/javascript" charset="utf-8" src="/js/lazyload-plugin/lazyload.intersectionObserver.min.js"></script></body></html>
