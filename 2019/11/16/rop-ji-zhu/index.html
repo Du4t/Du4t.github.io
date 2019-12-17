@@ -492,17 +492,9 @@ ROP存在的价值就是 当我">
 <p>(作用同上 但是这个ROP链适用于64位程序)</p>
 <p>其中的函数名是可以换的 直接替换成适合的函数即可</p>
 <h2 id="样例-攻防世界-进阶区-pwn100"><a href="#样例-攻防世界-进阶区-pwn100" class="headerlink" title="样例(攻防世界-进阶区-pwn100)"></a>样例(攻防世界-进阶区-pwn100)</h2><p>首先万年雷同起手式</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H565de1b3314e48eca5841b813a4afb464.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H565de1b3314e48eca5841b813a4afb464.png" alt></p>
 <p>拖入IDA 发现程序主要的逻辑就是读入200个字符 然后结束 发现在读入时存在栈溢出 程序仅执行一次且程序函数表没有system函数 此时考虑使用ROP</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H1fdd1e71e864469287ddbf46bf091747K.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H1fdd1e71e864469287ddbf46bf091747K.png" alt></p>
 <p>通过观察函数表 发现程序使用过puts函数 决定使用puts函数作为基础 使用ROP技术</p>
 <p>首先因为是64位程序 我们需要将参数puts_got给整到寄存器RDI中 这样才能正常调用 这是我使用的是ROPgadget 这个工具来查找适合的函数 </p>
 <p><img src="https://ae01.alicdn.com/kf/H7408932667ab43bda5577052e025cb3at.png" alt></p>
@@ -550,22 +542,12 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre>
 <p>执行即可getshell</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H26596ab1eb714c7cb3f943d21e85d677o.png" alt title class>
-                <p></p>
-            </figure>
-
-
+<p><img src="https://ae01.alicdn.com/kf/H26596ab1eb714c7cb3f943d21e85d677o.png" alt></p>
 <h2 id="样例-攻防世界-进阶区-welpwn"><a href="#样例-攻防世界-进阶区-welpwn" class="headerlink" title="样例(攻防世界-进阶区-welpwn)"></a>样例(攻防世界-进阶区-welpwn)</h2><blockquote>
 <p>第一次看见这个标题的时候以为是pwn的入门题..果然被骗了！</p>
 </blockquote>
 <p>老样子 先正常起手式</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hf1a8a25607ca499fae38283b4a04d3dfO.png" alt title class>
-                <p></p>
-            </figure>
-
-
+<p><img src="https://ae01.alicdn.com/kf/Hf1a8a25607ca499fae38283b4a04d3dfO.png" alt></p>
 <p>载入IDA 发现特别迷幻的地方 似乎整个程序都没有洞… 尝试动态调试下吧</p>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -803,13 +785,11 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
                         
                             hello_pwn提示 Do you know pwntools? 直接用pwntools 连上去就出flag
 
-                
-                
-            
+pwn_me_100_years (I)查保护
 
+拖入IDA 
 
-
-pwn_me_100_ye
+简单解释下逻辑 就是当0x6010c0地址处的值等于0x66
                         
                     </div>
                     <div class="publish-info">
@@ -1007,7 +987,7 @@ putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">17.7k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">19.5k</span> 字
             
             
             

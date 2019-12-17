@@ -480,11 +480,7 @@ Base64对于Base64来说 是我们通常比较常见的加密算法 通常是应
 <h2 id="Base64"><a href="#Base64" class="headerlink" title="Base64"></a>Base64</h2><pre><code>对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的
 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到</code></pre><p>Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节==</p>
 <p>在重新分配完6个字节后 会在==6位字节前部补0== 将字节补成八位 也就是说 此时字节最大值为 <em>00111111=63</em><br>此时 Base64算法会将此时的字节所代表的的十进制数作为下标来索引表中进行替换 索引表如下<br>| 编号 | 字符 | 编号 | 字符 | 编号 | 字符 | 编号 | 字符 |<br>|—-|—-|—-|—-|—-|—-|—-|—-|<br>| 0  | A  | 16 | Q  | 32 | g  | 48 | w  |<br>| 1  | B  | 17 | R  | 33 | h  | 49 | x  |<br>| 2  | C  | 18 | S  | 34 | i  | 50 | y  |<br>| 3  | D  | 19 | T  | 35 | j  | 51 | z  |<br>| 4  | E  | 20 | U  | 36 | k  | 52 | 0  |<br>| 5  | F  | 21 | V  | 37 | l  | 53 | 1  |<br>| 6  | G  | 22 | W  | 38 | m  | 54 | 2  |<br>| 7  | H  | 23 | X  | 39 | n  | 55 | 3  |<br>| 8  | I  | 24 | Y  | 40 | o  | 56 | 4  |<br>| 9  | J  | 25 | Z  | 41 | p  | 57 | 5  |<br>| 10 | K  | 26 | a  | 42 | q  | 58 | 6  |<br>| 11 | L  | 27 | b  | 43 | r  | 59 | 7  |<br>| 12 | M  | 28 | c  | 44 | s  | 60 | 8  |<br>| 13 | N  | 29 | d  | 45 | t  | 61 | 9  |<br>| 14 | O  | 30 | e  | 46 | u  | 62 |+  |<br>| 15 | P  | 31 | f  | 47 | v  | 63 |/|</p>
-<figure class="image-box">
-                <img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" alt title class>
-                <p></p>
-            </figure>
-<p>Base64算法在逆向中的体现 主要就在于==程序内存中存在一个索引表==<br><em>同理 如果是Base64解密 内存中当然存在一个解密表</em></p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" alt><br>Base64算法在逆向中的体现 主要就在于==程序内存中存在一个索引表==<br><em>同理 如果是Base64解密 内存中当然存在一个解密表</em></p>
 <p>并且在程序算法中存在明显的 右移2位和右移4位等明显位运算操作<br><em>同理 如果是Base64解密 应该存在左移2位和左移4位等明显的位运算操作</em></p>
 <p>但是注意 Base64是可以设计变种的 即更改索引表来实现变种加密 后续还是需要自己实现下Base64加密的算法 以达到就算是更改了索引表依旧能成功解密的水平</p>
 <p>具体算法设计可以查看<br><strong><a href="https://www.jianshu.com/p/61833e529cfc" target="_blank" rel="noopener">https://www.jianshu.com/p/61833e529cfc</a></strong></p>
@@ -1095,7 +1091,7 @@ git version
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">17.7k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">19.5k</span> 字
             
             
             

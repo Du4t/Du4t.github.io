@@ -518,6 +518,53 @@ $(function () {
             
             <div class="article col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
+                    <a href="/2019/12/15/uaf/">
+                        <div class="card-image">
+                            
+                            
+                            <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="UAF漏洞生成原理及利用">
+                            
+                            <span class="card-title">UAF漏洞生成原理及利用</span>
+                        </div>
+                    </a>
+
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                UAF漏洞生成原因UAF漏洞全称为Use After Free 从字面意思上都能理解是在程序Free掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-15
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/PWN/" class="post-category">
+                                    PWN
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/PWN/">
+                            <span class="chip bg-color">PWN</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="article col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
                     <a href="/2019/12/08/kmp-suan-fa/">
                         <div class="card-image">
                             
@@ -624,13 +671,11 @@ int main(void)
                             
                                 hello_pwn提示 Do you know pwntools? 直接用pwntools 连上去就出flag
 
-                
-                
-            
+pwn_me_100_years (I)查保护
 
+拖入IDA 
 
-
-pwn_me_100_ye
+简单解释下逻辑 就是当0x6010c0地址处的值等于0x66
                             
                         </div>
                         <div class="publish-info">
@@ -777,13 +822,11 @@ putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注
                         <div class="summary block-with-text">
                             
                                 逆向BabyXor
-                
-                
-            
-
 有壳 且没有检测出具体壳的种类 使用ESP定律手动脱壳 
 
-已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有f
+已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有flag
+
+得到flag{2378b077-7d6e-4564-bdca-7eec8eede9a2
                             
                         </div>
                         <div class="publish-info">
@@ -885,8 +928,7 @@ putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注
 
 CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息发现无壳 但是存在Canary保护和NX保护
 
-                
-   
+这里先讲一下什么是Canary保护Can
                             
                         </div>
                         <div class="publish-info">
@@ -974,56 +1016,6 @@ int main(void)
                 </div>
             </div>
             
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2019/10/08/ni-xiang-chang-jian-de-suan-fa/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="逆向常见的算法">
-                            
-                            <span class="card-title">逆向常见的算法</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                
-
-Base64对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的
-菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到Base64算法通俗的来讲就是 ==将3个8位字节转
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-10-08
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/RE/" class="post-category">
-                                    RE
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/RE/">
-                            <span class="chip bg-color">RE</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-            
         </div>
     </article>
 
@@ -1065,7 +1057,7 @@ Base64对于Base64来说 是我们通常比较常见的加密算法 通常是应
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">17.7k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">19.5k</span> 字
             
             
             

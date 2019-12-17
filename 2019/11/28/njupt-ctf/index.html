@@ -3,13 +3,11 @@
     <meta name="keywords" content="NJUPT_CTF-WP, Du4t~~~~">
     <meta name="description" content="hello_pwn提示 Do you know pwntools? 直接用pwntools 连上去就出flag
 
-                
-                
-            
+pwn_me_100_years (I)查保护
 
+拖入IDA 
 
-
-pwn_me_100_ye">
+简单解释下逻辑 就是当0x6010c0地址处的值等于0x66">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -481,19 +479,9 @@ pwn_me_100_ye">
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>提示 <code>Do you know pwntools?</code> 直接用pwntools 连上去就出flag</p>
-<figure class="image-box">
-                <img src="https://img02.sogoucdn.com/app/a/100520146/bcfa23648c0d59da32c0ba8b6cdabb1b" alt title class>
-                <p></p>
-            </figure>
-
-
-
+<p><img src="https://img02.sogoucdn.com/app/a/100520146/bcfa23648c0d59da32c0ba8b6cdabb1b" alt></p>
 <h2 id="pwn-me-100-years-I"><a href="#pwn-me-100-years-I" class="headerlink" title="pwn_me_100_years (I)"></a>pwn_me_100_years (I)</h2><p>查保护</p>
-<figure class="image-box">
-                <img src="https://img02.sogoucdn.com/app/a/100520146/8b83de84ae8ec07b01a461bfc7746ceb" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://img02.sogoucdn.com/app/a/100520146/8b83de84ae8ec07b01a461bfc7746ceb" alt></p>
 <p>拖入IDA </p>
 <p><img src="https://img02.sogoucdn.com/app/a/100520146/fd12eb6966aaf380b23c0e35c74436b3" alt></p>
 <p>简单解释下逻辑 就是当0x6010c0地址处的值等于0x66666666时 程序将打开一个shell 程序前面只有一个read 双击s1 发现s1是和0x6010c0相邻 </p>
@@ -510,17 +498,9 @@ payload<span class="token operator">=</span><span class="token string">'yes'</sp
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行即可getshell</p>
-<figure class="image-box">
-                <img src="https://img04.sogoucdn.com/app/a/100520146/a10722822f0bbdb83531695cc2cb811f" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://img04.sogoucdn.com/app/a/100520146/a10722822f0bbdb83531695cc2cb811f" alt></p>
 <h2 id="warm-up"><a href="#warm-up" class="headerlink" title="warm_up"></a>warm_up</h2><p>查保护</p>
-<figure class="image-box">
-                <img src="https://img04.sogoucdn.com/app/a/100520146/638a24772c7f4f3ef3f36972c873eaca" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://img04.sogoucdn.com/app/a/100520146/638a24772c7f4f3ef3f36972c873eaca" alt></p>
 <p>载入IDA 发现程序加了白名单 禁止掉了execve 那肯定就不能开个shell了 只能使用orw[open,read,write] 来读取flag了 </p>
 <p><img src="https://img03.sogoucdn.com/app/a/100520146/68b021fd58cf57e6109016f479acacef" alt></p>
 <p>这里明显存在栈溢出 那么就是正常rop的流程 肯定还是要先泄漏出来canary的值和libc版本 然后使用mprotect函数 使bss段可执行 再将open(“./flag”) read(3,bss_addr,0x100) write(1,bss_addr,0x100) 写到bss段上 最后跳转执行即可 脚本如下</p>
@@ -1029,7 +1009,7 @@ ROP存在的价值就是 当我
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">17.7k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">19.5k</span> 字
             
             
             

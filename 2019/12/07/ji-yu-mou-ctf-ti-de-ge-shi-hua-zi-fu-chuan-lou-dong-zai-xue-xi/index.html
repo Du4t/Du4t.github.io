@@ -493,11 +493,7 @@ int main(void)
 </blockquote>
 <p>俗话说的好..最危险的漏洞其实是人..格式化字符串漏洞的出现就是因为某些懒人程序员 在使用printf函数不规范造成的 </p>
 <p>正常来说 printf函数的使用方法是 <code>printf("格式化字符串",变量)</code> 但是如果程序员懒得写格式化字符串 直接写变量的话 程序也是可以正常运行的 没有什么太大的问题 但是当 输入变量可控和一个懒人程序员遇到一起 擦出爱情的火花 就会造成以下这种结果</p>
-<figure class="image-box">
-                <img src="https://ftp.bmp.ovh/imgs/2019/12/8cb6b8c99f50e4da.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/8cb6b8c99f50e4da.png" alt></p>
 <p>哦吼…明明用户输入的是一串%p 但是为什么输出的是一堆十六进制数据??这就是格式化字符串漏洞造成的结果 </p>
 <p>我们可以使用动态调试 将程序载入GDB 具体的来看下 这一连串的十六进制数据到底是个什么玩意 </p>
 <p><img src="https://ftp.bmp.ovh/imgs/2019/12/5887ce81ff381f29.png" alt></p>
@@ -525,11 +521,7 @@ int main(void)
 <p>编译时 请关闭PIE保护</p>
 </blockquote>
 <p>检查保护发现除了PIE之外保护都有 我们可以通过测试偏移发现 关于格式化字符串本身的偏移是6</p>
-<figure class="image-box">
-                <img src="https://ftp.bmp.ovh/imgs/2019/12/89ea68a9e780454e.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/89ea68a9e780454e.png" alt></p>
 <p>通过GDB和IDA配合调试 发现在栈中我们的输入的格式化字符串跟Canary值之间的偏移是152个字节 转化过来就是19个参数 也就是说 如果我们输入的格式化字符串是<code>%19$p</code> 程序输出的就是Canary的值 然后发现程序有一个 <code>read(0,a,0x200)</code> 此处存在栈溢出</p>
 <p>那么我们在已经获得了Canary值的情况下就可以随意的进行栈溢出 将返回地址改为shell函数的地址 这样就能Getshell了</p>
 <p>实现脚本如下</p>
@@ -546,11 +538,7 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行即可 Getshell</p>
-<figure class="image-box">
-                <img src="https://ftp.bmp.ovh/imgs/2019/12/aec1de95faffd1a6.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/aec1de95faffd1a6.png" alt></p>
 <p>但是利用格式化绕过Canary保护只有这一种办法么?? 要知道 根据格式化字符串的不同 程序是可以做出不同的响应的 其中最为重要的就是<code>%n</code><br>这个格式化字符串是可以将一个指定地址的值更改为 他之前的字符数</p>
 <p>举例来说 <code>1324%n</code> 就是将值改为4</p>
 <p>那么我们或许根本就不需要栈溢出就可以更改返回地址了???</p>
@@ -607,11 +595,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>同上个模块一样 首先我们还是要算出格式化字符串相对于返回地址 在栈中的偏移 首先可以通过程序直接测出程序内部格式化字符串的偏移8个参数</p>
 <p>首先需要明确一点的是 如果需要修改返回地址 就需要获得起码一个指向返回地址的指针 听起来可能有点绕 换种说法来讲就是 需要一个地址 那个地址里存放的是返回地址的值(也就是返回地址的老家23333) </p>
 <p>那么通过动态调试 我们发现有一个指针</p>
-<figure class="image-box">
-                <img src="https://ftp.bmp.ovh/imgs/2019/12/719cfd99297b2f41.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/719cfd99297b2f41.png" alt></p>
 <p>该指针指向的地址一直和返回地址的差0xE0 也就是说 我们可以先获取到该指针的值 然后减去0XE0 就可以得到指向返回地址的指针 然后通过该指针就可以修改返回地址的值了</p>
 <blockquote>
 <p>这里介绍一个pwntools很好用的模块 <code>fmtstr_payload</code></p>
@@ -932,13 +916,11 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
                         
                             hello_pwn提示 Do you know pwntools? 直接用pwntools 连上去就出flag
 
-                
-                
-            
+pwn_me_100_years (I)查保护
 
+拖入IDA 
 
-
-pwn_me_100_ye
+简单解释下逻辑 就是当0x6010c0地址处的值等于0x66
                         
                     </div>
                     <div class="publish-info">
@@ -1086,7 +1068,7 @@ pwn_me_100_ye
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">17.7k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">19.5k</span> 字
             
             
             

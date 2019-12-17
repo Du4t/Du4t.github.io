@@ -351,17 +351,25 @@
                 
                 
                 
-                <a href="/categories/PWN/" title="PWN: 5">
+                <a href="/categories/PWN/" title="PWN: 6">
                     <span class="chip center-align waves-effect waves-light
                              chip-default " style="background-color: #F9EBEA;">PWN
-                        <span class="tag-length">5</span>
+                        <span class="tag-length">6</span>
+                    </span>
+                </a>
+                
+                
+                <a href="/categories/Others/" title="Others: 1">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default " style="background-color: #F5EEF8;">Others
+                        <span class="tag-length">1</span>
                     </span>
                 </a>
                 
                 
                 <a href="/categories/WP/" title="WP: 3">
                     <span class="chip center-align waves-effect waves-light
-                             chip-active " style="background-color: #F5EEF8;">WP
+                             chip-active " style="background-color: #D5F5E3;">WP
                         <span class="tag-length">3</span>
                     </span>
                 </a>
@@ -369,15 +377,7 @@
                 
                 <a href="/categories/RE/" title="RE: 1">
                     <span class="chip center-align waves-effect waves-light
-                             chip-default " style="background-color: #D5F5E3;">RE
-                        <span class="tag-length">1</span>
-                    </span>
-                </a>
-                
-                
-                <a href="/categories/Others/" title="Others: 1">
-                    <span class="chip center-align waves-effect waves-light
-                             chip-default " style="background-color: #E8F8F5;">Others
+                             chip-default " style="background-color: #E8F8F5;">RE
                         <span class="tag-length">1</span>
                     </span>
                 </a>
@@ -409,13 +409,11 @@
                             
                                 hello_pwn提示 Do you know pwntools? 直接用pwntools 连上去就出flag
 
-                
-                
-            
+pwn_me_100_years (I)查保护
 
+拖入IDA 
 
-
-pwn_me_100_ye
+简单解释下逻辑 就是当0x6010c0地址处的值等于0x66
                             
                         </div>
                         <div class="publish-info">
@@ -462,13 +460,11 @@ pwn_me_100_ye
                         <div class="summary block-with-text">
                             
                                 逆向BabyXor
-                
-                
-            
-
 有壳 且没有检测出具体壳的种类 使用ESP定律手动脱壳 
 
-已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有f
+已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有flag
+
+得到flag{2378b077-7d6e-4564-bdca-7eec8eede9a2
                             
                         </div>
                         <div class="publish-info">
@@ -520,8 +516,7 @@ pwn_me_100_ye
 
 CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息发现无壳 但是存在Canary保护和NX保护
 
-                
-   
+这里先讲一下什么是Canary保护Can
                             
                         </div>
                         <div class="publish-info">
@@ -570,7 +565,7 @@ CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信�
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">17.7k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">19.5k</span> 字
             
             
             

