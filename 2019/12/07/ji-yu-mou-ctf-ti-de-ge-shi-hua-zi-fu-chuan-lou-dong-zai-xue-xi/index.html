@@ -4,11 +4,10 @@
     <meta name="description" content="最近在做SWPUCTF 发现PWN题又出现了利用格式化字符串漏洞修改值 决定彻底总结下格式化字符串漏洞
 漏洞成因
 这里给出本模块的实验案例
-#include 
+#include &lt;stdio.h>
 int main(void)
 {
-   char a[100];
-   scan">
+   char a[1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -482,7 +481,7 @@ int main(void)
                 <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><p>最近在做SWPUCTF 发现PWN题又出现了利用格式化字符串漏洞修改值 决定彻底总结下格式化字符串漏洞</p>
 <h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><blockquote>
 <p>这里给出本模块的实验案例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
    <span class="token keyword">char</span> a<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
@@ -501,9 +500,9 @@ int main(void)
 <p>通过动态调试 我们可以惊奇的发现…这些十六进制的数据 都是我们输入字符以下栈内的数据 粗略一想好像单单能拿到栈内的数据好像没什么用 但是请注意一点 只要单单能拿到栈内的数据 就已经可以绕过栈溢出的天敌——Canary保护</p>
 <h2 id="格式化字符串漏洞绕过Canary保护"><a href="#格式化字符串漏洞绕过Canary保护" class="headerlink" title="格式化字符串漏洞绕过Canary保护"></a>格式化字符串漏洞绕过Canary保护</h2><blockquote>
 <p>首先给出本模块的样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><unistd.h></unistd.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><unistd.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">void</span> <span class="token function">shell</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -545,9 +544,9 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>那么我们或许根本就不需要栈溢出就可以更改返回地址了???</p>
 <h2 id="格式化字符串漏洞修改返回地址"><a href="#格式化字符串漏洞修改返回地址" class="headerlink" title="格式化字符串漏洞修改返回地址"></a>格式化字符串漏洞修改返回地址</h2><blockquote>
 <p>这里先给出本模块的样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><unistd.h></unistd.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><unistd.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">shell</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -1069,7 +1068,7 @@ pwn_me_100_years (I)查保护
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">18.4k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">20.9k</span> 字
             
             
             

