@@ -3,6 +3,92 @@
   
     
     <entry>
+      <title><![CDATA[how2heap学习笔记]]></title>
+      <url>/2020/01/23/how2heap-xue-xi-bi-ji/</url>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="fastbin-dup-into-stack"><a href="#fastbin-dup-into-stack" class="headerlink" title="fastbin_dup_into_stack"></a>fastbin_dup_into_stack</h2><blockquote>
+<p>虽然这个不是第一个项目 但是是刚刚弄懂的..就赶紧记录下来了</p>
+</blockquote>
+<p>案例源码如下</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span> size<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>a<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>b<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>c<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"a:%p\n"</span><span class="token punctuation">,</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"b:%p\n"</span><span class="token punctuation">,</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"c:%p\n"</span><span class="token punctuation">,</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"size:%p\n"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"free a\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"free b\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"free a\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    size<span class="token operator">=</span><span class="token number">0x21</span><span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span> <span class="token operator">*</span>d<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>d<span class="token operator">=</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>size<span class="token operator">-</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>e<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>f<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>g<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"d:%p\n"</span><span class="token punctuation">,</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"e:%p\n"</span><span class="token punctuation">,</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"f:%p\n"</span><span class="token punctuation">,</span>f<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"g:%p\n"</span><span class="token punctuation">,</span>g<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span></code></pre>
+<p>阅读源码可以知道 首先有一个<code>double free</code>漏洞 这样在fastbin中chuck a和chuck b的fd指针都指向彼此 这样就会形成一个死循环 无论怎么重新<code>malloc</code>申请堆块 只要size一样 申请出来的都是chuck a和chuck b且交替出现</p>
+<p>此时<code>double free</code>后fastbin中两个chuck的状态</p>
+<p><img src="https://s2.ax1x.com/2020/01/24/1V4b7Q.png" alt="1V4b7Q.png"></p>
+<p>然后将局部变量<code>size</code>的值修改为0x21也就是chuck a的size字段的值 同时重新申请chuck a然后将其fd指针覆盖为栈上的数据 因为glibc在分配内存时只会验证size字段是否符合 这样的话 如果我们继续申请堆块 那么下个堆块就应该是在栈上</p>
+<p>覆盖fd指针后</p>
+<p><a href="https://imgchr.com/i/1V5FAJ" target="_blank" rel="noopener"><img src="https://s2.ax1x.com/2020/01/24/1V5FAJ.md.png" alt="1V5FAJ.md.png"></a></p>
+<blockquote>
+<p>不是申请了chuck a么 为什么其fd指针仍然生效</p>
+<p>这是因为在fastbin中未分配的chuck b fd指针仍然指向chuck a这样chuck a在glibc看来就仍然是未分配的堆块 如上图</p>
+</blockquote>
+<p>这样操作就可以通过<code>double free</code>拿到栈上一个指针 </p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></body></html>]]></content>
+      
+        <categories>
+            
+            <category> PWN </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> PWN </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[端口扫描脚本]]></title>
       <url>/2020/01/18/duan-kou-sao-miao-jiao-ben/</url>
       <content type="html"><![CDATA[<html><head></head><body><h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>Python小工具第二弹???这次脚本终于优化了传参方式..使用了<code>optparse</code>这个库进行传参 具体的端口扫描功能实现是利用<code>socket</code>库实现的 中间排bug排的快死了..</p>

