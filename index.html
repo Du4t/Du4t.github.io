@@ -532,8 +532,7 @@ $(function () {
                         <div class="summary block-with-text">
                             
                                 堆的基础知识堆是如何分配的在内存中堆有两种分配方式 一种是mmap另外一种是brk 这两者的区别是
-mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块sizefd     BK=p->bk
-FD->bk=
+mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块size<128kb的时候 使用brk分配
                             
                         </div>
                         <div class="publish-info">
@@ -1038,7 +1037,7 @@ putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">22k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">26.4k</span> 字
             
             
             

