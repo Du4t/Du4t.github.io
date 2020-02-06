@@ -474,7 +474,7 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="简述漏洞形成"><a href="#简述漏洞形成" class="headerlink" title="简述漏洞形成"></a>简述漏洞形成</h2><blockquote>
+                <h2 id="简述漏洞形成"><a href="#简述漏洞形成" class="headerlink" title="简述漏洞形成"></a>简述漏洞形成</h2><blockquote>
 <p>想要了解栈溢出漏洞是怎么形成的首先要先了解下在汇编层面的函数调用和栈相关的知识</p>
 <p>栈的生长方向是向低地址生长 也就是压栈时数据是先放到高地址的地方<br>这里栈的概念是和数据结构中的栈一致的 即一种<strong>FILO</strong>(first in last out)的数据结构</p>
 <p>而在汇编层面上 函数调用时会进行保存现场操作 即保存函数调用前寄存器的状态 通常在进入函数体时 栈内就已经有数据了 通常的排布如下</p>
@@ -570,7 +570,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
+<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
 <p>利用格式化字符串的第一步就是需要测出内存中存储的字符串相对于参数的偏移</p>
 <p><img src="https://s2.ax1x.com/2019/10/18/KeEsiV.png" alt="KeEsiV.png"></p>
 <p>这里可以测出 在我本机的偏移是6 那么将程序载入IDA(或者动态调试 都能达到相同的目的) 可以通过汇编面板看到 Var_c就是Canary值 那么转到主函数的栈图 可以明确看到 输入的参数距离Var_c的距离是 <strong>70-c=0x64</strong> 那么输入的参数距离Canary的参数个数就为 <strong>100(0x64)/4+6=31</strong> 明确我们利用格式化子串的格式化输入为 <strong>%31$p</strong></p>
@@ -616,7 +616,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
+<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
 <p>这个就没有那么多将就 直接载入IDA 看距离 覆盖到Canary值即可</p>
 <p>脚本如下</p>
 <pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true">#coding:utf-8</span>
@@ -658,7 +658,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
             });
             document.body.appendChild(img);
           });
-      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+      </script>
             </div>
             <hr>
 
@@ -1082,7 +1082,7 @@ CGfsb首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信�
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">26.4k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">27.3k</span> 字
             
             
             

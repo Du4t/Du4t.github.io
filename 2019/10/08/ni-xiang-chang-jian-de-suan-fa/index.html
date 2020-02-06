@@ -475,7 +475,7 @@ Base64对于Base64来说 是我们通常比较常见的加密算法 通常是应
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><a id="more"></a>
+                <a id="more"></a>
 
 <h2 id="Base64"><a href="#Base64" class="headerlink" title="Base64"></a>Base64</h2><pre><code>对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的
 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到</code></pre><p>Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节==</p>
@@ -552,7 +552,16 @@ void EnBase64()
         tmp4=(a[2]&63);
         ans[i]=sy[tmp4];
         i++;
-        //cout<<"000"; } int main(void) { i="0;" enbase64(); cout<<ans; < code><!--"000";--><!--4)|((a[2]&192)--><!--4--><!--6))--><!--4--></ans;></iostream></code></pre>
+        //cout<<"000";
+    }    
+}
+
+
+int main(void)
+{
+    int i=0;
+    EnBase64();
+    cout<<ans; } < code></ans;></iostream></code></pre><code class="C">
 <h2 id="Tea"><a href="#Tea" class="headerlink" title="Tea"></a>Tea</h2><p>在密码学中，微型加密算法（Tiny Encryption Algorithm，TEA）是一种易于描述和执行的块密码，通常只需要很少的代码就可实现。其设计者是剑桥大学计算机实验室的大卫 · 惠勒与罗杰 · 尼达姆</p>
 <p>Tea的实现代码比较固定 这里给出常见Tea加密的实现代码</p>
 <pre class=" language-C"><code class="language-C">#include <stdint.h>
@@ -563,8 +572,8 @@ void encrypt (uint32_t* v, uint32_t* k) {
     uint32_t k0=k[0], k1=k[1], k2=k[2], k3=k[3];   /* cache key */
     for (i=0; i < 32; i++) {                       /* basic cycle start */
         sum += delta;
-        v0 += ((v1<<4) + k0) ^ (v1 sum) ((v1>>5) + k1);
-        v1 += ((v0<<4) + k2) ^ (v0 sum) ((v0>>5) + k3);  
+        v0 += ((v1<<4) + k0) ^ (v1 + sum) ^ ((v1>>5) + k1);
+        v1 += ((v0<<4) + k2) ^ (v0 + sum) ^ ((v0>>5) + k3);  
     }                                              /* end cycle */
     v[0]=v0; v[1]=v1;
 }
@@ -573,12 +582,13 @@ void decrypt (uint32_t* v, uint32_t* k) {
     uint32_t v0=v[0], v1=v[1], sum=0xC6EF3720, i;  /* set up */
     uint32_t delta=0x9e3779b9;                     /* a key schedule constant */
     uint32_t k0=k[0], k1=k[1], k2=k[2], k3=k[3];   /* cache key */
-    for (i=0; i<32; i++) { * basic cycle start v1 -="((v0<<4)" + k2) ^ (v0 sum) ((v0>>5) + k3);
-        v0 -= ((v1<<4) + k0) ^ (v1 sum) ((v1>>5) + k1);
+    for (i=0; i<32; i++) {                         /* basic cycle start */
+        v1 -= ((v0<<4) + k2) ^ (v0 + sum) ^ ((v0>>5) + k3);
+        v0 -= ((v1<<4) + k0) ^ (v1 + sum) ^ ((v1>>5) + k1);
         sum -= delta;                                   
     }                                              /* end cycle */
     v[0]=v0; v[1]=v1;
-}<!--4)--><!--32;--><!--4)--><!--4)--></stdint.h></code></pre>
+}</stdint.h></code></pre>
 <p>Tea加密的明显特征是 ==存在一个Image Number:0x9e3779b9== </p>
 <h2 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h2><p>MD5 消息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生出一个 128 位（16 字节）的散列值（hash value），用于确保信息传输完整一致。MD5 由美国密码学家罗纳德 · 李维斯特（Ronald Linn Rivest）设计，于 1992 年公开，用以取代 MD4 算法。这套算法的程序在 RFC 1321 中被加以规范</p>
 <p>这里给出MD5实现的伪代码</p>
@@ -644,7 +654,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
     h3 := h3 + d
     End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as little-endian)</code></pre>
 <p>MD5算法的显著特征就是 ==存在4个变量 h0=0x67452301 h1=0xefcdab89 h2=0x98badcfe h3=0x10325476==</p>
-<script>
+</code><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -662,7 +672,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
             });
             document.body.appendChild(img);
           });
-      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+      </script>
             </div>
             <hr>
 
@@ -1091,7 +1101,7 @@ git version
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">26.4k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">27.3k</span> 字
             
             
             

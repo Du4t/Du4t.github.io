@@ -472,7 +472,7 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><p>最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的学习 </p>
+                <p>最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的学习 </p>
 <h2 id="系统调用的原理"><a href="#系统调用的原理" class="headerlink" title="系统调用的原理"></a>系统调用的原理</h2><p>其实栈溢出的系统调用没有那么高大上..起码我觉得没有栈迁移高大上….栈在乱飞..想想就觉得高级…栈溢出的西永调用主要是利用了一个系统层面的中断<code>int 0x80</code> 利用<code>int 0x80</code>来使程序陷入核心 然后将参数通过寄存器传往核心 具体调用的系统函数就是由系统调用号来决定 内核的中断处理机制会根据系统调用号 然后调用响应的内核函数 也就是系统调用 而栈溢出最终目的通常都是Getshell 那么观察一下所有的系统调用号 就会发现有一个我们的老面孔<code>execve</code> 其实之前执行的<code>system('/bin/sh)</code>的真实形态执行的就是 <code>execve('/bin/sh')</code></p>
 <blockquote>
 <p>关于前20个32位系统的系统调用号如下 别问…问就是懒…</p>
@@ -524,7 +524,7 @@
             });
             document.body.appendChild(img);
           });
-      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+      </script>
             </div>
             <hr>
 
@@ -937,7 +937,7 @@
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">26.4k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">27.3k</span> 字
             
             
             

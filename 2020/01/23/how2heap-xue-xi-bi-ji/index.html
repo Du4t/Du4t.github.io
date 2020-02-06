@@ -450,14 +450,14 @@ mmap:是当申请的堆块size&gt;128kb时 使用mmap分配brk:是当申请的�
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        5.5k
+                        6.3k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="far fa-clock fa-fw"></i>阅读时长:  
-                        26 分
+                        30 分
                     </div>
                     
                 
@@ -954,6 +954,68 @@ uint64_t <span class="token operator">*</span>chunk0_ptr<span class="token punct
   <span class="token function">memcpy</span><span class="token punctuation">(</span><span class="token punctuation">(</span>p4<span class="token operator">+</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&</span>sc<span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// This bypasses stack-smash detection since it jumps over the canary</span>
 <span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdint<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>string<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
 <p>至于需要伪造两个chunk的原因是 当<code>stack_buffer_1</code>这个chunk被<code>malloc</code>的时候 会执行上述的检验流程 来检验他的<code>stack_buffer_1->bk->=stack_buffer_1</code> 所以需要伪造一个在stack_buffer_1之前的chunk来绕过检验</p>
+<h3 id="overlapping-chunks"><a href="#overlapping-chunks" class="headerlink" title="overlapping_chunks"></a>overlapping_chunks</h3><p><code>overlapping_chunks</code>是一种修改<code>unsorted bin</code>中chunk的<code>size</code>字段 以达到后续<code>malloc</code>一个大chunk的时候 造成chunk重叠 案例如下</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></span></span>
+
+<span class="token comment" spellcheck="true">// char a[10]="abc";</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span> <span class="token operator">*</span>p1<span class="token punctuation">,</span><span class="token operator">*</span>p2<span class="token punctuation">,</span><span class="token operator">*</span>p3<span class="token punctuation">,</span><span class="token operator">*</span>p4<span class="token punctuation">;</span>
+  p1<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  p2<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  p3<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x80</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">free</span><span class="token punctuation">(</span>p2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token operator">*</span><span class="token punctuation">(</span>p2<span class="token number">-1</span><span class="token punctuation">)</span><span class="token operator">=</span><span class="token number">0x1a0</span><span class="token punctuation">;</span>
+  p4<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x190</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%p\n"</span><span class="token punctuation">,</span>p2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%p~%p\n"</span><span class="token punctuation">,</span>p4<span class="token punctuation">,</span>p4<span class="token operator">+</span><span class="token number">0x190</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%p~%p\n"</span><span class="token punctuation">,</span>p3<span class="token punctuation">,</span>p3<span class="token operator">+</span><span class="token number">0x80</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>string<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<p>需要注意的是 修改<code>size</code>字段的时候 要含上p2和p3的chunk头大小 后续<code>malloc</code>的时候也是</p>
+<h3 id="overlapping-chunks-2"><a href="#overlapping-chunks-2" class="headerlink" title="overlapping_chunks_2"></a>overlapping_chunks_2</h3><h3 id="house-of-force"><a href="#house-of-force" class="headerlink" title="house_of_force"></a>house_of_force</h3><p><code>house_of_force</code>是一种通过改写<code>top chunk</code>的<code>size</code>字段 以达到欺骗<code>malloc</code>返回任意地址的chunk 因为在空闲内存的最高处 必然存在一块空闲的chunk 即为top chunk 当<code>bin</code>和<code>fastbin</code>都不能满足分配的需要时 malloc会自动从top chunk中分配一块适合的空间给用户使用 所以top chunk的size大小是会随着chunk的分配和释放而变化的 如果用户可以通过溢出等方式来控制top chunk的<code>size</code>字段 那么就可以分配一个巨大的chunk来达到任意地址写的目的 在glibc中 malloc时会对用户申请的大小和top chunk的<code>size</code>大小进行验证</p>
+<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">// 获取当前的top chunk，并计算其对应的大小</span>
+victim <span class="token operator">=</span> av<span class="token operator">-></span>top<span class="token punctuation">;</span>
+size   <span class="token operator">=</span> <span class="token function">chunksize</span><span class="token punctuation">(</span>victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 如果在分割之后，其大小仍然满足chunk的最小大小，那么就可以直接进行分割。</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>size<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>nb <span class="token operator">+</span> MINSIZE<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    remainder_size <span class="token operator">=</span> size <span class="token operator">-</span> nb<span class="token punctuation">;</span>
+    remainder      <span class="token operator">=</span> <span class="token function">chunk_at_offset</span><span class="token punctuation">(</span>victim<span class="token punctuation">,</span> nb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    av<span class="token operator">-></span>top        <span class="token operator">=</span> remainder<span class="token punctuation">;</span>
+    <span class="token function">set_head</span><span class="token punctuation">(</span>victim<span class="token punctuation">,</span> nb <span class="token operator">|</span> PREV_INUSE <span class="token operator">|</span>
+            <span class="token punctuation">(</span>av <span class="token operator">!=</span> <span class="token operator">&</span>main_arena <span class="token operator">?</span> NON_MAIN_ARENA <span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">set_head</span><span class="token punctuation">(</span>remainder<span class="token punctuation">,</span> remainder_size <span class="token operator">|</span> PREV_INUSE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">check_malloced_chunk</span><span class="token punctuation">(</span>av<span class="token punctuation">,</span> victim<span class="token punctuation">,</span> nb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span>p <span class="token operator">=</span> <span class="token function">chunk2mem</span><span class="token punctuation">(</span>victim<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alloc_perturb</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> bytes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> p<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>可以清晰的看到 如果<code>size</code>字段无限大的话 理论上用户就可以分配到无限大的chunk 也就能实现任意地址读写 因为原本样例写的过于臃肿 我自己写了一个简单版的样例来实现<code>house_of_force</code>攻击</p>
+<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdlib.h></span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><string.h></span></span>
+
+<span class="token keyword">char</span> a<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"abc"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">char</span> <span class="token operator">*</span>p1<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">long</span> <span class="token operator">*</span>top_ptr<span class="token operator">=</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span>p1<span class="token operator">+</span><span class="token number">0x18</span><span class="token punctuation">;</span>
+  <span class="token operator">*</span>top_ptr<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword">long</span> size<span class="token operator">=</span><span class="token punctuation">(</span><span class="token keyword">long</span><span class="token punctuation">)</span>a<span class="token operator">-</span><span class="token punctuation">(</span><span class="token keyword">long</span><span class="token punctuation">)</span>top_ptr<span class="token number">-0x10</span><span class="token punctuation">;</span>
+  <span class="token keyword">char</span> <span class="token operator">*</span>p2<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span>size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">char</span> <span class="token operator">*</span>p3<span class="token operator">=</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">0x10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%p\n"</span><span class="token punctuation">,</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%p\n"</span><span class="token punctuation">,</span>p3<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">// printf("%s\n",p3);</span>
+  <span class="token function">strcpy</span><span class="token punctuation">(</span>p3<span class="token punctuation">,</span><span class="token string">"bcd"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%s"</span><span class="token punctuation">,</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>string<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<p>首先<code>malloc</code>一个紧邻着top chunk的chunk 大小为0x10 那么实际上这个chunk可用的大小为0x18 因为如果两个相邻的chunk 且前方的chunk是正在使用的话 后方chunk的<code>prev_size</code>字段是无效的 且可以被前方的chunk存储数据 所以可以推算出top chunk的<code>size</code>字段的地址<code>top_ptr</code> 注意上方glibc中的源码 发现在检验<code>size</code>大小的时候是将<code>size</code>转换为了<code>unsigned long</code>那么就可以将其值设为-1 利用整数溢出 就能轻松绕过<code>size</code>检验 接下来是计算需要将top chunk的地址抬到哪个地方 以方便我们下次<code>malloc</code>时就分配到指定位置的chunk 这里size的计算公式是:<code>目标地址-top chunk地址-chunk头大小</code> 接下来就是<code>malloc(size)</code> 这个时候会把top chunk抬到合适的位置 最后直接<code>malloc</code>就可以得到指定位置的chunk 可以随意覆写</p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -1389,7 +1451,7 @@ mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆�
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">26.4k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">27.3k</span> 字
             
             
             

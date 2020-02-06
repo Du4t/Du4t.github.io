@@ -450,7 +450,7 @@
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        263
+                        267
                     </div>
                     
 
@@ -473,12 +473,12 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>Python小工具第二弹???这次脚本终于优化了传参方式..使用了<code>optparse</code>这个库进行传参 具体的端口扫描功能实现是利用<code>socket</code>库实现的 中间排bug排的快死了..</p>
+                <h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>Python小工具第二弹???这次脚本终于优化了传参方式..使用了<code>optparse</code>这个库进行传参 具体的端口扫描功能实现是利用<code>socket</code>库实现的 中间排bug排的快死了..</p>
 <h2 id="端口扫描脚本-V1-0"><a href="#端口扫描脚本-V1-0" class="headerlink" title="端口扫描脚本 V1.0"></a>端口扫描脚本 V1.0</h2><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># -*- coding: utf-8 -*-</span>
 <span class="token keyword">import</span> optparse
 <span class="token keyword">from</span> socket <span class="token keyword">import</span> <span class="token operator">*</span>
 
-parser<span class="token operator">=</span>optparse<span class="token punctuation">.</span>OptionParser<span class="token punctuation">(</span><span class="token string">'usage %prog -H <target host> -P <target port>'</span><span class="token punctuation">)</span>
+parser<span class="token operator">=</span>optparse<span class="token punctuation">.</span>OptionParser<span class="token punctuation">(</span><span class="token string">'usage %prog -H <target host=""> -P <target port="">'</span><span class="token punctuation">)</span>
 parser<span class="token punctuation">.</span>add_option<span class="token punctuation">(</span><span class="token string">'-H'</span><span class="token punctuation">,</span>dest<span class="token operator">=</span><span class="token string">'tgthost'</span><span class="token punctuation">,</span>type<span class="token operator">=</span><span class="token string">'string'</span><span class="token punctuation">,</span>help<span class="token operator">=</span><span class="token string">'target host'</span><span class="token punctuation">)</span>
 parser<span class="token punctuation">.</span>add_option<span class="token punctuation">(</span><span class="token string">'-P'</span><span class="token punctuation">,</span>dest<span class="token operator">=</span><span class="token string">'tgtport'</span><span class="token punctuation">,</span>type<span class="token operator">=</span><span class="token string">'string'</span><span class="token punctuation">,</span>help<span class="token operator">=</span><span class="token string">'target host'</span><span class="token punctuation">)</span>
 
@@ -510,7 +510,7 @@ tgtport<span class="token operator">=</span>str<span class="token punctuation">(
         <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口响应:\n"</span><span class="token operator">+</span>result<span class="token punctuation">)</span>
         con<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
     <span class="token keyword">except</span><span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口未开放"</span><span class="token punctuation">)</span></code></pre>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口未开放"</span><span class="token punctuation">)</span><span class="token operator"><</span><span class="token operator">/</span>target<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>target<span class="token operator">></span></code></pre>
 <h2 id="ToDoList"><a href="#ToDoList" class="headerlink" title="ToDoList"></a>ToDoList</h2><ul>
 <li>多线程</li>
 </ul>
@@ -532,7 +532,7 @@ tgtport<span class="token operator">=</span>str<span class="token punctuation">(
             });
             document.body.appendChild(img);
           });
-      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
+      </script>
             </div>
             <hr>
 
@@ -946,7 +946,7 @@ mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆�
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">26.4k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">27.3k</span> 字
             
             
             
