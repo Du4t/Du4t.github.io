@@ -395,25 +395,24 @@
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2020/01/23/how2heap-xue-xi-bi-ji/">
+                    <a href="/2020/02/14/ji-yu-zhan-yi-chu-de-ret2syscall-xue-xi/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="how2heap学习笔记">
+                            <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="基于栈溢出的ret2syscall学习">
                             
-                            <span class="card-title">how2heap学习笔记</span>
+                            <span class="card-title">基于栈溢出的ret2syscall学习</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                堆的基础知识堆是如何分配的在内存中堆有两种分配方式 一种是mmap另外一种是brk 这两者的区别是
-mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块size<128kb的时候 使用brk分配
+                                最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的
                             
                         </div>
                         <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-01-23
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-02-14
                             </span>
                             <span class="publish-author">
                                 
@@ -442,24 +441,26 @@ mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆�
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2020/01/12/ji-yu-zhan-yi-chu-de-ret2syscall-xue-xi/">
+                    <a href="/2020/01/23/how2heap-xue-xi-bi-ji/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="基于栈溢出的ret2syscall学习">
+                            <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="how2heap学习笔记">
                             
-                            <span class="card-title">基于栈溢出的ret2syscall学习</span>
+                            <span class="card-title">how2heap学习笔记</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的
+                                堆的基础知识堆是如何分配的在内存中堆有两种分配方式 一种是mmap另外一种是brk 这两者的区别是
+mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块size
+#include <string.h>
                             
                         </div>
                         <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-01-12
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-01-23
                             </span>
                             <span class="publish-author">
                                 
@@ -801,7 +802,7 @@ int main(void)
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">27.3k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">29k</span> 字
             
             
             

