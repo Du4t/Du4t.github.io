@@ -455,7 +455,7 @@ int main(void)
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        2k
+                        1.9k
                     </div>
                     
 
@@ -478,7 +478,7 @@ int main(void)
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>最近在做SWPUCTF 发现PWN题又出现了利用格式化字符串漏洞修改值 决定彻底总结下格式化字符串漏洞</p>
+                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><p>最近在做SWPUCTF 发现PWN题又出现了利用格式化字符串漏洞修改值 决定彻底总结下格式化字符串漏洞</p>
 <h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><blockquote>
 <p>这里给出本模块的实验案例</p>
 <pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string"><stdio.h></span></span>
@@ -489,7 +489,7 @@ int main(void)
    <span class="token function">printf</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 </blockquote>
 <p>俗话说的好..最危险的漏洞其实是人..格式化字符串漏洞的出现就是因为某些懒人程序员 在使用printf函数不规范造成的 </p>
 <p>正常来说 printf函数的使用方法是 <code>printf("格式化字符串",变量)</code> 但是如果程序员懒得写格式化字符串 直接写变量的话 程序也是可以正常运行的 没有什么太大的问题 但是当 输入变量可控和一个懒人程序员遇到一起 擦出爱情的火花 就会造成以下这种结果</p>
@@ -517,7 +517,7 @@ int main(void)
    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token function">read</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span>a<span class="token punctuation">,</span><span class="token number">0x200</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>   
-<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>unistd<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <p>编译时 请关闭PIE保护</p>
 </blockquote>
 <p>检查保护发现除了PIE之外保护都有 我们可以通过测试偏移发现 关于格式化字符串本身的偏移是6</p>
@@ -588,7 +588,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
   <span class="token punctuation">}</span>
   <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>unistd<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <p>编译请关闭PIE保护</p>
 </blockquote>
 <p>因为格式化字符串中有一个<code>%n</code>的东西 所以这个漏洞的地位就直接上升了一个档次 也就是无视栈不可执行和栈溢出保护 而直接修改返回地址</p>
@@ -658,7 +658,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
             </div>
             <hr>
 
@@ -1068,7 +1068,7 @@ pwn_me_100_years (I)查保护
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">29k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">30.4k</span> 字
             
             
             

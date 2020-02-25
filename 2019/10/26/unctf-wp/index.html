@@ -477,7 +477,7 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h2><h3 id="BabyXor"><a href="#BabyXor" class="headerlink" title="BabyXor"></a>BabyXor</h3><p><img src="https://ae01.alicdn.com/kf/H177f67923b764acd81d41f273e48f59bR.png" alt></p>
+                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h2><h3 id="BabyXor"><a href="#BabyXor" class="headerlink" title="BabyXor"></a>BabyXor</h3><p><img src="https://ae01.alicdn.com/kf/H177f67923b764acd81d41f273e48f59bR.png" alt></p>
 <p>有壳 且没有检测出具体壳的种类 使用ESP定律手动脱壳 </p>
 <p><img src="https://ae01.alicdn.com/kf/H385b1b23dcc94510bdadae87f250ec19m.png" alt></p>
 <p>已经脱掉壳了 载入dbg动态调试 单步跟几部之后发现在栈中存有flag</p>
@@ -501,7 +501,17 @@ using namespace std<span class="token punctuation">;</span>
     <span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
     <span class="token keyword">int</span> key<span class="token operator">=</span><span class="token number">0x12</span><span class="token punctuation">;</span>
     cin<span class="token operator">>></span>a2<span class="token punctuation">;</span>
-    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator"><</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token operator">=</span><span class="token string">""</span> v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"a2[i];"</span> v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"a2[i+1];"</span> v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"a2[i+2];"</span> a1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"(v5[i]^key)-6;"</span> a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"(v4[i+1]^key)+6;"</span> a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"v3[i+2]^key^6;"</span> <span class="token punctuation">}</span><span class="token operator">=</span><span class="token string">""</span> cout<span class="token operator"><<</span>a1<span class="token punctuation">;</span><span class="token operator">=</span><span class="token string">""</span> <span class="token operator"><=</span><span class="token string">""</span> code<span class="token operator">=</span><span class="token string">""</span><span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>iostream<span class="token operator">></span></code></pre><code class="c">
+    <span class="token keyword">for</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator"><</span>key<span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span>a2<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">=</span><span class="token punctuation">(</span>v5<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">6</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token punctuation">(</span>v4<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">6</span><span class="token punctuation">;</span>
+        a1<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">=</span>v3<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">^</span>key<span class="token operator">^</span><span class="token number">6</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    cout<span class="token operator"><<</span>a1<span class="token punctuation">;</span>
+ <span class="token punctuation">}</span> </code></pre>
 <p><img src="https://ae01.alicdn.com/kf/Hfc2b5deb6260419db18bf6bee9ab746cJ.png" alt></p>
 <p>得到flag:unctf{b66_6b6_66b}</p>
 <h3 id="unctf-easy-Maze"><a href="#unctf-easy-Maze" class="headerlink" title="unctf_easy_Maze"></a>unctf_easy_Maze</h3><p>从名字中就可以推测出是迷宫题 下载附件 拖进IDA</p>
@@ -551,7 +561,11 @@ using namespace std<span class="token punctuation">;</span>
     <span class="token punctuation">{</span>
         <span class="token keyword">if</span><span class="token punctuation">(</span>i<span class="token operator">%</span><span class="token number">7</span><span class="token operator">==</span><span class="token number">0</span><span class="token punctuation">)</span>
         <span class="token punctuation">{</span>
-            cout<span class="token operator"><<</span>endl<span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token operator">=</span><span class="token string">""</span> cout<span class="token operator"><<</span>mazz<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token operator">=</span><span class="token string">""</span> <span class="token punctuation">}</span><span class="token operator"><=</span><span class="token string">""</span> code<span class="token operator">=</span><span class="token string">""</span><span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>endl<span class="token punctuation">;</span><span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>iostream<span class="token operator">></span></code></pre><code class="c">
+            cout<span class="token operator"><<</span>endl<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        cout<span class="token operator"><<</span>mazz<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>    
+<span class="token punctuation">}</span></code></pre>
 <p><img src="https://ae01.alicdn.com/kf/H16a308588307444e99589e8d835d5845l.png" alt></p>
 <p>对照迷宫从(0,0)走到(6,6)即可 </p>
 <p><img src="https://ae01.alicdn.com/kf/Ha6b282e91d8346fb9ffb4d6744471271Z.png" alt></p>
@@ -699,7 +713,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
 </code></pre>
 <p><img src="https://ae01.alicdn.com/kf/H40e854236162467fadefc95cc93de3ede.png" alt></p>
 <p>得到shell </p>
-</code></code><script>
+<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -717,7 +731,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
             </div>
             <hr>
 
@@ -1133,7 +1147,7 @@ putsputs函数嘛…我们的老常客..大部分漏洞都会用到它 需要注
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">29k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">30.4k</span> 字
             
             
             

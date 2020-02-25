@@ -449,7 +449,7 @@
                     
                     <div class="info-break-policy">
                         <i class="far fa-file-word fa-fw"></i>文章字数:  
-                        1.9k
+                        1.8k
                     </div>
                     
 
@@ -472,7 +472,7 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="UAF漏洞生成原因"><a href="#UAF漏洞生成原因" class="headerlink" title="UAF漏洞生成原因"></a>UAF漏洞生成原因</h2><p>UAF漏洞全称为<code>Use After Free</code> 从字面意思上都能理解是在程序<code>Free</code>掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除逻辑方面的漏洞 讲解一下原理层面<code>UAF漏洞</code>是怎么造成的 以及造成的原理是什么</p>
+                <meta name="generator" content="Hexo 3.9.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"><h2 id="UAF漏洞生成原因"><a href="#UAF漏洞生成原因" class="headerlink" title="UAF漏洞生成原因"></a>UAF漏洞生成原因</h2><p>UAF漏洞全称为<code>Use After Free</code> 从字面意思上都能理解是在程序<code>Free</code>掉堆上的一个数据后还能继续使用 但是这并不单纯是一个函数上的漏洞 其实UAF漏洞生成的更多因素在于编程者书写代码时的逻辑漏洞 这里我们先抛除逻辑方面的漏洞 讲解一下原理层面<code>UAF漏洞</code>是怎么造成的 以及造成的原理是什么</p>
 <p>首先我们需要明确一点 应用程序在调用<code>free()</code>函数来释放一个内存块的时候 如果内存块的大小是小于256kb的时候 dlmalloc(一种内存分配器 相当于管理员)并不会立即就将内存块释放回内存 而是将内存块标记为空闲状态备用 这样做的主要目的有两种 其一是因为此时的内存块并不是位于堆的顶端 导致内存块并不能马上释放回内核 其二是为了以防程序下一次重新申请内存块的时候还要去内存中重新申请 这块内存会留下来备用 等到程序再次申请时 直接将此内存块分配给程序 提高程序执行速度</p>
 <p>当然 dlmalloc肯定不会允许程序内部空闲的内存块无限堆积 当程序内部空闲的内存块达到256kb时 dlmalloc会立即调用<code>munmap()</code>释放内存 即dlmalloc堆积内存块的最高上限为256kb 当程序申请256kb以上的内存块时 dlmalloc会调用<code>mmap()</code>向内核重新申请256kb的内存块 而不会使用堆积空闲的内存块</p>
 <p>从程序开发和执行的角度来讲 这样的机制其实并没有什么问题 毕竟这样的机制是可以提升程序的执行效率的 而且并没有什么明显的缺陷</p>
@@ -496,7 +496,7 @@
    <span class="token function">memcpy</span><span class="token punctuation">(</span>p1<span class="token punctuation">,</span><span class="token string">"world"</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"p2 addr:%p,%s\n"</span><span class="token punctuation">,</span>p2<span class="token punctuation">,</span>p2<span class="token punctuation">)</span><span class="token punctuation">;</span>
    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span class="token operator"><</span><span class="token operator">/</span>string<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdlib<span class="token punctuation">.</span>h<span class="token operator">></span><span class="token operator"><</span><span class="token operator">/</span>stdio<span class="token punctuation">.</span>h<span class="token operator">></span></code></pre>
+<span class="token punctuation">}</span></code></pre>
 <p>使用GCC编译时无需关闭任何保护 直接编译即可</p>
 </blockquote>
 <p>这个模块是通过两个小例子来验证UAF漏洞原理的正确性 看看是否free掉内存块后 依旧对其读写会对后续分配的内存块有影响和在小于256kb的情况下 重新分配内存 是否依旧是之前free掉的内存</p>
@@ -558,7 +558,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             });
             document.body.appendChild(img);
           });
-      </script>
+      </script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2d-widget-model-wanko"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script>
             </div>
             <hr>
 
@@ -962,7 +962,7 @@ sh<span class="token punctuation">.</span>interactive<span class="token punctuat
             | Theme <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
             <br>
             
-             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">29k</span> 字
+             <i class="fas fa-chart-area"></i> 站点总字数: <span class="white-color">30.4k</span> 字
             
             
             
