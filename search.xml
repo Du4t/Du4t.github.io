@@ -3,6 +3,47 @@
   
     
     <entry>
+      <title><![CDATA[SSH-PWN的起手式]]></title>
+      <url>/2020/03/30/ssh-pwn-de-qi-shou-shi/</url>
+      <content type="html"><![CDATA[<html><head></head><body><p>最近在刷BUUCTF的时候遇到了好多之前没使用过的东西 例如什么roptuil和SSH-pwn 还有什么需要在参数部分打上Payload的pwn啊…之类的 之前没学过 在这里记录一下</p>
+<h2 id="使用PWNTOOLS来进行SSH连接的PWN"><a href="#使用PWNTOOLS来进行SSH连接的PWN" class="headerlink" title="使用PWNTOOLS来进行SSH连接的PWN"></a>使用PWNTOOLS来进行SSH连接的PWN</h2><p>首先pwntools自己就支持使用ssh的方式来进行连接 连接方式为<br><code>shell=ssh(host='xxx.xxx.xxx.xxx',user='xxx',password='xxxxx',port='xxxx')</code><br>此时直接进行打开交互的话是可以如同正常ssh软件 例如XShell一样是可以操控的 如果我们需要打开PWN题的话就需要使用ssh对象<code>shell</code>来开启一个本地进程 使用<br><code>sh=shell.process("./xxxx")</code><br>来开启一个本地进程进行PWN 剩下的就和正常pwn一样了 填入payload即可 </p>
+<h2 id="使用PWNTOOLS来进行输入参数的PWN"><a href="#使用PWNTOOLS来进行输入参数的PWN" class="headerlink" title="使用PWNTOOLS来进行输入参数的PWN"></a>使用PWNTOOLS来进行输入参数的PWN</h2><p>这个也是我翻了翻文档才发现 之前例如什么<code>sh=process("./pwn")</code> 其实process()函数还有一个其他的参数 完整体的process()函数是这样的<br><code>sh=process(argv=['程序路径','参数'])</code><br>这样的话就可以实现带参的PWN了</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></body></html>]]></content>
+      
+        <categories>
+            
+            <category> PWN </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> PWN </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[DES加密算法]]></title>
       <url>/2020/03/11/des-jia-mi-suan-fa/</url>
       <content type="html"><![CDATA[<html><head></head><body><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># coding:utf-8</span>
